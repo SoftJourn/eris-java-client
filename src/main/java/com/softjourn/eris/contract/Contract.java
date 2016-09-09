@@ -3,10 +3,11 @@ package com.softjourn.eris.contract;
 
 import com.softjourn.eris.contract.response.Response;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-public interface Contract {
+public interface Contract extends Closeable, AutoCloseable {
 
     /**
      * Call contract function with passed arguments
@@ -24,6 +25,4 @@ public interface Contract {
     String subscribeToUserCall(String address, Consumer<Response> callBack);
 
     void unsubscribe(String subscriptionId);
-
-
 }

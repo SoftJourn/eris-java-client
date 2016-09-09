@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class EventHandler {
+public class EventHandler implements AutoCloseable {
 
     private static final Random random = new Random();
 
@@ -57,6 +57,11 @@ public class EventHandler {
         } catch (WebSocketException | IOException e) {
             throw new EventSubscriptionException("Can't connect via websockets to " + url, e);
         }
+    }
+
+    @Override
+    public void close() {
+        socket.disconnect();
     }
 
     public String subscribe(String eventId, Consumer<String> callBack) {

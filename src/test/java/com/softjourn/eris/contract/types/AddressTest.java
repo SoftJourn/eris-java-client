@@ -30,7 +30,7 @@ public class AddressTest extends TestCase {
 
     public void testCanRepresent() throws Exception {
         assertTrue(address.canRepresent("1111111111111111111111111111111111111111"));
-        assertFalse(address.canRepresent(1111111));
+        assertFalse(address.canRepresent("1111"));
     }
 
     public void testToString() throws Exception {

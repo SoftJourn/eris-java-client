@@ -10,12 +10,15 @@ public class Bool extends Type<Boolean> {
 
     @Override
     public Boolean formatOutput(String value) {
-        return value.equals("0000000000000000000000000000000000000000000000000000000000000001");
+        if (canRepresent(value))
+            return value.equals("0000000000000000000000000000000000000000000000000000000000000001");
+        else
+            throw new IllegalArgumentException("Type bool can't represent value " + value + " as boolean.");
     }
 
     @Override
-    public boolean canRepresent(Object value) {
-        return value instanceof Boolean;
+    public boolean canRepresent(String value) {
+        return value!= null && value.matches("0{63}[01]");
     }
 
     @Override
@@ -26,5 +29,9 @@ public class Bool extends Type<Boolean> {
     @Override
     public Class<Boolean> valueClass() {
         return Boolean.class;
+    }
+
+    public static boolean isType(String name) {
+        return name.matches("bool");
     }
 }

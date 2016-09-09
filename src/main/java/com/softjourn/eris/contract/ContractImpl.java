@@ -123,7 +123,7 @@ class ContractImpl implements Contract, Cloneable {
 
         for (int i = 0; i < args.length; i++) {
             Type type = unit.getInputs()[i].getType();
-            if (type.canRepresent(args[i])) {
+            if (type.valueClass().isInstance(args[i])) {
                 res.append(type.formatInput(args[i]));
             } else {
                 throw new IllegalArgumentException("The " + (i + 1) + "-th parameter of function " + unit.getName() +
@@ -150,4 +150,8 @@ class ContractImpl implements Contract, Cloneable {
         return contractUnits.hashCode();
     }
 
+    @Override
+    public void close() throws IOException {
+        eventHandler.close();
+    }
 }

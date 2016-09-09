@@ -30,7 +30,7 @@ public abstract class Type<T> {
      * @param value value to be checked
      * @return true if this value can be represented by this type
      */
-    public abstract boolean canRepresent(Object value);
+    public abstract boolean canRepresent(String value);
 
     /**
      * Returns name of type with length (i.e. uint256, bytes32)

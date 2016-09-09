@@ -3,7 +3,6 @@ package com.softjourn.eris.contract.types;
 import junit.framework.TestCase;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 public class UintTest extends TestCase {
 
@@ -36,12 +35,10 @@ public class UintTest extends TestCase {
     }
 
     public void testCanRepresent() throws Exception {
-        assertTrue(uint.canRepresent(5));
-        assertTrue(uint.canRepresent(new BigInteger("5")));
-        assertTrue(uint.canRepresent(new BigDecimal(5)));
-        assertTrue(uint.canRepresent("5"));
-        assertFalse(uint.canRepresent("Test"));
-        assertFalse(uint.canRepresent(new Object()));
+        assertTrue(uint.canRepresent("0000000000000000000000000000000000000000000000000000000000000005"));
+        assertTrue(uint.canRepresent("0000000000000000000000000000000000000000000000000000000000000100"));
+        assertTrue(uint.canRepresent("0000000000000000000000000000000000000000000000000000000000000064"));
+        assertFalse(uint.canRepresent("00000000000000000000000000000000000000000G000000000000000000005"));
     }
 
 }

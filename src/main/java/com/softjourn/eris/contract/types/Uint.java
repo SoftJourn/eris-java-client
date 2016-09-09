@@ -47,12 +47,8 @@ public class Uint extends Type<BigDecimal> {
     }
 
     @Override
-    public boolean canRepresent(Object value) {
-        return value instanceof BigDecimal ||
-                value instanceof BigInteger ||
-                value instanceof Integer ||
-                value instanceof Long ||
-                (value instanceof  String && canParse((String) value));
+    public boolean canRepresent(String value) {
+        return canParse(value);
     }
 
     private boolean canParse(String val) {
