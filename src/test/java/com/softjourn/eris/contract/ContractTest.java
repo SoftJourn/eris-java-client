@@ -13,12 +13,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -121,13 +122,13 @@ public class ContractTest {
 
     @Test
     public void callQuery() throws Exception {
-        assertEquals(new BigDecimal(100), contract.call("query").getReturnValue().getVal());
+        assertEquals(100L, contract.call("query").getReturnValue().getVal());
         verify(accountData, never()).getPrivKey();
     }
 
     @Test
     public void callTx() throws Exception {
-        assertEquals(true, contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", new BigDecimal(100)).getReturnValue().getVal());
+        assertEquals(true, contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", 100L).getReturnValue().getVal());
         verify(accountData, atLeastOnce()).getPrivKey();
     }
 

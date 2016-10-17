@@ -5,7 +5,6 @@ import com.softjourn.eris.contract.types.Type;
 import com.softjourn.eris.contract.types.Uint;
 import junit.framework.TestCase;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,9 +55,9 @@ public class ContractManagerTest extends TestCase {
         String EXPECTED_GET = "6D4CE63C";
         assertEquals(EXPECTED_GET, testContract.callRPCData("get"));
         String EXPECTED_SET = "60FE47B10000000000000000000000000000000000000000000000000000000000000005";
-        assertEquals(EXPECTED_SET, testContract.callRPCData("set", new BigDecimal(5)));
+        assertEquals(EXPECTED_SET, testContract.callRPCData("set", 5L));
         String EXPECTED_SEND = "D0679D3400000000000000000000000011111111111111111111111111111111111111110000000000000000000000000000000000000000000000000000000000000005";
-        assertEquals(EXPECTED_SEND, testContract.callRPCData("send", "1111111111111111111111111111111111111111",  new BigDecimal(5)));
+        assertEquals(EXPECTED_SEND, testContract.callRPCData("send", "1111111111111111111111111111111111111111", 5L));
     }
 
 

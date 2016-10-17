@@ -3,10 +3,9 @@ package com.softjourn.eris.contract.types;
 
 import com.softjourn.eris.contract.Util;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class Uint extends Type<BigDecimal> {
+public class Uint extends Type<Long> {
 
     private static final int DEFAULT_INPUT_LENGTH = 64;
 
@@ -37,18 +36,18 @@ public class Uint extends Type<BigDecimal> {
     }
 
     @Override
-    public Class<BigDecimal> valueClass() {
-        return BigDecimal.class;
+    public Class<Long> valueClass() {
+        return Long.class;
     }
 
     @Override
-    public String formatInput(BigDecimal value) {
-        return Util.leftPad(value.toBigInteger().toString(16), DEFAULT_INPUT_LENGTH, DEFAULT_PADDING_CHAR).toUpperCase();
+    public String formatInput(Long value) {
+        return Util.leftPad(BigInteger.valueOf(value).toString(16), DEFAULT_INPUT_LENGTH, DEFAULT_PADDING_CHAR).toUpperCase();
     }
 
     @Override
-    public BigDecimal formatOutput(String value) {
-        return new BigDecimal(new BigInteger(value, 16));
+    public Long formatOutput(String value) {
+        return Long.parseLong(value, 16);
     }
 
     @Override

@@ -9,17 +9,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
 
 public class ResponseParserTest {
 
-    private Response<BigDecimal> txResponse;
+    private Response<Long> txResponse;
 
-    private Response txResponseWithRetValue;
+    private Response<Long> txResponseWithRetValue;
 
-    private Response<BigDecimal> valResponse;
+    private Response<Long> valResponse;
 
     private Response errorResponse;
 
@@ -92,14 +91,14 @@ public class ResponseParserTest {
     @Before
     public void setUp() throws Exception {
         txResponse = new Response<>("", null, null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
-        txResponseWithRetValue = new Response<>("", new ReturnValue<>(BigDecimal.class, new BigDecimal(100)), null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
-        valResponse = new Response<>("", new ReturnValue<>(BigDecimal.class, new BigDecimal(100)), null, null);
+        txResponseWithRetValue = new Response<>("", new ReturnValue<>(Long.class, new Long(100)), null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
+        valResponse = new Response<>("", new ReturnValue<>(Long.class, new Long(100)), null, null);
         errorResponse = new Response<>("", null, new Error(-32603, "Error when transacting: Insuffient gas"), null);
     }
 
     @Test
     public void testParseVal() throws Exception {
-        ResponseParser<BigDecimal> parser = new ResponseParser<>(new Variable<>("x", new Uint()));
+        ResponseParser<Long> parser = new ResponseParser<>(new Variable<>("x", new Uint()));
         assertEquals(valResponse, parser.parse(valResponseString));
     }
 

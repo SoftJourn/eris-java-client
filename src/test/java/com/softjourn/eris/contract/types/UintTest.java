@@ -2,8 +2,6 @@ package com.softjourn.eris.contract.types;
 
 import junit.framework.TestCase;
 
-import java.math.BigDecimal;
-
 public class UintTest extends TestCase {
 
     Uint uint = new Uint();
@@ -23,15 +21,15 @@ public class UintTest extends TestCase {
 
     public void testFormatInput() throws Exception {
 
-        assertEquals("0000000000000000000000000000000000000000000000000000000000000005", uint.formatInput(new BigDecimal(5)));
-        assertEquals("000000000000000000000000000000000000000000000000000000000000000A", uint.formatInput(new BigDecimal(10)));
-        assertEquals("0000000000000000000000000000000000000000000000000000000000000100", uint.formatInput(new BigDecimal(256)));
+        assertEquals("0000000000000000000000000000000000000000000000000000000000000005", uint.formatInput(5L));
+        assertEquals("000000000000000000000000000000000000000000000000000000000000000A", uint.formatInput(10L));
+        assertEquals("0000000000000000000000000000000000000000000000000000000000000100", uint.formatInput(256L));
     }
 
     public void testFormatOutput() throws Exception {
-        assertEquals(new BigDecimal(5), uint.formatOutput("0000000000000000000000000000000000000000000000000000000000000005"));
-        assertEquals(new BigDecimal(10), uint.formatOutput("000000000000000000000000000000000000000000000000000000000000000A"));
-        assertEquals(new BigDecimal(256), uint.formatOutput("0000000000000000000000000000000000000000000000000000000000000100"));
+        assertEquals(new Long(5L), uint.formatOutput("0000000000000000000000000000000000000000000000000000000000000005"));
+        assertEquals(new Long(10L), uint.formatOutput("000000000000000000000000000000000000000000000000000000000000000A"));
+        assertEquals(new Long(256L), uint.formatOutput("0000000000000000000000000000000000000000000000000000000000000100"));
     }
 
     public void testCanRepresent() throws Exception {
