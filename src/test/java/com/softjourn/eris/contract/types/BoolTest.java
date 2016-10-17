@@ -61,4 +61,8 @@ public class BoolTest {
         assertFalse(Bool.isType("uint256"));
     }
 
+    @Test
+    public void testIsDynamic() throws Exception {
+        assertFalse(bool.isDynamic());
+    }
 }

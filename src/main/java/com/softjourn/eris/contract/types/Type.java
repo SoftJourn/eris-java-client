@@ -39,6 +39,12 @@ public abstract class Type<T> {
      */
     public abstract String toString();
 
+    /**
+     * @return true if this type is dynamic(has not predefined byte length like array)
+     * and else otherwise
+     */
+    public abstract boolean isDynamic();
+
     public abstract Class<T> valueClass();
 
     @SuppressWarnings("unchecked")

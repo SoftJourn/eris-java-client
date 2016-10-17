@@ -27,6 +27,11 @@ public class Bool extends Type<Boolean> {
     }
 
     @Override
+    public boolean isDynamic() {
+        return false;
+    }
+
+    @Override
     public Class<Boolean> valueClass() {
         return Boolean.class;
     }

@@ -37,4 +37,8 @@ public class AddressTest extends TestCase {
         assertEquals("address", address.toString());
     }
 
+    public void testIsDynamic() {
+        assertFalse(address.isDynamic());
+    }
+
 }

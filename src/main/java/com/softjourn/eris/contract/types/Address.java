@@ -51,6 +51,11 @@ public class Address extends Type<String> {
     }
 
     @Override
+    public boolean isDynamic() {
+        return false;
+    }
+
+    @Override
     public Class<String> valueClass() {
         return String.class;
     }

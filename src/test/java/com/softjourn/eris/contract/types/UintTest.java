@@ -41,4 +41,7 @@ public class UintTest extends TestCase {
         assertFalse(uint.canRepresent("00000000000000000000000000000000000000000G000000000000000000005"));
     }
 
+    public void testIsDynamic() throws Exception {
+        assertFalse(uint.isDynamic());
+    }
 }

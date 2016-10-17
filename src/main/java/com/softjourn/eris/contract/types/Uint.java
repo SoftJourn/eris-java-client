@@ -32,6 +32,11 @@ public class Uint extends Type<BigDecimal> {
     }
 
     @Override
+    public boolean isDynamic() {
+        return false;
+    }
+
+    @Override
     public Class<BigDecimal> valueClass() {
         return BigDecimal.class;
     }
