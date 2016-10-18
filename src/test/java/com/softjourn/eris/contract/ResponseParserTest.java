@@ -9,16 +9,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
 
 public class ResponseParserTest {
 
-    private Response<Long> txResponse;
+    private Response<BigInteger> txResponse;
 
-    private Response<Long> txResponseWithRetValue;
+    private Response<BigInteger> txResponseWithRetValue;
 
-    private Response<Long> valResponse;
+    private Response<BigInteger> valResponse;
 
     private Response errorResponse;
 
@@ -91,14 +92,14 @@ public class ResponseParserTest {
     @Before
     public void setUp() throws Exception {
         txResponse = new Response<>("", null, null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
-        txResponseWithRetValue = new Response<>("", new ReturnValue<>(Long.class, new Long(100)), null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
-        valResponse = new Response<>("", new ReturnValue<>(Long.class, new Long(100)), null, null);
+        txResponseWithRetValue = new Response<>("", new ReturnValue<>(BigInteger.class, BigInteger.valueOf(100L)), null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
+        valResponse = new Response<>("", new ReturnValue<>(BigInteger.class, BigInteger.valueOf(100L)), null, null);
         errorResponse = new Response<>("", null, new Error(-32603, "Error when transacting: Insuffient gas"), null);
     }
 
     @Test
     public void testParseVal() throws Exception {
-        ResponseParser<Long> parser = new ResponseParser<>(new Variable<>("x", new Uint()));
+        ResponseParser<BigInteger> parser = new ResponseParser<>(new Variable<>("x", new Uint()));
         assertEquals(valResponse, parser.parse(valResponseString));
     }
 

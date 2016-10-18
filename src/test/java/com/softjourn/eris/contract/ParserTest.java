@@ -5,14 +5,16 @@ import com.softjourn.eris.contract.event.EventHandler;
 import com.softjourn.eris.contract.types.Address;
 import com.softjourn.eris.contract.types.Type;
 import com.softjourn.eris.contract.types.Uint;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class ParserTest extends TestCase {
+public class ParserTest {
 
     private ContractImpl testContract;
     private ContractImpl testContract1;
@@ -20,6 +22,7 @@ public class ParserTest extends TestCase {
     EventHandler eventHandler;
     ErisAccountData account;
 
+    @Before
     public void setUp() throws Exception {
 
         eventHandler = mock(EventHandler.class);
@@ -99,7 +102,7 @@ public class ParserTest extends TestCase {
     }
 
 
-
+    @Test
     public void testParse() throws Exception {
         String TEST_DATA = "[\n" +
                 "  {\n" +
@@ -215,6 +218,119 @@ public class ParserTest extends TestCase {
                 .withChainUrl("")
                 .withContractAddress("")
                 .withCallerAccount(account)
+                .build());
+    }
+
+    @Test
+    public void testParseWithArray() throws Exception {
+        String TEST_DATA = "[\n" +
+                "  {\n" +
+                "    \"constant\": false,\n" +
+                "    \"inputs\": [\n" +
+                "      {\n" +
+                "        \"name\": \"accounts\",\n" +
+                "        \"type\": \"uint256[]\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"name\": \"amount\",\n" +
+                "        \"type\": \"uint256\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"name\": \"distribute\",\n" +
+                "    \"outputs\": [\n" +
+                "      {\n" +
+                "        \"name\": \"success\",\n" +
+                "        \"type\": \"bool\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"type\": \"function\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"constant\": true,\n" +
+                "    \"inputs\": [\n" +
+                "      {\n" +
+                "        \"name\": \"addr\",\n" +
+                "        \"type\": \"address\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"name\": \"queryBalance\",\n" +
+                "    \"outputs\": [\n" +
+                "      {\n" +
+                "        \"name\": \"balance\",\n" +
+                "        \"type\": \"uint256\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"type\": \"function\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"constant\": false,\n" +
+                "    \"inputs\": [\n" +
+                "      {\n" +
+                "        \"name\": \"owner\",\n" +
+                "        \"type\": \"address\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"name\": \"amount\",\n" +
+                "        \"type\": \"uint256\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"name\": \"mint\",\n" +
+                "    \"outputs\": [],\n" +
+                "    \"type\": \"function\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"constant\": false,\n" +
+                "    \"inputs\": [\n" +
+                "      {\n" +
+                "        \"name\": \"receiver\",\n" +
+                "        \"type\": \"address\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"name\": \"amount\",\n" +
+                "        \"type\": \"uint256\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"name\": \"send\",\n" +
+                "    \"outputs\": [\n" +
+                "      {\n" +
+                "        \"name\": \"success\",\n" +
+                "        \"type\": \"bool\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"type\": \"function\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"inputs\": [],\n" +
+                "    \"type\": \"constructor\"\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"anonymous\": false,\n" +
+                "    \"inputs\": [\n" +
+                "      {\n" +
+                "        \"indexed\": false,\n" +
+                "        \"name\": \"from\",\n" +
+                "        \"type\": \"address\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"indexed\": false,\n" +
+                "        \"name\": \"to\",\n" +
+                "        \"type\": \"address\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"indexed\": false,\n" +
+                "        \"name\": \"value\",\n" +
+                "        \"type\": \"uint256\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"name\": \"Send\",\n" +
+                "    \"type\": \"event\"\n" +
+                "  }\n" +
+                "]";
+        assertEquals(testContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
+                .withEventHandler(eventHandler)
+                .withChainUrl("")
+                .withCallerAccount(account)
+                .withContractAddress("")
                 .build());
     }
 

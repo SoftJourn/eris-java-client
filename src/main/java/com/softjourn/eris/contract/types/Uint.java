@@ -5,7 +5,7 @@ import com.softjourn.eris.contract.Util;
 
 import java.math.BigInteger;
 
-public class Uint extends Type<Long> {
+public class Uint extends Type<BigInteger> {
 
     private static final int DEFAULT_INPUT_LENGTH = 64;
 
@@ -36,18 +36,18 @@ public class Uint extends Type<Long> {
     }
 
     @Override
-    public Class<Long> valueClass() {
-        return Long.class;
+    public Class<BigInteger> valueClass() {
+        return BigInteger.class;
     }
 
     @Override
-    public String formatInput(Long value) {
-        return Util.leftPad(BigInteger.valueOf(value).toString(16), DEFAULT_INPUT_LENGTH, DEFAULT_PADDING_CHAR).toUpperCase();
+    public String formatInput(BigInteger value) {
+        return Util.leftPad(value.toString(16), DEFAULT_INPUT_LENGTH, DEFAULT_PADDING_CHAR).toUpperCase();
     }
 
     @Override
-    public Long formatOutput(String value) {
-        return Long.parseLong(value, 16);
+    public BigInteger formatOutput(String value) {
+        return new BigInteger(value, 16);
     }
 
     @Override

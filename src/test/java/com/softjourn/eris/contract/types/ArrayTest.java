@@ -2,6 +2,7 @@ package com.softjourn.eris.contract.types;
 
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 public class ArrayTest {
 
     private Array<String> addressArray = new Array<>(new Address());
-    private Array<Long> uintArray = new Array<>(new Uint());
+    private Array<BigInteger> uintArray = new Array<>(new Uint());
 
     @Test
     public void formatInput() throws Exception {
@@ -22,7 +23,7 @@ public class ArrayTest {
         assertEquals(expectedAddressArray, actualAddressArray);
 
         String expectedUintArray = "00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000F";
-        String actualUintArray = uintArray.formatInput(Arrays.asList(5L, 15L));
+        String actualUintArray = uintArray.formatInput(Arrays.asList(BigInteger.valueOf(5L), BigInteger.valueOf(15L)));
         assertEquals(expectedUintArray, actualUintArray);
     }
 
@@ -33,14 +34,14 @@ public class ArrayTest {
         assertEquals(Arrays.asList("2222222222222222222222222222222222222222", "1111111111111111111111111111111111111111"), actualAddressArray);
 
         String inputUints = "00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000F";
-        List<Long> actualUintArray = uintArray.formatOutput(inputUints);
-        assertEquals(Arrays.asList(5L, 15L), actualUintArray);
+        List<BigInteger> actualUintArray = uintArray.formatOutput(inputUints);
+        assertEquals(Arrays.asList(BigInteger.valueOf(5L), BigInteger.valueOf(15L)), actualUintArray);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void formatOutputWrongLength() {
         String inputUints = "00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000F";
-        List<Long> actualUintArray = uintArray.formatOutput(inputUints);
+        List<BigInteger> actualUintArray = uintArray.formatOutput(inputUints);
         assertEquals(Arrays.asList(5L, 15L), actualUintArray);
     }
 

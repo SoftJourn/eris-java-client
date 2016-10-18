@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,13 +123,13 @@ public class ContractTest {
 
     @Test
     public void callQuery() throws Exception {
-        assertEquals(100L, contract.call("query").getReturnValue().getVal());
+        assertEquals(BigInteger.valueOf(100L), contract.call("query").getReturnValue().getVal());
         verify(accountData, never()).getPrivKey();
     }
 
     @Test
     public void callTx() throws Exception {
-        assertEquals(true, contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", 100L).getReturnValue().getVal());
+        assertEquals(true, contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", BigInteger.valueOf(100L)).getReturnValue().getVal());
         verify(accountData, atLeastOnce()).getPrivKey();
     }
 
