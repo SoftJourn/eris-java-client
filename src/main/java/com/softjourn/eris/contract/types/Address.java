@@ -42,7 +42,7 @@ public class Address extends Type<String> {
 
     @Override
     public boolean canRepresent(String value) {
-        return value.matches("^(0x)?[0-9a-fA-F]{40}$");
+        return value.matches("^(0x)?0{24}[0-9a-fA-F]{40}$");
     }
 
     @Override

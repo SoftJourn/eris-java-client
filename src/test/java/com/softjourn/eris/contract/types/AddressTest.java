@@ -29,7 +29,7 @@ public class AddressTest extends TestCase {
     }
 
     public void testCanRepresent() throws Exception {
-        assertTrue(address.canRepresent("1111111111111111111111111111111111111111"));
+        assertTrue(address.canRepresent("0000000000000000000000001111111111111111111111111111111111111111"));
         assertFalse(address.canRepresent("1111"));
     }
 
