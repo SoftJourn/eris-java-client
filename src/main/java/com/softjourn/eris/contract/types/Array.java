@@ -1,45 +1,50 @@
 package com.softjourn.eris.contract.types;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.softjourn.eris.contract.Util.leftPad;
+import static com.softjourn.eris.contract.Util.encodeInt;
 
 public class Array<P> extends Type<List<P>> {
 
+    private static final int DYNAMIC_ARRAY_LENGTH = -1;
+
     private Type<P> type;
 
+    private int staticArrayLength;
+
     public Array(Type<P> type) {
+        this(type, DYNAMIC_ARRAY_LENGTH);
+    }
+
+    public Array(Type<P> type, int staticArrayLength) {
         this.type = type;
+        this.staticArrayLength = staticArrayLength;
     }
 
     @Override
     public String formatInput(List<P> value) {
         return value.stream()
                 .map(v -> type.formatInput(v))
-                .collect(Collectors.joining("", getLengthRepresentation(value), ""));
+                .collect(Collectors.joining("", encodeInt(value.size()), ""));
     }
 
-    private String getLengthRepresentation(List<P> value) {
-        return leftPad(BigInteger.valueOf(value.size()).toString(16), 64, '0');
-    }
 
     @Override
     public List<P> formatOutput(String value) {
         int length = readLength(value);
         checkLength(value, length);
         List<P> result = new ArrayList<>();
-        for (int i = 1; i <= length; i++){
+        for (int i = 1; i <= length; i++) {
             result.add(type.formatOutput(getIthPart(value, i)));
         }
         return result;
     }
 
     private int readLength(String value) {
-        return Integer.parseInt(value.substring(0,64), 16);
+        return Integer.parseInt(value.substring(0, 64), 16);
     }
 
     private void checkLength(String value, int length) {
@@ -59,7 +64,7 @@ public class Array<P> extends Type<List<P>> {
             int length = readLength(value);
             checkLength(value, length);
             for (int i = 1; i <= length; i++) {
-                if (! type.canRepresent(getIthPart(value, i))) return false;
+                if (!type.canRepresent(getIthPart(value, i))) return false;
             }
             return true;
         } catch (IllegalArgumentException e) {
@@ -69,18 +74,57 @@ public class Array<P> extends Type<List<P>> {
 
     @Override
     public String toString() {
-        return null;
+        return type.toString() + "[]";
     }
 
     @Override
     public boolean isDynamic() {
-        return true;
+        return staticArrayLength == DYNAMIC_ARRAY_LENGTH;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Class<List<P>> valueClass() {
-        return (Class<List<P>>) Collections.emptyList().getClass();
+        return (Class<List<P>>) Collections.emptyList().getClass().getSuperclass();
     }
 
+    @Override
+    public boolean isType(String name) {
+        return name.matches(".*(\\[(\\d)*\\])+$") && type.isType(name.substring(0, name.indexOf('[')));
+    }
+
+    @Override
+    public Type<List<P>> createFromName(String name) {
+        return new Array<>(type.createFromName(getSubName(name)), geLength(name));
+    }
+
+    private int geLength(String name) {
+        String s = name.substring(name.lastIndexOf('[')).replaceAll("[\\[\\]\\s]", "");
+        return s.isEmpty() ? DYNAMIC_ARRAY_LENGTH : Integer.parseInt(s);
+    }
+
+    static String getSubName(String typeName) {
+        return typeName.substring(0, typeName.lastIndexOf('['));
+    }
+
+    @Override
+    int getStaticArrayLength() {
+        return staticArrayLength == DYNAMIC_ARRAY_LENGTH ? 1 : staticArrayLength;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Array<?> array = (Array<?>) o;
+
+        return type.equals(array.type);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return type.hashCode();
+    }
 }

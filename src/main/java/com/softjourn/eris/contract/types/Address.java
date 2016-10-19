@@ -23,8 +23,13 @@ public class Address extends Type<String> {
         this.length = length;
     }
 
-    public static boolean isType(String name) {
+    public boolean isType(String name) {
         return name.matches("^address[0-9]*$");
+    }
+
+    @Override
+    public Type<String> createFromName(String name) {
+        return new Address(getLength(name));
     }
 
     @Override

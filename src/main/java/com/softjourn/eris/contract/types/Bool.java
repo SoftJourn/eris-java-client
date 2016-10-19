@@ -36,7 +36,22 @@ public class Bool extends Type<Boolean> {
         return Boolean.class;
     }
 
-    public static boolean isType(String name) {
+    public boolean isType(String name) {
         return name.matches("bool");
+    }
+
+    @Override
+    public Type<Boolean> createFromName(String name) {
+        return this;
+    }
+
+    @Override
+    public int hashCode() {
+        return 1;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof Bool;
     }
 }

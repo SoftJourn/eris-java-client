@@ -9,11 +9,11 @@ public class UintTest extends TestCase {
     Uint uint = new Uint();
 
     public void testIsType() throws Exception {
-        assertTrue(Uint.isType("uint"));
-        assertTrue(Uint.isType("uint256"));
-        assertTrue(Uint.isType("uint32"));
-        assertFalse(Uint.isType("int"));
-        assertFalse(Uint.isType("address"));
+        assertTrue(new Uint().isType("uint"));
+        assertTrue(new Uint().isType("uint256"));
+        assertTrue(new Uint().isType("uint32"));
+        assertFalse(new Uint().isType("int"));
+        assertFalse(new Uint().isType("address"));
     }
 
     public void testToString() throws Exception {

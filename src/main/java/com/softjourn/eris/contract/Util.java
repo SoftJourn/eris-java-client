@@ -4,6 +4,7 @@ package com.softjourn.eris.contract;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
@@ -38,5 +39,9 @@ public class Util {
             return new String(pad) + val;
         }
         return val;
+    }
+
+    public static String encodeInt(int value) {
+        return leftPad(BigInteger.valueOf(value).toString(16), 64, '0');
     }
 }

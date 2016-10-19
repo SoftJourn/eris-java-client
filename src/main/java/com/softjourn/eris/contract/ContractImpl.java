@@ -12,6 +12,9 @@ import lombok.NonNull;
 import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+
+import static com.softjourn.eris.contract.Util.encodeInt;
 
 
 class ContractImpl implements Contract, Cloneable {
@@ -121,15 +124,30 @@ class ContractImpl implements Contract, Cloneable {
         }
         StringBuilder res = new StringBuilder();
 
+        int dynamicOffset = Stream.of(unit.getInputs())
+                .map(Variable::getType)
+                .map(Type::staticPartLength)
+                .reduce(0, (x, y) -> x+ y);
+
+        StringBuilder dynamicData = new StringBuilder();
+
         for (int i = 0; i < args.length; i++) {
             Type type = unit.getInputs()[i].getType();
             if (type.valueClass().isInstance(args[i])) {
-                res.append(type.formatInput(args[i]));
+                String encodedValue = type.formatInput(args[i]);
+                if (type.isDynamic()) {
+                    res.append(encodeInt(dynamicOffset));
+                    dynamicOffset += encodedValue.length() / 2;
+                    dynamicData.append(encodedValue);
+                } else {
+                    res.append(encodedValue);
+                }
             } else {
                 throw new IllegalArgumentException("The " + (i + 1) + "-th parameter of function " + unit.getName() +
                         " is " + type.toString() + " but argument was " + args[i]);
             }
         }
+        res.append(dynamicData);
 
         return res.toString();
     }
@@ -153,5 +171,13 @@ class ContractImpl implements Contract, Cloneable {
     @Override
     public void close() throws IOException {
         eventHandler.close();
+    }
+
+    @Override
+    public String toString() {
+        return "ContractImpl{" +
+                "contractUnits=" + contractUnits +
+                ", contractAddress='" + contractAddress + '\'' +
+                '}';
     }
 }

@@ -6,9 +6,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class ArrayTest {
@@ -42,7 +40,6 @@ public class ArrayTest {
     public void formatOutputWrongLength() {
         String inputUints = "00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000F";
         List<BigInteger> actualUintArray = uintArray.formatOutput(inputUints);
-        assertEquals(Arrays.asList(5L, 15L), actualUintArray);
     }
 
     @Test
@@ -58,8 +55,10 @@ public class ArrayTest {
 
     @Test
     public void isDynamic() throws Exception {
-        assertTrue(addressArray.isDynamic());
-        assertTrue(uintArray.isDynamic());
+        assertTrue(addressArray.createFromName("address[]").isDynamic());
+        assertTrue(addressArray.createFromName("address[5][]").isDynamic());
+        assertFalse(addressArray.createFromName("address[5]").isDynamic());
+        assertFalse(addressArray.createFromName("address[5][5]").isDynamic());
     }
 
     @Test
@@ -68,4 +67,23 @@ public class ArrayTest {
         assertTrue(List.class.isAssignableFrom(addressArray.valueClass()));
     }
 
+    @Test
+    public void isTypeTest() throws Exception {
+        assertTrue(addressArray.isType("address[]"));
+        assertTrue(uintArray.isType("uint256[]"));
+        assertTrue(uintArray.isType("uint256[2]"));
+        assertTrue(uintArray.isType("uint256[2][]"));
+        assertFalse(addressArray.isType("uint256[]"));
+        assertFalse(uintArray.isType("uint256"));
+        assertFalse(addressArray.isType(""));
+    }
+
+    @Test
+    public void getStaticArrayLengthTest() {
+        assertEquals(1, addressArray.createFromName("address[]").getStaticArrayLength());
+        assertEquals(1, addressArray.createFromName("address[1]").getStaticArrayLength());
+        assertEquals(1, addressArray.createFromName("address[2][]").getStaticArrayLength());
+        assertEquals(2, addressArray.createFromName("address[2]").getStaticArrayLength());
+        assertEquals(3, addressArray.createFromName("address[2][3]").getStaticArrayLength());
+    }
 }

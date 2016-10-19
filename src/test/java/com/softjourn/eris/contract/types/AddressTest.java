@@ -8,10 +8,10 @@ public class AddressTest extends TestCase {
     private Address address = new Address();
 
     public void testIsType() throws Exception {
-        assertTrue(Address.isType("address"));
-        assertTrue(Address.isType("address16"));
-        assertTrue(Address.isType("address256"));
-        assertFalse(Address.isType("uint"));
+        assertTrue(new Address().isType("address"));
+        assertTrue(new Address().isType("address16"));
+        assertTrue(new Address().isType("address256"));
+        assertFalse(new Address().isType("uint"));
     }
 
     public void testFormatInput() throws Exception {

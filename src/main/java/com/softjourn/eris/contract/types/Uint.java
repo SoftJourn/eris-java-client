@@ -21,8 +21,13 @@ public class Uint extends Type<BigInteger> {
         this.length = length;
     }
 
-    public static boolean isType(String name) {
+    public boolean isType(String name) {
         return name.matches("^uint[0-9]*$");
+    }
+
+    @Override
+    public Type<BigInteger> createFromName(String name) {
+        return new Uint(getLength(name));
     }
 
     @Override

@@ -55,10 +55,10 @@ public class BoolTest {
 
     @Test
     public void isType() throws Exception {
-        assertTrue(Bool.isType("bool"));
-        assertFalse(Bool.isType("address"));
-        assertFalse(Bool.isType("uint"));
-        assertFalse(Bool.isType("uint256"));
+        assertTrue(new Bool().isType("bool"));
+        assertFalse(new Bool().isType("address"));
+        assertFalse(new Bool().isType("uint"));
+        assertFalse(new Bool().isType("uint256"));
     }
 
     @Test

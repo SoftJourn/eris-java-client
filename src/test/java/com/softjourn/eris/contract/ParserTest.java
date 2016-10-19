@@ -2,12 +2,11 @@ package com.softjourn.eris.contract;
 
 import com.softjourn.eris.ErisAccountData;
 import com.softjourn.eris.contract.event.EventHandler;
-import com.softjourn.eris.contract.types.Address;
-import com.softjourn.eris.contract.types.Type;
-import com.softjourn.eris.contract.types.Uint;
+import com.softjourn.eris.contract.types.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +17,7 @@ public class ParserTest {
 
     private ContractImpl testContract;
     private ContractImpl testContract1;
+    private ContractImpl arrayTestContract;
 
     EventHandler eventHandler;
     ErisAccountData account;
@@ -29,6 +29,8 @@ public class ParserTest {
         account = mock(ErisAccountData.class);
 
         Type uintType = new Uint(256);
+        Type boolType = new Bool();
+        Type arrayUintType = new Array(uintType);
 
 
         final ContractUnit getFunction = new ContractUnit();
@@ -44,6 +46,13 @@ public class ParserTest {
         setFunction.setName("set");
         setFunction.setOutputs(new Variable[0]);
         setFunction.setType(ContractUnitType.function);
+
+        final ContractUnit distributeFunction = new ContractUnit();
+        distributeFunction.setConstant(false);
+        distributeFunction.setInputs(new Variable[]{new Variable("accounts", arrayUintType), new Variable("amount", uintType)});
+        distributeFunction.setName("distribute");
+        distributeFunction.setOutputs(new Variable[]{new Variable("success", boolType)});
+        distributeFunction.setType(ContractUnitType.function);
 
         Map<String, ContractUnit> contractUnits = new HashMap<String, ContractUnit>() {{
             put("get", getFunction);
@@ -98,6 +107,8 @@ public class ParserTest {
         testContract1 = new ContractImpl("", null, testUnits1, null, "", null);
 
         testContract = new ContractImpl("", null, contractUnits, null, "", null);
+
+        arrayTestContract = new ContractImpl("", null, Collections.singletonMap("distribute", distributeFunction), null, "", null);
 
     }
 
@@ -244,89 +255,9 @@ public class ParserTest {
                 "      }\n" +
                 "    ],\n" +
                 "    \"type\": \"function\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"constant\": true,\n" +
-                "    \"inputs\": [\n" +
-                "      {\n" +
-                "        \"name\": \"addr\",\n" +
-                "        \"type\": \"address\"\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"name\": \"queryBalance\",\n" +
-                "    \"outputs\": [\n" +
-                "      {\n" +
-                "        \"name\": \"balance\",\n" +
-                "        \"type\": \"uint256\"\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"type\": \"function\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"constant\": false,\n" +
-                "    \"inputs\": [\n" +
-                "      {\n" +
-                "        \"name\": \"owner\",\n" +
-                "        \"type\": \"address\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"name\": \"amount\",\n" +
-                "        \"type\": \"uint256\"\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"name\": \"mint\",\n" +
-                "    \"outputs\": [],\n" +
-                "    \"type\": \"function\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"constant\": false,\n" +
-                "    \"inputs\": [\n" +
-                "      {\n" +
-                "        \"name\": \"receiver\",\n" +
-                "        \"type\": \"address\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"name\": \"amount\",\n" +
-                "        \"type\": \"uint256\"\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"name\": \"send\",\n" +
-                "    \"outputs\": [\n" +
-                "      {\n" +
-                "        \"name\": \"success\",\n" +
-                "        \"type\": \"bool\"\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"type\": \"function\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"inputs\": [],\n" +
-                "    \"type\": \"constructor\"\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"anonymous\": false,\n" +
-                "    \"inputs\": [\n" +
-                "      {\n" +
-                "        \"indexed\": false,\n" +
-                "        \"name\": \"from\",\n" +
-                "        \"type\": \"address\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"indexed\": false,\n" +
-                "        \"name\": \"to\",\n" +
-                "        \"type\": \"address\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"indexed\": false,\n" +
-                "        \"name\": \"value\",\n" +
-                "        \"type\": \"uint256\"\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"name\": \"Send\",\n" +
-                "    \"type\": \"event\"\n" +
                 "  }\n" +
                 "]";
-        assertEquals(testContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
+        assertEquals(arrayTestContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
                 .withEventHandler(eventHandler)
                 .withChainUrl("")
                 .withCallerAccount(account)
