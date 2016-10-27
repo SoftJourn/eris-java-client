@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class Util {
 
-    private static final MessageDigest DEFAULT_DIGEST = new Keccak.Digest256();
+    private static final MessageDigest SHA3_DIGEST = new Keccak.Digest256();
 
     /**
      * Get hexadecimal string representation of Keccak256 hash of passed param
@@ -18,8 +18,22 @@ public class Util {
      * @return hashed value
      */
     public static String hash(String val) {
-        byte[] hash = DEFAULT_DIGEST.digest(val.getBytes());
+        return sha3(val.getBytes());
+    }
+
+    public static String sha3(byte[] value) {
+        byte[] hash = SHA3_DIGEST.digest(value);
         return Hex.encodeHexString(hash);
+    }
+
+    /**
+     * Convert hexadecimal string to byte representation
+     * @param value string to be converted
+     * @return byte array that represents string
+     * @throws NumberFormatException if string is not properly formatted hexadecimal value
+     */
+    public static byte[] hexStringToBytes(String value) {
+        return new BigInteger(value, 16).toByteArray();
     }
 
     /**
