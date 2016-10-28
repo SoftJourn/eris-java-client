@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-
+@SuppressWarnings("unchecked")
 public class ContractManagerTest {
 
     private ContractImpl testContract;

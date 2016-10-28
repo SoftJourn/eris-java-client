@@ -6,9 +6,9 @@ import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.softjourn.eris.rpc.ErisRPCRequestEntity;
+import org.apache.commons.codec.binary.Hex;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
@@ -48,28 +48,32 @@ public class EventHandler implements AutoCloseable {
         this(url, new WebSocketFactory());
     }
 
-    public EventHandler(String url, WebSocketFactory factory) {
+    EventHandler(String url, WebSocketFactory factory) {
         try {
             listener = new Listener();
             socket = factory.createSocket(url + DEFAULT_SOCKET_ENDPOINT);
-            socket.connect();
-            socket.addListener(listener);
-        } catch (WebSocketException | IOException e) {
+        } catch (IOException e) {
             throw new EventSubscriptionException("Can't connect via websockets to " + url, e);
         }
     }
 
+    private void openConnection() throws WebSocketException {
+        socket.connect();
+        socket.addListener(listener);
+    }
+
     @Override
     public void close() {
-        socket.disconnect();
+        if (socket.isOpen()) socket.disconnect();
     }
 
     public String subscribe(String eventId, Consumer<String> callBack) {
         return subscribe(eventId, callBack, DEFAULT_TIMEOUT);
     }
 
-    public String subscribe(String eventId, Consumer<String> callBack, int timeoutMilis) {
+    private String subscribe(String eventId, Consumer<String> callBack, int timeoutMilis) {
         try {
+            if (! socket.isOpen()) openConnection();
             String id = genId();
             CountDownLatch lock = new CountDownLatch(1);
             locks.put(id, lock);
@@ -89,6 +93,8 @@ public class EventHandler implements AutoCloseable {
             return subscriptionId;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        } catch (WebSocketException e) {
+            throw new EventSubscriptionException(e);
         }
     }
 
@@ -105,9 +111,13 @@ public class EventHandler implements AutoCloseable {
     }
 
     public void unsubscribe(String subscriptionId) {
-        socket.sendText(createUnsubscribeRequest(subscriptionId));
-        handlersMap.remove(subscriptionId);
+        if (! socket.isOpen()) try {
+            openConnection();
+            socket.sendText(createUnsubscribeRequest(subscriptionId));
+            handlersMap.remove(subscriptionId);
+        } catch (WebSocketException ignored) {
 
+        }
     }
 
     private String createUnsubscribeRequest(String subscriptionId) {
@@ -123,7 +133,7 @@ public class EventHandler implements AutoCloseable {
     String genId() {
         byte[] id = new byte[32];
         random.nextBytes(id);
-        return new BigInteger(id).toString(16).replaceAll("-", "");
+        return Hex.encodeHexString(id);
     }
 
     private class Listener extends WebSocketAdapter {

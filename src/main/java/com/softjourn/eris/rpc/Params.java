@@ -50,6 +50,24 @@ public class Params {
         return (Map<String, Object>) container.params.clone();
     }
 
+    /**
+     * Creates call params that should be used for sending tokens(eris currency)
+     * @param privateKey private key of user who is sending tokens
+     * @param address account address that user send tokens to
+     * @param amount amount of tokens
+     * @return map with required parameters
+     * TODO this method should be changed when Eris will start supporting signing see https://docs.erisindustries.com/documentation/eris-db-api/#unsafe
+     *
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> sendParams(String privateKey, String address, Integer amount) {
+        Params container = new Params();
+        container.params.put("priv_key", privateKey);
+        container.params.put("to_address", address);
+        container.params.put("amount", amount);
+        return (Map<String, Object>) container.params.clone();
+    }
+
     private Params() {
         this.params = new HashMap<>();
     }

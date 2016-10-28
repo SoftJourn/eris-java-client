@@ -19,6 +19,10 @@ public class ErisRPCRequestEntity {
     // see https://docs.erisindustries.com/documentation/eris-db-api/#unsafe
     private static final String TRANSACTIONAL_CALL_METHOD = "erisdb.transactAndHold";
 
+    //TODO this value should be changed when Eris will start supporting signing
+    // see https://docs.erisindustries.com/documentation/eris-db-api/#unsafe
+    private static final String SEND_CALL_METHOD = "erisdb.sendAndHold";
+
     private String jsonrpc = "2.0";
 
     private String method;
@@ -53,6 +57,15 @@ public class ErisRPCRequestEntity {
      */
     public static ErisRPCRequestEntity transactionalCallEntity(Map<String, Object> params) {
         return new ErisRPCRequestEntity(params, TRANSACTIONAL_CALL_METHOD);
+    }
+
+    /**
+     * Creates entity to call method that requires transaction
+     * @param params params to pass to contract method
+     * @return RequestEntity
+     */
+    public static ErisRPCRequestEntity sendCallEntity(Map<String, Object> params) {
+        return new ErisRPCRequestEntity(params, SEND_CALL_METHOD);
     }
 
     @Override

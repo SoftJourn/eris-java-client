@@ -142,6 +142,7 @@ public class EventHandlerTest  {
         when(socket.connect()).thenThrow(new WebSocketException(null, ""));
 
         EventHandler eventHandler = new EventHandler("http://real.url", factory);
+        eventHandler.subscribe("id", (s -> System.out.println(s)));
     }
 
     @Test(expected = EventSubscriptionException.class)

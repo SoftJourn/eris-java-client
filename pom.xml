@@ -4,7 +4,7 @@
 
     <groupId>com.softjourn</groupId>
     <artifactId>eris-java-client</artifactId>
-    <version>0.6</version>
+    <version>0.7</version>
     <build>
         <plugins>
             <plugin>
@@ -110,6 +110,12 @@
             <artifactId>lombok</artifactId>
             <version>1.16.10</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.i2p.crypto</groupId>
+            <artifactId>eddsa</artifactId>
+            <version>0.1.0</version>
         </dependency>
 
 
