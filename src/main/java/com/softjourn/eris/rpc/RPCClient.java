@@ -15,5 +15,5 @@ public interface RPCClient {
      * @return String representation of response body
      * @throws IOException
      */
-    String call(String URL, Object entity) throws IOException;
+    String call(String URL, RPCRequestEntity entity) throws IOException;
 }

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class HTTPRPCClient implements RPCClient {
 
     @Override
-    public String call(String URL, Object entity) throws IOException {
+    public String call(String URL, RPCRequestEntity entity) throws IOException {
         HttpResponse response =  makeRequest(URL + "/rpc", entity.toString());
         try {
             StatusLine statusLine = response.getStatusLine();

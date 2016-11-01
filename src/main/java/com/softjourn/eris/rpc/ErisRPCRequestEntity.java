@@ -11,7 +11,7 @@ import java.util.Map;
  * RPC entity to call eris contract
  */
 @Getter
-public class ErisRPCRequestEntity {
+public class ErisRPCRequestEntity implements RPCRequestEntity {
 
     private static final String CONSTANT_CALL_METHOD = "erisdb.call";
 
@@ -39,6 +39,10 @@ public class ErisRPCRequestEntity {
         this.params = params;
         this.method = method;
         this.id = id;
+    }
+
+    public ErisRPCRequestEntity setId(String id) {
+        return new ErisRPCRequestEntity(params, method, id);
     }
 
     /**
