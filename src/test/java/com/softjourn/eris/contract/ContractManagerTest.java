@@ -94,7 +94,7 @@ public class ContractManagerTest {
             put("distribute2af", distributeFunction2AFixed);
         }};
 
-        testContract = new ContractImpl("", null, contractUnits, null, "", null);
+        testContract = new ContractImpl("", null, contractUnits, null, null);
 
     }
 

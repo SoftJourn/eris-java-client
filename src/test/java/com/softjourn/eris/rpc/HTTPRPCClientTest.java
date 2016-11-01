@@ -29,7 +29,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PrepareForTest(HttpClientBuilder.class)
 public class HTTPRPCClientTest extends TestCase {
 
-    HTTPRPCClient client = new HTTPRPCClient();
+    HTTPRPCClient client = new HTTPRPCClient("url");
 
     private String expectedResponse = "{\"test\": \"response\"}";
 
@@ -88,7 +88,7 @@ public class HTTPRPCClientTest extends TestCase {
 
     @Test
     public void testCall() throws Exception {
-        assertEquals(expectedResponse, client.call("url", ErisRPCRequestEntity.constantCallEntity(new HashMap<>())));
+        assertEquals(expectedResponse, client.call(ErisRPCRequestEntity.constantCallEntity(new HashMap<>())));
     }
 
 }

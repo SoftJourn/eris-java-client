@@ -19,7 +19,6 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.*;
 
@@ -108,8 +107,8 @@ public class ContractTest {
         when(eventHandler.subscribe(matches(OUT_EVENT_ID_PATTERN), any())).then(i -> OUT_EVENT_ID);
         when(eventHandler.subscribe(matches(CALL_EVENT_ID_PATTERN), any())).then(i -> CALL_EVENT_ID);
 
-        when(rpcClient.call(eq(CHAIN_URL), any())).then(i -> {
-            ErisRPCRequestEntity entity = (ErisRPCRequestEntity) i.getArguments()[1];
+        when(rpcClient.call(any())).then(i -> {
+            ErisRPCRequestEntity entity = (ErisRPCRequestEntity) i.getArguments()[0];
             return entity.getMethod().equals("erisdb.call") ? VALUE_RESPONSE_STRING : TX_RESPONSE_STRING;
         });
 
@@ -117,7 +116,7 @@ public class ContractTest {
         when(accountData.getPrivKey()).thenReturn("privKey");
         when(accountData.getPubKey()).thenReturn("pubKey");
 
-        contract = new ContractImpl(CONTRACT_ADDRESS, rpcClient, contractUnits, accountData, CHAIN_URL, eventHandler);
+        contract = new ContractImpl(CONTRACT_ADDRESS, rpcClient, contractUnits, accountData, eventHandler);
 
     }
 

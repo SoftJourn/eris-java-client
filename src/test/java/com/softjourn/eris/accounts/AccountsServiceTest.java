@@ -11,10 +11,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccountsServiceTest {
@@ -40,7 +37,7 @@ public class AccountsServiceTest {
         accountsService = new AccountsService(keyService, "key", rpcClient, url);
 
         when(keyService.generateNewKey()).thenReturn(accountData);
-        when(rpcClient.call(any(), any())).thenReturn(sendResponse);
+        when(rpcClient.call(any())).thenReturn(sendResponse);
 
     }
 
@@ -50,29 +47,29 @@ public class AccountsServiceTest {
 
         verify(keyService, times(1)).generateNewKey();
 
-        verify(rpcClient, times(1)).call(eq(url), any());
+        verify(rpcClient, times(1)).call(any());
     }
 
     @Test(expected = AccountCreatingException.class)
     public void createAccountError() throws Exception {
-        when(rpcClient.call(any(), any())).thenReturn(sendResponseError);
+        when(rpcClient.call(any())).thenReturn(sendResponseError);
 
         ErisAccountData accountData = accountsService.createAccount();
 
         verify(keyService, times(1)).generateNewKey();
 
-        verify(rpcClient, times(1)).call(eq(url), any());
+        verify(rpcClient, times(1)).call(any());
     }
 
     @Test(expected = AccountCreatingException.class)
     public void createAccountSendError() throws Exception {
-        when(rpcClient.call(any(), any())).thenThrow(new IOException());
+        when(rpcClient.call(any())).thenThrow(new IOException());
 
         ErisAccountData accountData = accountsService.createAccount();
 
         verify(keyService, times(1)).generateNewKey();
 
-        verify(rpcClient, times(1)).call(eq(url), any());
+        verify(rpcClient, times(1)).call(any());
     }
 
 

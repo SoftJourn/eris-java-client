@@ -71,8 +71,6 @@ public class ContractManager {
 
         private RPCClient client;
 
-        private String chainUrl;
-
         private final HashMap<String, ContractUnit> contractUnits;
 
         private EventHandler eventHandler;
@@ -91,11 +89,6 @@ public class ContractManager {
             return this;
         }
 
-        public ContractBuilder withChainUrl(String chainUrl) {
-            this.chainUrl = chainUrl;
-            return this;
-        }
-
         public ContractBuilder withCallerAccount(ErisAccountData accountData) {
             this.accountData = accountData;
             return this;
@@ -108,12 +101,11 @@ public class ContractManager {
 
         @SuppressWarnings("unchecked")
         public Contract build() {
-            if (eventHandler == null) eventHandler = new EventHandler(chainUrl);
-            if (client == null) client = new HTTPRPCClient();
-            if (chainUrl == null) throw new RuntimeException("Chain url is not provided. Can't create contract.");
+            if (eventHandler == null) throw new RuntimeException("EventHandler is not provided. Can't create contract.");
+            if (client == null) throw new RuntimeException("RPCClient is not provided. Can't create contract.");
             if (accountData == null) throw new RuntimeException("Account is not provided. Can't create contract.");
             if (contractAddress == null) throw new RuntimeException("Contract address is not provided. Can't create contract.");
-            return new ContractImpl(contractAddress, client, (Map<String, ContractUnit>) contractUnits.clone(), accountData, chainUrl, eventHandler);
+            return new ContractImpl(contractAddress, client, (Map<String, ContractUnit>) contractUnits.clone(), accountData, eventHandler);
         }
     }
 

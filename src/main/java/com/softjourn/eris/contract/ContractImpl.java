@@ -27,16 +27,13 @@ class ContractImpl implements Contract, Cloneable {
 
     private final ErisAccountData accountData;
 
-    private final String chainUrl;
-
     private final EventHandler eventHandler;
 
-    ContractImpl(String contractAddress, RPCClient client, @NonNull Map<String, ContractUnit> contractUnits, ErisAccountData accountData, String chainUrl, EventHandler eventHandler) {
+    ContractImpl(String contractAddress, RPCClient client, @NonNull Map<String, ContractUnit> contractUnits, ErisAccountData accountData, EventHandler eventHandler) {
         this.contractAddress = contractAddress;
         this.client = client;
         this.contractUnits = contractUnits;
         this.accountData = accountData;
-        this.chainUrl = chainUrl;
         this.eventHandler = eventHandler;
     }
 
@@ -51,7 +48,7 @@ class ContractImpl implements Contract, Cloneable {
             parser = new ResponseParser<>(retVars[0]);
         }
 
-        String response = client.call(chainUrl, callRPCParams(function, args));
+        String response = client.call(callRPCParams(function, args));
 
         return parser.parse(response);
     }

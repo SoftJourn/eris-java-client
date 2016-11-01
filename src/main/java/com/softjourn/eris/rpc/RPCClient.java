@@ -10,10 +10,9 @@ public interface RPCClient {
 
     /**
      * Make call to specified URL with Json payload
-     * @param URL Url endpoint to call
      * @param entity entity that will be passed as Json payload
      * @return String representation of response body
      * @throws IOException
      */
-    String call(String URL, RPCRequestEntity entity) throws IOException;
+    String call(RPCRequestEntity entity) throws IOException;
 }

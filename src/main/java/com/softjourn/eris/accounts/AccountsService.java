@@ -46,7 +46,7 @@ public class AccountsService {
 
         ResponseParser parser = new ResponseParser<>(null);
 
-        String response = client.call(url, ErisRPCRequestEntity.sendCallEntity(Params.sendParams(userPrivateKey, address, defaultAmountToSend)));
+        String response = client.call(ErisRPCRequestEntity.sendCallEntity(Params.sendParams(userPrivateKey, address, defaultAmountToSend)));
         return parser.parse(response);
     }
 

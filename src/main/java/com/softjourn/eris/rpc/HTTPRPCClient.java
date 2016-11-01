@@ -21,8 +21,14 @@ import java.util.stream.Collectors;
  */
 public class HTTPRPCClient implements RPCClient {
 
+    private final String URL;
+
+    public HTTPRPCClient(String host) {
+        this.URL = host;
+    }
+
     @Override
-    public String call(String URL, RPCRequestEntity entity) throws IOException {
+    public String call(RPCRequestEntity entity) throws IOException {
         HttpResponse response =  makeRequest(URL + "/rpc", entity.toString());
         try {
             StatusLine statusLine = response.getStatusLine();

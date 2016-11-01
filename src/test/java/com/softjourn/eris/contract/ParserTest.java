@@ -104,11 +104,11 @@ public class ParserTest {
         }};
 
 
-        testContract1 = new ContractImpl("", null, testUnits1, null, "", null);
+        testContract1 = new ContractImpl("", null, testUnits1, null, null);
 
-        testContract = new ContractImpl("", null, contractUnits, null, "", null);
+        testContract = new ContractImpl("", null, contractUnits, null, null);
 
-        arrayTestContract = new ContractImpl("", null, Collections.singletonMap("distribute", distributeFunction), null, "", null);
+        arrayTestContract = new ContractImpl("", null, Collections.singletonMap("distribute", distributeFunction), null, null);
 
     }
 
@@ -143,7 +143,7 @@ public class ParserTest {
                 "]";
         assertEquals(testContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
                 .withEventHandler(eventHandler)
-                .withChainUrl("")
+                .withRPCClient(entity -> null)
                 .withCallerAccount(account)
                 .withContractAddress("")
                 .build());
@@ -226,9 +226,9 @@ public class ParserTest {
                 "]";
         assertEquals(testContract1, new ContractManager(TEST_DATA_1).parseContract(TEST_DATA_1)
                 .withEventHandler(eventHandler)
-                .withChainUrl("")
                 .withContractAddress("")
                 .withCallerAccount(account)
+                .withRPCClient(entity -> null)
                 .build());
     }
 
@@ -259,8 +259,8 @@ public class ParserTest {
                 "]";
         assertEquals(arrayTestContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
                 .withEventHandler(eventHandler)
-                .withChainUrl("")
                 .withCallerAccount(account)
+                .withRPCClient(entity -> null)
                 .withContractAddress("")
                 .build());
     }
