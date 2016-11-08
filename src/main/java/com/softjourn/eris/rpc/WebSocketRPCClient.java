@@ -121,14 +121,6 @@ public class WebSocketRPCClient implements RPCClient, AutoCloseable {
 
     @Override
     public synchronized void close() {
-        if (socket.isOpen()) socket.disconnect(WebSocketCloseCode.NORMAL, null, 100);
-        while (socket.isOpen()) {
-            System.out.println("Closing...");
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        socket.disconnect(WebSocketCloseCode.NORMAL, null, 100);
     }
 }

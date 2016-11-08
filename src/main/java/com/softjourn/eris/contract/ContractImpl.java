@@ -167,7 +167,8 @@ class ContractImpl implements Contract, Cloneable {
 
     @Override
     public void close() throws IOException {
-        eventHandler.close();
+        if (eventHandler != null) eventHandler.close();
+        if (client != null) client.close();
     }
 
     @Override

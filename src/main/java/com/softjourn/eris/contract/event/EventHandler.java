@@ -64,7 +64,7 @@ public class EventHandler implements AutoCloseable {
 
     @Override
     public void close() {
-        if (socket.isOpen()) socket.disconnect();
+        socket.disconnect();
     }
 
     public String subscribe(String eventId, Consumer<String> callBack) {

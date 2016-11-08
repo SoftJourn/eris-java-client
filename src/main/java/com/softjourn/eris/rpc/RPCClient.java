@@ -6,7 +6,7 @@ import java.io.IOException;
 /**
  * Interface to make simple Http call with Json payload
  */
-public interface RPCClient {
+public interface RPCClient extends AutoCloseable {
 
     /**
      * Make call to specified URL with Json payload
@@ -15,4 +15,6 @@ public interface RPCClient {
      * @throws IOException
      */
     String call(RPCRequestEntity entity) throws IOException;
+
+    void close();
 }

@@ -59,4 +59,8 @@ public class HTTPRPCClient implements RPCClient {
         }
     }
 
+    @Override
+    public void close() {
+        //do nothing
+    }
 }
