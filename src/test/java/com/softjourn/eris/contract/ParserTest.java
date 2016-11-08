@@ -3,9 +3,12 @@ package com.softjourn.eris.contract;
 import com.softjourn.eris.ErisAccountData;
 import com.softjourn.eris.contract.event.EventHandler;
 import com.softjourn.eris.contract.types.*;
+import com.softjourn.eris.rpc.RPCClient;
+import com.softjourn.eris.rpc.RPCRequestEntity;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -143,7 +146,17 @@ public class ParserTest {
                 "]";
         assertEquals(testContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
                 .withEventHandler(eventHandler)
-                .withRPCClient(entity -> null)
+                .withRPCClient(new RPCClient() {
+                    @Override
+                    public String call(RPCRequestEntity entity) throws IOException {
+                        return null;
+                    }
+
+                    @Override
+                    public void close() {
+
+                    }
+                })
                 .withCallerAccount(account)
                 .withContractAddress("")
                 .build());
@@ -228,7 +241,17 @@ public class ParserTest {
                 .withEventHandler(eventHandler)
                 .withContractAddress("")
                 .withCallerAccount(account)
-                .withRPCClient(entity -> null)
+                .withRPCClient(new RPCClient() {
+                    @Override
+                    public String call(RPCRequestEntity entity) throws IOException {
+                        return null;
+                    }
+
+                    @Override
+                    public void close() {
+
+                    }
+                })
                 .build());
     }
 
@@ -260,7 +283,17 @@ public class ParserTest {
         assertEquals(arrayTestContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
                 .withEventHandler(eventHandler)
                 .withCallerAccount(account)
-                .withRPCClient(entity -> null)
+                .withRPCClient(new RPCClient() {
+                    @Override
+                    public String call(RPCRequestEntity entity) throws IOException {
+                        return null;
+                    }
+
+                    @Override
+                    public void close() {
+
+                    }
+                })
                 .withContractAddress("")
                 .build());
     }
