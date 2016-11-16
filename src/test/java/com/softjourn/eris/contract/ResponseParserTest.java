@@ -17,6 +17,8 @@ public class ResponseParserTest {
 
     private Response<BigInteger> txResponse;
 
+    private Response txResponse_V_12;
+
     private Response<BigInteger> txResponseWithRetValue;
 
     private Response<BigInteger> valResponse;
@@ -79,6 +81,25 @@ public class ResponseParserTest {
             "    \"jsonrpc\": \"2.0\"\n" +
             "  }";
 
+    private final String txResponseEris_V_12 = "{\n" +
+            "  \"result\": {\n" +
+            "    \"call_data\": {\n" +
+            "      \"caller\": \"6F4090E6FBB579CFFCCDF56CC0F74EFA2A3ADD5E\",\n" +
+            "      \"callee\": \"92639EEA8028DD04DBE16F186962400C5CF64DD9\",\n" +
+            "      \"data\": \"40C10F190000000000000000000000009D370D7A53B844F59CE127E30A86982707BAC89E0000000000000000000000000000000000000000000000000000000000000064\",\n" +
+            "      \"value\": 1,\n" +
+            "      \"gas\": 832\n" +
+            "    },\n" +
+            "    \"origin\": \"6F4090E6FBB579CFFCCDF56CC0F74EFA2A3ADD5E\",\n" +
+            "    \"tx_id\": \"E0B8E0A8005FDC681D8836F9FE1BAA3CC4B82AE7\",\n" +
+            "    \"return\": \"\",\n" +
+            "    \"exception\": \"\"\n" +
+            "  },\n" +
+            "  \"error\": null,\n" +
+            "  \"id\": \"\",\n" +
+            "  \"jsonrpc\": \"2.0\"\n" +
+            "}";
+
     private final String errorResponseString = "{\n" +
             "    \"result\": null,\n" +
             "    \"error\": {\n" +
@@ -92,6 +113,7 @@ public class ResponseParserTest {
     @Before
     public void setUp() throws Exception {
         txResponse = new Response<>("", null, null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
+        txResponse_V_12 = new Response<>("", null, null, new TxParams("6F4090E6FBB579CFFCCDF56CC0F74EFA2A3ADD5E", "E0B8E0A8005FDC681D8836F9FE1BAA3CC4B82AE7"));
         txResponseWithRetValue = new Response<>("", new ReturnValue<>(BigInteger.class, BigInteger.valueOf(100L)), null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
         valResponse = new Response<>("", new ReturnValue<>(BigInteger.class, BigInteger.valueOf(100L)), null, null);
         errorResponse = new Response<>("", null, new Error(-32603, "Error when transacting: Insuffient gas"), null);
@@ -113,6 +135,12 @@ public class ResponseParserTest {
     public void testParseTx() throws IOException {
         ResponseParser parser = new ResponseParser<>(null);
         assertEquals(txResponse, parser.parse(txResponseSring));
+    }
+
+    @Test
+    public void testParseTx_Eris_V_12() throws IOException {
+        ResponseParser parser = new ResponseParser<>(null);
+        assertEquals(txResponse_V_12, parser.parse(txResponseEris_V_12));
     }
 
     @Test

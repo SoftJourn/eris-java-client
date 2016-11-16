@@ -8,10 +8,11 @@ import com.softjourn.eris.contract.response.Error;
 import com.softjourn.eris.contract.types.Type;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
-public class ResponseParser<T> implements Function<String, Response<T>>{
+public class ResponseParser<T> implements Function<String, Response<T>> {
 
     private ObjectMapper mapper;
 
@@ -36,20 +37,14 @@ public class ResponseParser<T> implements Function<String, Response<T>>{
     }
 
     private TxParams getTxParams(JsonNode res) throws ResponseParsingException {
-        JsonNode result = res.get("result");
-        if (result == null) throw new ResponseParsingException("Wrong response. Result field is not presented.");
-        if (result.isNull()) return null;
-        if (! (result.isObject() || result.isArray())) throw new ResponseParsingException("Wrong response. Result field is neither object nor array type.");
-
         ObjectReader reader = mapper.readerFor(TxParams.class);
-        if (result.isArray()) {
-            return StreamSupport.stream(result.spliterator(), false)
-                    .filter(JsonNode::isObject)
-                    .map(n -> this.<TxParams> valueByNode(n, reader))
-                    .findFirst().orElse(null);
-        }
 
-        return null;
+        return Optional.ofNullable(res)
+                .flatMap(r -> Optional.ofNullable(r.get("result")))
+                .flatMap(r -> Optional.ofNullable(getResultObject(r)))
+                .flatMap(r -> Optional.ofNullable((TxParams)valueByNode(r, reader)))
+                .filter(tx -> !(tx.getTxId() == null && tx.getOrigin() == null))
+                .orElse(null);
     }
 
     @Override
@@ -61,7 +56,8 @@ public class ResponseParser<T> implements Function<String, Response<T>>{
         }
     }
 
-    private static class ReadException extends RuntimeException {}
+    private static class ReadException extends RuntimeException {
+    }
 
     private <V> V valueByNode(JsonNode node, ObjectReader reader) {
         try {
@@ -72,7 +68,7 @@ public class ResponseParser<T> implements Function<String, Response<T>>{
     }
 
     private Error getError(JsonNode res) throws IOException {
-        if (! res.has("error")) throw new ResponseParsingException("Wrong response. Error field is not presented.");
+        if (!res.has("error")) throw new ResponseParsingException("Wrong response. Error field is not presented.");
         JsonNode error = res.get("error");
         ObjectReader reader = mapper.readerFor(Error.class);
         return reader.readValue(error);
@@ -87,27 +83,50 @@ public class ResponseParser<T> implements Function<String, Response<T>>{
     @SuppressWarnings("unchecked")
     private ReturnValue<T> getReturnValue(JsonNode res) throws ResponseParsingException {
         if (outVariable == null) return null;
-        JsonNode result = res.get("result");
-        if (result.isNull()) return null;
-        if (! (result.isObject() || result.isArray())) throw new ResponseParsingException("Wrong response. Result field is not object type.");
+        JsonNode result = getResultObject(res.get("result"));
 
-        if (result.isArray()) {
-            result = StreamSupport.stream(result.spliterator(), false)
+        return Optional.ofNullable(result)
+                .flatMap(r -> Optional.ofNullable(r.get("return")))
+                .map(JsonNode::asText)
+                .map(this::mapReturnString)
+                .orElse(null);
+    }
+
+    private ReturnValue<T> mapReturnString(String value) {
+        if (!outVariable.getType().canRepresent(value)) {
+            throw new ResponseParsingException("Wrong response. " +
+                    "Value " + value + " can't be represented by " +
+                    "required type " + outVariable.getType().toString() + ".");
+        } else {
+            Type<T> type = outVariable.getType();
+            return new ReturnValue<>(type.valueClass(), type.formatOutput(value));
+        }
+    }
+
+    /**
+     * Returns single result object.
+     * Eris 0.11.4 returns result object as array with single object included
+     * Eris 0.12 returns just object
+     *
+     * @param resultObjectOrArray result node from response
+     * @return Returns single result object.
+     */
+    private JsonNode getResultObject(JsonNode resultObjectOrArray) throws ResponseParsingException {
+        if (resultObjectOrArray.isNull()) return null;
+        if (!(resultObjectOrArray.isObject() || resultObjectOrArray.isArray()))
+            throw new ResponseParsingException("Wrong response. Result field is not object type.");
+        JsonNode result = null;
+        if (resultObjectOrArray.isArray()) {
+            result = StreamSupport.stream(resultObjectOrArray.spliterator(), false)
                     .filter(JsonNode::isObject)
                     .findFirst().orElse(null);
+        } else if (resultObjectOrArray.isObject()) {
+            return resultObjectOrArray;
         }
-
-        if (result == null) throw new ResponseParsingException("Wrong response. Result field is not presented.");
-
-        JsonNode retVal = result.get("return");
-        if (retVal == null) throw new ResponseParsingException("Wrong response. Return value expected but not presented.");
-        String retString = retVal.asText();
-        if (! outVariable.getType().canRepresent(retString))
-            throw new ResponseParsingException("Wrong response. " +
-                    "Value " + retString + " can't be represented by " +
-                    "required type " + outVariable.getType().toString() + ".");
-
-        Type<T> type = outVariable.getType();
-        return new ReturnValue<>(type.valueClass(), type.formatOutput(retString));
+        if (result == null) {
+            throw new ResponseParsingException("Wrong response. Result field is not presented.");
+        } else {
+            return result;
+        }
     }
 }
