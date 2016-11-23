@@ -96,9 +96,11 @@ public abstract class Type<T> {
                 new Uint(),
                 new Address(),
                 new Bool(),
+                new Bytes(),
                 new Array(new Uint()),
                 new Array(new Address()),
-                new Array(new Bool())
+                new Array(new Bool()),
+                new Array(new Bytes())
         };
     }
 
