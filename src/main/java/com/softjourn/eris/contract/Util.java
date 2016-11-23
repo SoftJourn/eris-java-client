@@ -77,6 +77,35 @@ public class Util {
         return val;
     }
 
+    /**
+     * Fill right side of passed value with passed {@param c}
+     * to make it required {@param length}.
+     * If value length is already greater or equals returns {@param val} without any changes
+     * @param val value to be padded
+     * @param length required length
+     * @param c chat to fill with
+     * @return padded to required length value
+     */
+    public static String rightPad(String val, int length, char c) {
+        int diff = length - val.length();
+        if (diff > 0) {
+            char[] pad = new char[diff];
+            Arrays.fill(pad, c);
+            return val + new String(pad);
+        }
+        return val;
+    }
+
+    private static String getAbsentString(String val, int length, char c) {
+        int diff = length - val.length();
+        if (diff > 0) {
+            char[] pad = new char[diff];
+            Arrays.fill(pad, c);
+            return new String(pad);
+        }
+        return "";
+    }
+
     public static String encodeInt(int value) {
         return leftPad(BigInteger.valueOf(value).toString(16), 64, '0');
     }

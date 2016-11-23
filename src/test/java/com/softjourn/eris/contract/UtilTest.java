@@ -2,6 +2,7 @@ package com.softjourn.eris.contract;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -14,4 +15,19 @@ public class UtilTest {
         assertTrue("DC9A1D54D7E29668C3D12C64D4196FD52761AAC5".equalsIgnoreCase(Util.tendermintRIPEDM160Hash(Util.hexStringToBytes("78B8378CC6FAD2B967E7D12AD79CC9FEB4FB93C57FAA0218A30C70DD3FFE226B"))));
     }
 
+    @Test
+    public void leftPadTest() throws Exception {
+        assertEquals("00001111", Util.leftPad("1111", 8, '0'));
+        assertEquals("00000000", Util.leftPad("", 8, '0'));
+        assertEquals("11111111", Util.leftPad("11111111", 8, '0'));
+        assertEquals("111111111", Util.leftPad("111111111", 8, '0'));
+    }
+
+    @Test
+    public void rightPadTest() throws Exception {
+        assertEquals("11110000", Util.rightPad("1111", 8, '0'));
+        assertEquals("00000000", Util.rightPad("", 8, '0'));
+        assertEquals("11111111", Util.rightPad("11111111", 8, '0'));
+        assertEquals("111111111", Util.rightPad("111111111", 8, '0'));
+    }
 }
