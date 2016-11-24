@@ -28,7 +28,7 @@ public class Array<P> extends Type<List<P>> {
     public String formatInput(List<P> value) {
         return value.stream()
                 .map(v -> type.formatInput(v))
-                .collect(Collectors.joining("", encodeInt(value.size()), ""));
+                .collect(Collectors.joining("", isDynamic() ? encodeInt(value.size()) : "", ""));
     }
 
 

@@ -13,6 +13,7 @@ public class ArrayTest {
 
     private Array<String> addressArray = new Array<>(new Address());
     private Array<BigInteger> uintArray = new Array<>(new Uint());
+    private Array<BigInteger> staticUintArray = new Array<BigInteger>(new Uint(), 2);
 
     @Test
     public void formatInput() throws Exception {
@@ -23,6 +24,10 @@ public class ArrayTest {
         String expectedUintArray = "00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000F";
         String actualUintArray = uintArray.formatInput(Arrays.asList(BigInteger.valueOf(5L), BigInteger.valueOf(15L)));
         assertEquals(expectedUintArray, actualUintArray);
+
+        String expectedStaticUintArray = "0000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000F";
+        String actualStaticUintArray = staticUintArray.formatInput(Arrays.asList(BigInteger.valueOf(5L), BigInteger.valueOf(15L)));
+        assertEquals(expectedStaticUintArray, actualStaticUintArray);
     }
 
     @Test
@@ -39,7 +44,7 @@ public class ArrayTest {
     @Test(expected = IllegalArgumentException.class)
     public void formatOutputWrongLength() {
         String inputUints = "00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000F";
-        List<BigInteger> actualUintArray = uintArray.formatOutput(inputUints);
+        uintArray.formatOutput(inputUints);
     }
 
     @Test
