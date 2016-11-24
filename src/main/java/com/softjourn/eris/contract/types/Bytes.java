@@ -26,7 +26,7 @@ public class Bytes extends Type<byte[]> {
         int outLength = value.length / 32 + value.length % 32 > 0 ? 32 : 0;
         String result = Util.rightPad(new String(Hex.encodeHex(value)), outLength * 2, '0');
         if (length == 0) {
-            result = Util.encodeInt(outLength) + result;
+            result = Util.encodeInt(value.length) + result;
         }
         return result;
     }
@@ -60,7 +60,7 @@ public class Bytes extends Type<byte[]> {
 
     @Override
     public boolean isDynamic() {
-        return false;
+        return length == 0;
     }
 
     @Override
