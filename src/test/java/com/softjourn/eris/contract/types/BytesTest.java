@@ -56,7 +56,9 @@ public class BytesTest {
 
     @Test
     public void isDynamic() throws Exception {
-        assertFalse(new Bytes().isDynamic());
+        assertFalse(new Bytes(16).isDynamic());
+        assertFalse(new Bytes(32).isDynamic());
+        assertTrue(new Bytes().isDynamic());
     }
 
     @Test
