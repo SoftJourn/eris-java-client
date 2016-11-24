@@ -3,7 +3,6 @@ package com.softjourn.eris.contract;
 import com.softjourn.eris.ErisAccountData;
 import com.softjourn.eris.contract.event.EventHandler;
 import com.softjourn.eris.contract.response.Response;
-import com.softjourn.eris.contract.types.Type;
 import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.Params;
 import com.softjourn.eris.rpc.RPCClient;
@@ -12,9 +11,6 @@ import lombok.NonNull;
 import java.io.IOException;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import static com.softjourn.eris.contract.Util.encodeInt;
 
 
 class ContractImpl implements Contract, Cloneable {
@@ -29,12 +25,15 @@ class ContractImpl implements Contract, Cloneable {
 
     private final EventHandler eventHandler;
 
+    private final ArgumentsDecoder decoder;
+
     ContractImpl(String contractAddress, RPCClient client, @NonNull Map<String, ContractUnit> contractUnits, ErisAccountData accountData, EventHandler eventHandler) {
         this.contractAddress = contractAddress;
         this.client = client;
         this.contractUnits = contractUnits;
         this.accountData = accountData;
         this.eventHandler = eventHandler;
+        decoder = new ArgumentsDecoder();
     }
 
     @SuppressWarnings("unchecked")
@@ -107,46 +106,7 @@ class ContractImpl implements Contract, Cloneable {
 
         ContractUnit unit = contractUnits.get(contractUnitName);
 
-        return (unit.signature() + writeArgs(unit, args)).toUpperCase();
-
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private String writeArgs(@NonNull ContractUnit unit, Object... args) {
-        if (unit.getInputs().length != args.length) {
-            throw new IllegalArgumentException("Count of args in function " + unit.getName() +
-                    " is " + unit.getInputs().length +
-                    " but was passed " + args.length);
-        }
-        StringBuilder res = new StringBuilder();
-
-        int dynamicOffset = Stream.of(unit.getInputs())
-                .map(Variable::getType)
-                .map(Type::staticPartLength)
-                .reduce(0, (x, y) -> x+ y);
-
-        StringBuilder dynamicData = new StringBuilder();
-
-        for (int i = 0; i < args.length; i++) {
-            Type type = unit.getInputs()[i].getType();
-            if (type.valueClass().isInstance(args[i])) {
-                String encodedValue = type.formatInput(args[i]);
-                if (type.isDynamic()) {
-                    res.append(encodeInt(dynamicOffset));
-                    dynamicOffset += encodedValue.length() / 2;
-                    dynamicData.append(encodedValue);
-                } else {
-                    res.append(encodedValue);
-                }
-            } else {
-                throw new IllegalArgumentException("The " + (i + 1) + "-th parameter of function " + unit.getName() +
-                        " is " + type.toString() + " but argument was " + args[i]);
-            }
-        }
-        res.append(dynamicData);
-
-        return res.toString();
+        return (unit.signature() + decoder.writeArgs(unit, args)).toUpperCase();
     }
 
     @Override

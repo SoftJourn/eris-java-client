@@ -37,18 +37,18 @@ public class Array<P> extends Type<List<P>> {
         int length = readLength(value);
         checkLength(value, length);
         List<P> result = new ArrayList<>();
-        for (int i = 1; i <= length; i++) {
+        for (int i = lengthPartOffset(); i <= length - (1 - lengthPartOffset()); i++) {
             result.add(type.formatOutput(getIthPart(value, i)));
         }
         return result;
     }
 
     private int readLength(String value) {
-        return Integer.parseInt(value.substring(0, 64), 16);
+        return isDynamic() ? Integer.parseInt(value.substring(0, 64), 16) : staticArrayLength;
     }
 
     private void checkLength(String value, int length) {
-        if (value.length() != (length + 1) * 64) {
+        if (value.length() != (length + lengthPartOffset()) * 64) {
             throw new IllegalArgumentException("Wrong input. Length of array should be " + length +
                     " but presented length of input value is " + value.length());
         }
@@ -58,12 +58,16 @@ public class Array<P> extends Type<List<P>> {
         return value.substring(i * 64, (i + 1) * 64);
     }
 
+    private int lengthPartOffset() {
+        return isDynamic() ? 1  : 0;
+    }
+
     @Override
     public boolean canRepresent(String value) {
         try {
             int length = readLength(value);
             checkLength(value, length);
-            for (int i = 1; i <= length; i++) {
+            for (int i = lengthPartOffset(); i <= length; i++) {
                 if (!type.canRepresent(getIthPart(value, i))) return false;
             }
             return true;
