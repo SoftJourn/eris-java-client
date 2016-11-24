@@ -10,14 +10,59 @@ import java.util.stream.Stream;
 
 import static com.softjourn.eris.contract.Util.encodeInt;
 
+/**
+ * Class to encode/decode java types to Eris(Solidity) string representation
+ */
 public class ArgumentsDecoder {
 
+    /**
+     * Read Eris response string as out parameters
+     * @param unit Contract unit (i.e. function, event)
+     * @param value response string
+     * @return List of Java object that represents appropriate Eris(Solidity) types
+     */
     public List<Object> readArgs(@NonNull ContractUnit unit, String value) {
         Variable[] variables = unit.getOutputs();
         int[] offsets = getOffsets(unit);
         return IntStream.range(0, variables.length)
                 .mapToObj(i -> processType(variables[i].getType(), offsets[i], value))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Write arguments of specified ContractUnit (function) to Eris(Solidity) formatted string
+     * @param unit Contract unit (i.e. function)
+     * @param args Arguments to be formatted
+     *             Must be exact as function need count and types
+     * @return formatted string
+     */
+    @SuppressWarnings("unchecked")
+    public String writeArgs(@NonNull ContractUnit unit, Object... args) {
+        checkLengthCorrectness(unit, args);
+        StringBuilder res = new StringBuilder();
+
+        int dynamicOffset = Stream.of(unit.getInputs())
+                .map(Variable::getType)
+                .map(Type::staticPartLength)
+                .map(l -> ((l + 31) / 32) * 32)
+                .reduce(0, (x, y) -> x + y);
+
+        StringBuilder dynamicData = new StringBuilder();
+
+        for (int i = 0; i < args.length; i++) {
+            checkTypeCorrectness(unit, args, i);
+            Type type = unit.getInputs()[i].getType();
+
+            String encodedValue = type.formatInput(args[i]);
+            if (type.isDynamic()) {
+                res.append(encodeInt(dynamicOffset));
+                dynamicOffset += encodedValue.length() / 2;
+                dynamicData.append(encodedValue);
+            } else {
+                res.append(encodedValue);
+            }
+        }
+        return res.append(dynamicData).toString().toUpperCase();
     }
 
     private int[] getOffsets(ContractUnit unit) {
@@ -64,35 +109,6 @@ public class ArgumentsDecoder {
 
     private Object formatStaticType(Type type, int offset, String value) {
         return type.formatOutput(value.substring(offset * 2, (offset + type.staticPartLength()) * 2));
-    }
-
-    @SuppressWarnings("unchecked")
-    public String writeArgs(@NonNull ContractUnit unit, Object... args) {
-        checkLengthCorrectness(unit, args);
-        StringBuilder res = new StringBuilder();
-
-        int dynamicOffset = Stream.of(unit.getInputs())
-                .map(Variable::getType)
-                .map(Type::staticPartLength)
-                .map(l -> ((l + 31) / 32) * 32)
-                .reduce(0, (x, y) -> x + y);
-
-        StringBuilder dynamicData = new StringBuilder();
-
-        for (int i = 0; i < args.length; i++) {
-            checkTypeCorrectness(unit, args, i);
-            Type type = unit.getInputs()[i].getType();
-
-            String encodedValue = type.formatInput(args[i]);
-            if (type.isDynamic()) {
-                res.append(encodeInt(dynamicOffset));
-                dynamicOffset += encodedValue.length() / 2;
-                dynamicData.append(encodedValue);
-            } else {
-                res.append(encodedValue);
-            }
-        }
-        return res.append(dynamicData).toString().toUpperCase();
     }
 
     private void checkLengthCorrectness(ContractUnit unit, Object... args) {
