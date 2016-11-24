@@ -79,4 +79,9 @@ public class Bytes extends Type<byte[]> {
         return new Bytes(getLength(name));
     }
 
+    @Override
+    public int staticPartLength() {
+        return (length == 0 ? 1 : length) * getStaticArrayLength();
+    }
+
 }
