@@ -44,7 +44,7 @@ public class AccountsService {
 
     private Response sendTokens(String userPrivateKey, String address, Integer defaultAmountToSend) throws IOException {
 
-        ResponseParser parser = new ResponseParser<>(null);
+        ResponseParser parser = new ResponseParser(null);
 
         String response = client.call(ErisRPCRequestEntity.sendCallEntity(Params.sendParams(userPrivateKey, address, defaultAmountToSend)));
         return parser.parse(response);

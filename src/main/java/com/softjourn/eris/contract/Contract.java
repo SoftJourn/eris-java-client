@@ -15,7 +15,7 @@ public interface Contract extends Closeable, AutoCloseable {
      * @param args arguments to pass to called functions(can be zero arguments)
      * @return JSON representation of result of call
      */
-    <T> Response<T> call(String function, Object... args) throws IOException;
+    Response call(String function, Object... args) throws IOException;
 
 
     String subscribeToUserIn(String address, Consumer<Response> callBack);

@@ -98,7 +98,7 @@ public class ContractTest {
         tx.setOutputs(new Variable[]{new Variable("result", new Bool())});
 
 
-        contractUnits = new HashMap<String, ContractUnit>(){{
+        contractUnits = new HashMap<String, ContractUnit>() {{
             put("query", query);
             put("tx", tx);
         }};
@@ -122,41 +122,43 @@ public class ContractTest {
 
     @Test
     public void callQuery() throws Exception {
-        assertEquals(BigInteger.valueOf(100L), contract.call("query").getReturnValue().getVal());
+        assertEquals(BigInteger.valueOf(100L), contract.call("query").getReturnValues().get(0));
         verify(accountData, never()).getPrivKey();
     }
 
     @Test
     public void callTx() throws Exception {
-        assertEquals(true, contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", BigInteger.valueOf(100L)).getReturnValue().getVal());
+        assertEquals(true, contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", BigInteger.valueOf(100L)).getReturnValues().get(0));
         verify(accountData, atLeastOnce()).getPrivKey();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void callTxWithWrongArgsCount() throws Exception {
-        assertEquals(true, contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159").getReturnValue().getVal());
-        verify(accountData, atLeastOnce()).getPrivKey();
+        contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159");
+
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void callTxWithWrongArgsType() throws Exception {
-        assertEquals(true, contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", "100").getReturnValue().getVal());
-        verify(accountData, atLeastOnce()).getPrivKey();
+        contract.call("tx", "5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", "100");
     }
 
     @Test
     public void subscribeToUserIn() throws Exception {
-        assertEquals(INP_EVENT_ID, contract.subscribeToUserIn("5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", i -> {}));
+        assertEquals(INP_EVENT_ID, contract.subscribeToUserIn("5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", i -> {
+        }));
     }
 
     @Test
     public void subscribeToUserOut() throws Exception {
-        assertEquals(OUT_EVENT_ID, contract.subscribeToUserOut("5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", i -> {}));
+        assertEquals(OUT_EVENT_ID, contract.subscribeToUserOut("5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", i -> {
+        }));
     }
 
     @Test
     public void subscribeToUserCall() throws Exception {
-        assertEquals(CALL_EVENT_ID, contract.subscribeToUserCall("5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", i -> {}));
+        assertEquals(CALL_EVENT_ID, contract.subscribeToUserCall("5DCFF4E2FAE97CDB8DB921386B97A2C16CB2E159", i -> {
+        }));
     }
 
 }

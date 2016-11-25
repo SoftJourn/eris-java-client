@@ -38,14 +38,10 @@ class ContractImpl implements Contract, Cloneable {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Response<T> call(String function, Object... args) throws IOException {
-        Variable[] retVars = contractUnits.get(function).getOutputs();
+    public  Response call(String function, Object... args) throws IOException {
+        ContractUnit contractUnit = contractUnits.get(function);
         ResponseParser parser;
-        if (retVars.length == 0) {
-            parser = new ResponseParser<>(null);
-        } else {
-            parser = new ResponseParser<>(retVars[0]);
-        }
+        parser = new ResponseParser(contractUnit);
 
         String response = client.call(callRPCParams(function, args));
 
@@ -73,7 +69,7 @@ class ContractImpl implements Contract, Cloneable {
     }
 
     private Consumer<String> mapping(Consumer<Response> callBack) {
-        return s -> callBack.accept(new ResponseParser<>(null).apply(s));
+        return s -> callBack.accept(new ResponseParser(null).apply(s));
     }
 
     private String constructAccountInEventId(String accountAddress) {

@@ -3,14 +3,14 @@ package com.softjourn.eris.contract.response;
 
 import lombok.Data;
 
-import java.lang.*;
+import java.util.List;
 
 @Data
-public class Response<T> {
+public class Response {
 
     private final String id;
 
-    private final ReturnValue<T> returnValue;
+    private final List<Object> returnValues;
 
     private final Error error;
 

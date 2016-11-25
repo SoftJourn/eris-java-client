@@ -2,7 +2,6 @@ package com.softjourn.eris.contract;
 
 import com.softjourn.eris.contract.response.Error;
 import com.softjourn.eris.contract.response.Response;
-import com.softjourn.eris.contract.response.ReturnValue;
 import com.softjourn.eris.contract.response.TxParams;
 import com.softjourn.eris.contract.types.Uint;
 import org.junit.Before;
@@ -10,22 +9,27 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
 public class ResponseParserTest {
 
-    private Response<BigInteger> txResponse;
+    private Response txResponse;
 
     private Response txResponse_V_12;
 
-    private Response<BigInteger> txResponseWithRetValue;
+    private Response txResponseWithRetValue;
 
-    private Response<BigInteger> valResponse;
+    private Response valResponse;
 
     private Response errorResponse;
 
     private ResponseParser parser;
+
+    private ContractUnit valResponseContractUnit = new ContractUnit();
+    private ContractUnit txResponseContractUnit = new ContractUnit();
+    private ContractUnit txValResponseContractUnit = new ContractUnit();
 
     private final String valResponseString = "{\n" +
             "    \"result\": {\n" +
@@ -112,40 +116,43 @@ public class ResponseParserTest {
 
     @Before
     public void setUp() throws Exception {
-        txResponse = new Response<>("", null, null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
-        txResponse_V_12 = new Response<>("", null, null, new TxParams("6F4090E6FBB579CFFCCDF56CC0F74EFA2A3ADD5E", "E0B8E0A8005FDC681D8836F9FE1BAA3CC4B82AE7"));
-        txResponseWithRetValue = new Response<>("", new ReturnValue<>(BigInteger.class, BigInteger.valueOf(100L)), null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
-        valResponse = new Response<>("", new ReturnValue<>(BigInteger.class, BigInteger.valueOf(100L)), null, null);
-        errorResponse = new Response<>("", null, new Error(-32603, "Error when transacting: Insuffient gas"), null);
+        txResponse = new Response("", null, null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
+        txResponse_V_12 = new Response("", null, null, new TxParams("6F4090E6FBB579CFFCCDF56CC0F74EFA2A3ADD5E", "E0B8E0A8005FDC681D8836F9FE1BAA3CC4B82AE7"));
+        txResponseWithRetValue = new Response("", Collections.singletonList(BigInteger.valueOf(100L)), null, new TxParams("1ADA404B3EEDD5CC971475489A17BAACB9BA5D68", "8993486AB880DB2144A58989B4E3D72F9656246D"));
+        valResponse = new Response("", Collections.singletonList(BigInteger.valueOf(100L)), null, null);
+        errorResponse = new Response("", null, new Error(-32603, "Error when transacting: Insuffient gas"), null);
+
+        valResponseContractUnit.setOutputs(new Variable[]{new Variable<>("x", new Uint())});
+        txValResponseContractUnit.setOutputs(new Variable[]{new Variable<>("x", new Uint())});
     }
 
     @Test
     public void testParseVal() throws Exception {
-        ResponseParser<BigInteger> parser = new ResponseParser<>(new Variable<>("x", new Uint()));
+        ResponseParser parser = new ResponseParser(valResponseContractUnit);
         assertEquals(valResponse, parser.parse(valResponseString));
     }
 
     @Test
     public void testParseError() throws IOException {
-        ResponseParser parser = new ResponseParser<>(null);
+        ResponseParser parser = new ResponseParser(valResponseContractUnit);
         assertEquals(errorResponse, parser.parse(errorResponseString));
     }
 
     @Test
     public void testParseTx() throws IOException {
-        ResponseParser parser = new ResponseParser<>(null);
+        ResponseParser parser = new ResponseParser(txResponseContractUnit);
         assertEquals(txResponse, parser.parse(txResponseSring));
     }
 
     @Test
     public void testParseTx_Eris_V_12() throws IOException {
-        ResponseParser parser = new ResponseParser<>(null);
+        ResponseParser parser = new ResponseParser(txResponseContractUnit);
         assertEquals(txResponse_V_12, parser.parse(txResponseEris_V_12));
     }
 
     @Test
     public void testParseTxWithRetVal() throws IOException {
-        ResponseParser parser = new ResponseParser<>(new Variable<>("x", new Uint()));
+        ResponseParser parser = new ResponseParser(txValResponseContractUnit);
         assertEquals(txResponseWithRetValue, parser.parse(txResponseWithRetValueSring));
     }
 

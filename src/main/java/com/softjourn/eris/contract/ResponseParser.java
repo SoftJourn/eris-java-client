@@ -3,37 +3,39 @@ package com.softjourn.eris.contract;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.softjourn.eris.contract.response.*;
 import com.softjourn.eris.contract.response.Error;
-import com.softjourn.eris.contract.types.Type;
+import com.softjourn.eris.contract.response.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
-public class ResponseParser<T> implements Function<String, Response<T>> {
+public class ResponseParser implements Function<String, Response> {
 
     private ObjectMapper mapper;
 
-    private Variable<T> outVariable;
+    private ContractUnit contractUnit;
 
+    private ArgumentsDecoder decoder;
 
-    public ResponseParser(Variable<T> outVar) {
+    public ResponseParser(ContractUnit contractUnit) {
+        this.contractUnit = contractUnit;
         mapper = new ObjectMapper();
-        outVariable = outVar;
+        decoder = new ArgumentsDecoder();
     }
 
 
-    public Response<T> parse(String responseBody) throws IOException {
+    public Response parse(String responseBody) throws IOException {
         JsonNode res = mapper.readTree(responseBody);
 
         String id = getId(res);
-        ReturnValue<T> returnValue = getReturnValue(res);
+        List<Object> returnValue = getReturnValue(res);
         Error error = getError(res);
         TxParams txParams = getTxParams(res);
 
-        return new Response<>(id, returnValue, error, txParams);
+        return new Response(id, returnValue, error, txParams);
     }
 
     private TxParams getTxParams(JsonNode res) throws ResponseParsingException {
@@ -48,7 +50,7 @@ public class ResponseParser<T> implements Function<String, Response<T>> {
     }
 
     @Override
-    public Response<T> apply(String s) {
+    public Response apply(String s) {
         try {
             return parse(s);
         } catch (IOException e) {
@@ -81,26 +83,15 @@ public class ResponseParser<T> implements Function<String, Response<T>> {
     }
 
     @SuppressWarnings("unchecked")
-    private ReturnValue<T> getReturnValue(JsonNode res) throws ResponseParsingException {
-        if (outVariable == null) return null;
+    private List<Object> getReturnValue(JsonNode res) throws ResponseParsingException {
+        if (contractUnit == null || contractUnit.getOutputs() == null || contractUnit.getOutputs().length == 0) return null;
         JsonNode result = getResultObject(res.get("result"));
 
         return Optional.ofNullable(result)
                 .flatMap(r -> Optional.ofNullable(r.get("return")))
                 .map(JsonNode::asText)
-                .map(this::mapReturnString)
+                .map(s -> decoder.readArgs(contractUnit, s))
                 .orElse(null);
-    }
-
-    private ReturnValue<T> mapReturnString(String value) {
-        if (!outVariable.getType().canRepresent(value)) {
-            throw new ResponseParsingException("Wrong response. " +
-                    "Value " + value + " can't be represented by " +
-                    "required type " + outVariable.getType().toString() + ".");
-        } else {
-            Type<T> type = outVariable.getType();
-            return new ReturnValue<>(type.valueClass(), type.formatOutput(value));
-        }
     }
 
     /**
