@@ -1,5 +1,5 @@
 ###Eris java client
-Library to call Eris contracts from Java code. This library partially copy ___`eris/contracts-js`___ but not all features is implemented. 
+Library to call Eris contracts from Java code. This library partially copy [eris-ltd/eris-contracts.js](https://github.com/eris-ltd/eris-contracts.js) but not all features is implemented. 
 #### Simple usage 
 ```$xslt
 public class test {
