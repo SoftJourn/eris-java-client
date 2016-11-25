@@ -144,7 +144,7 @@ public class ParserTest {
                 "    \"type\": \"function\"\n" +
                 "  }\n" +
                 "]";
-        assertEquals(testContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
+        assertEquals(testContract, new ContractManager().parseContract(TEST_DATA)
                 .withEventHandler(eventHandler)
                 .withRPCClient(new RPCClient() {
                     @Override
@@ -237,7 +237,7 @@ public class ParserTest {
                 "    \"type\": \"event\"\n" +
                 "  }\n" +
                 "]";
-        assertEquals(testContract1, new ContractManager(TEST_DATA_1).parseContract(TEST_DATA_1)
+        assertEquals(testContract1, new ContractManager().parseContract(TEST_DATA_1)
                 .withEventHandler(eventHandler)
                 .withContractAddress("")
                 .withCallerAccount(account)
@@ -280,7 +280,7 @@ public class ParserTest {
                 "    \"type\": \"function\"\n" +
                 "  }\n" +
                 "]";
-        assertEquals(arrayTestContract, new ContractManager(TEST_DATA).parseContract(TEST_DATA)
+        assertEquals(arrayTestContract, new ContractManager().parseContract(TEST_DATA)
                 .withEventHandler(eventHandler)
                 .withCallerAccount(account)
                 .withRPCClient(new RPCClient() {

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.softjourn.eris.ErisAccountData;
 import com.softjourn.eris.contract.event.EventHandler;
-import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCClient;
 
 import java.io.BufferedReader;
@@ -25,20 +24,16 @@ public class ContractManager {
 
     private final ObjectReader contractUnitReader;
 
-    private final String contractAbiString;
-
-    public ContractManager(File contractAbiFile) throws IOException {
-        this(readContract(contractAbiFile));
-    }
-
-    public ContractManager(String contractAbiString) {
-        this.contractAbiString = contractAbiString;
-
+    public ContractManager() {
         ObjectMapper mapper = new ObjectMapper();
         contractUnitReader = mapper.readerFor(ContractUnit.class);
     }
 
-    public ContractBuilder contractBuilder() throws IOException {
+    public ContractBuilder contractBuilder(File contractAbiFile) throws IOException {
+        return parseContract(readContract(contractAbiFile));
+    }
+
+    public ContractBuilder contractBuilder(String contractAbiString) throws IOException {
         return parseContract(contractAbiString);
     }
 
