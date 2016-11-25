@@ -108,7 +108,13 @@ public class ArgumentsDecoder {
     }
 
     private Object formatStaticType(Type type, int offset, String value) {
-        return type.formatOutput(value.substring(offset * 2, (offset + type.staticPartLength()) * 2));
+        int startOffset = offset * 2;
+        int endOffSet =  (offset + type.staticPartLength()) * 2;
+        if (value.length() < startOffset || value.length() < endOffSet) {
+            throw new IllegalArgumentException("Can't parse " + type + " from response. Wrong response length or offsets.");
+        }
+        String currentValue = value.substring(startOffset, endOffSet);
+        return type.formatOutput(currentValue);
     }
 
     private void checkLengthCorrectness(ContractUnit unit, Object... args) {

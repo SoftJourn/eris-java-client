@@ -1,8 +1,6 @@
 package com.softjourn.eris.contract;
 
-import com.softjourn.eris.contract.types.Array;
-import com.softjourn.eris.contract.types.Bytes;
-import com.softjourn.eris.contract.types.Uint;
+import com.softjourn.eris.contract.types.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,6 +18,8 @@ public class ArgumentsDecoderTest {
 
     ContractUnit function1 = new ContractUnit();
 
+    ContractUnit function2 = new ContractUnit();
+
     Variable<List<BigInteger>> staticArrayVariabe = new Variable<>("stArr", new Array<>(new Uint(), 2));
     Variable<List<BigInteger>> dynamicArrayVariabe = new Variable<>("dnArr", new Array<>(new Uint()));
     Variable<byte[]> staticBytesVariable = new Variable<>("stBytes", new Bytes(16));
@@ -35,6 +35,8 @@ public class ArgumentsDecoderTest {
         function1.setInputs(new Variable[]{staticArrayVariabe, dynamicArrayVariabe, staticBytesVariable, dynamicBytesVariable, staticIntVariable});
 
         function1.setOutputs(new Variable[]{staticArrayVariabe, dynamicArrayVariabe, staticBytesVariable, dynamicBytesVariable, staticIntVariable});
+
+        function2.setOutputs(new Variable[]{new Variable<>("x", new Address())});
 
     }
 
@@ -58,7 +60,12 @@ public class ArgumentsDecoderTest {
                 assertEquals(expected.get(i), result.get(i));
             }
         }
+    }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void readArgs_Empty() throws Exception {
+        String data = "";
+        decoder.readArgs(function2, data);
     }
 
     @Test
