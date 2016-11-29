@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class Params {
 
-    private static final int DEFAULT_GAS_LIMIT = 1000;
+    private static final int DEFAULT_GAS_LIMIT = 100000000;
 
     private HashMap<String, Object> params;
 
