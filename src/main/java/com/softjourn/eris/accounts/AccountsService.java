@@ -19,14 +19,10 @@ public class AccountsService {
 
     private RPCClient client;
 
-    private String url;
-
-
-    public AccountsService(KeyService keyService, String userPrivateKey, RPCClient client, String url) {
+    public AccountsService(KeyService keyService, String userPrivateKey, RPCClient client) {
         this.keyService = keyService;
         this.userPrivateKey = userPrivateKey;
         this.client = client;
-        this.url = url;
     }
 
     public ErisAccountData createAccount() {
