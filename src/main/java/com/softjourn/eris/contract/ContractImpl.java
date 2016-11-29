@@ -10,6 +10,7 @@ import lombok.NonNull;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 
@@ -39,9 +40,9 @@ class ContractImpl implements Contract, Cloneable {
     @SuppressWarnings("unchecked")
     @Override
     public  Response call(String function, Object... args) throws IOException {
-        ContractUnit contractUnit = contractUnits.get(function);
-        ResponseParser parser;
-        parser = new ResponseParser(contractUnit);
+        ResponseParser parser = Optional.ofNullable(contractUnits.get(function))
+                .map(ResponseParser::new)
+                .orElseThrow(() -> new RuntimeException("This contract doesn't have function \"" + function + "\""));
 
         String response = client.call(callRPCParams(function, args));
 

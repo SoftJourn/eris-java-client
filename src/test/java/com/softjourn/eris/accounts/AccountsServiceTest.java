@@ -34,7 +34,7 @@ public class AccountsServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        accountsService = new AccountsService(keyService, "key", rpcClient, url);
+        accountsService = new AccountsService(keyService, "key", rpcClient);
 
         when(keyService.generateNewKey()).thenReturn(accountData);
         when(rpcClient.call(any())).thenReturn(sendResponse);
