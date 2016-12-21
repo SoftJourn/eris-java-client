@@ -2,7 +2,6 @@ package com.softjourn.eris.contract;
 
 import com.softjourn.eris.ErisAccountData;
 import com.softjourn.eris.contract.event.EventHandler;
-import com.softjourn.eris.contract.types.Address;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCClient;
 import org.junit.Before;
@@ -10,15 +9,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ContractDeployerTest {
 
-    ContractDeployer deployer = new ContractDeployer();
+    ContractManager deployer = new ContractManager();
 
     ErisAccountData account;
 
@@ -52,16 +48,16 @@ public class ContractDeployerTest {
 
         Contract contract = deployer.contractBuilder(new File("src/test/resources/crowdsale-abi"))
                 .withSolidityByteCode(new File("src/test/resources/code"))
-                .withParameters("0x4BE9C281CFE741BDEFA68C26F4B48FC58D6180A7",
+                .withParameters("4BE9C281CFE741BDEFA68C26F4B48FC58D6180A7",
                         BigInteger.valueOf(1000),
                         BigInteger.valueOf(10),
                         true,
                         new ArrayList<String>() {{
-                            add("0xAB16E684DEAF5473D0A0C6B4671E796F749704C9");
+                            add("AB16E684DEAF5473D0A0C6B4671E796F749704C9");
                         }})
                 .withRPCClient(client)
                 .withEventHandler(new EventHandler(chainUrl))
-                .withCallerAccount(account).build();
+                .withCallerAccount(account).buildAndDeploy();
         System.out.println(contract.toString());
     }
 
