@@ -101,12 +101,12 @@ public class ContractManager {
             return this;
         }
 
-        ContractBuilder withSolidityByteCode(String byteCode) {
+        public ContractBuilder withSolidityByteCode(String byteCode) {
             this.solidityByteCode = byteCode;
             return this;
         }
 
-        ContractBuilder withSolidityByteCode(File file) throws IOException {
+        public ContractBuilder withSolidityByteCode(File file) throws IOException {
             return withSolidityByteCode(readContract(file));
         }
 
