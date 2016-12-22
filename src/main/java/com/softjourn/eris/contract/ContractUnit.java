@@ -32,7 +32,7 @@ class ContractUnit {
         return Util.hash(name + "(" + commaSeparatedInputVars() + ")").substring(0, 8);
     }
 
-    private  String commaSeparatedInputVars() {
+    private String commaSeparatedInputVars() {
         return Stream
                 .of(inputs)
                 .map(Variable::getType)
@@ -48,7 +48,7 @@ class ContractUnit {
         ContractUnit that = (ContractUnit) o;
 
         if (constant != that.constant) return false;
-        if (!name.equals(that.name)) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (type != that.type) return false;
         // Probably incorrect - comparing Object[] arrays with Arrays.equals
         if (!Arrays.equals(inputs, that.inputs)) return false;

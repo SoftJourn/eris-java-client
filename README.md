@@ -26,17 +26,25 @@ public class test {
 
         String chainUrl = "http://172.17.0.1:1337";
         try (
-                Create client (HTTP or WebSocet)
+                //Create client (HTTP or WebSocet)
                 RPCClient client = new HTTPRPCClient(chainUrl);
                 //RPCClient client = new WebSocketRPCClient(chainUrl);
 
-                Create contract
+                //Using existing contract
                 Contract sj_testing_contract = contractManager.contractBuilder()
                         .withContractAddress("2DBE3BDA2E595FB86258E580A24D27415138C8AB")
                         .withRPCClient(client)
                         .withEventHandler(new EventHandler(chainUrl))
                         .withCallerAccount(account)
                         .build()
+                        
+                //Deploy new contract
+                Contract sj_testing_contract = contractManager.contractBuilder()
+                        .withSolidityByteCode(new File("path/to/solidity/bytecode/file"))
+                        .withRPCClient(client)
+                        .withEventHandler(new EventHandler(chainUrl))
+                        .withCallerAccount(account)
+                        .buildAndDeploy()
         ) {
              // Call contract method with required parameters
              return sj_testing_contract.call("queryBalance", "2DBE3BDA2E595FB86258E580A24D27415138C8AB");

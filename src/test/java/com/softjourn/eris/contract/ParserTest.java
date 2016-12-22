@@ -242,7 +242,7 @@ public class ParserTest {
                 "    \"type\": \"event\"\n" +
                 "  }\n" +
                 "]";
-        assertEquals(testContract1.toString(), new ContractManager().parseContract(TEST_DATA_1)
+        assertEquals(testContract1, new ContractManager().parseContract(TEST_DATA_1)
                 .withEventHandler(eventHandler)
                 .withContractAddress("")
                 .withCallerAccount(account)
@@ -257,7 +257,7 @@ public class ParserTest {
 
                     }
                 })
-                .build().toString());
+                .build());
     }
 
     @Test

@@ -23,6 +23,10 @@ public class ContractDeployer {
     private final ObjectMapper mapper;
     private final ArgumentsDecoder decoder;
 
+    /**
+     * @param client      - needed to make http request to eris
+     * @param accountData - eris's caller account
+     */
     public ContractDeployer(RPCClient client, ErisAccountData accountData) {
         this.accountData = accountData;
         this.client = client;
@@ -30,6 +34,14 @@ public class ContractDeployer {
         this.decoder = new ArgumentsDecoder();
     }
 
+    /**
+     * Deploys new instance of solidity contract
+     *
+     * @param unit             - structure of contract constructor
+     * @param solidityByteCode - contract's compiled code
+     * @param args             - solidity's contract constructor parameters
+     * @return DeployResponse
+     */
     public DeployResponse deploy(ContractUnit unit, String solidityByteCode, Object... args) {
         solidityByteCode += decoder.writeArgs(unit, args).toUpperCase();
         try {

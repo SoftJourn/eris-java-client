@@ -1,19 +1,12 @@
 package com.softjourn.eris.contract;
 
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.softjourn.eris.ErisAccountData;
 import com.softjourn.eris.contract.event.EventHandler;
 import com.softjourn.eris.contract.response.DeployResponse;
-import com.softjourn.eris.contract.response.DeployResult;
-import com.softjourn.eris.contract.response.Error;
-import com.softjourn.eris.contract.response.ResponseParsingException;
-import com.softjourn.eris.rpc.ErisRPCRequestEntity;
-import com.softjourn.eris.rpc.Params;
 import com.softjourn.eris.rpc.RPCClient;
-import com.softjourn.eris.rpc.RPCRequestEntity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -128,6 +121,14 @@ public class ContractManager {
             return new ContractImpl(contractAddress, client, (Map<String, ContractUnit>) contractUnits.clone(), accountData, eventHandler);
         }
 
+        /**
+         * Deploys new instance of solidity contract and build new contract object
+         *
+         * @param args - parameters of contract constructor(If constructor does not have any parameters, just call
+         *             this method like this "buildAndDeploy()", else if constructor has parameters, than put these
+         *             parameters in the same order that they are in contract constructor)
+         * @return Contract
+         */
         public Contract buildAndDeploy(Object... args) {
             if (eventHandler == null)
                 throw new RuntimeException("EventHandler is not provided. Can't create contract.");
