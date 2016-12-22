@@ -32,12 +32,11 @@ public class ContractManager {
 
     ObjectMapper mapper;
     private final ObjectReader contractUnitReader;
-    private final ArgumentsDecoder decoder;
+
 
     public ContractManager() {
         mapper = new ObjectMapper();
         contractUnitReader = mapper.readerFor(ContractUnit.class);
-        decoder = new ArgumentsDecoder();
     }
 
     public ContractBuilder contractBuilder(File contractAbiFile) throws IOException {
@@ -118,16 +117,6 @@ public class ContractManager {
             return withSolidityByteCode(readContract(file));
         }
 
-        ContractBuilder withParameters(Object... args) throws IOException {
-            if (solidityByteCode == null)
-                throw new RuntimeException("Solidity byte code is not provided. Can't create contract");
-            else {
-                ContractUnit unit = contractUnits.get(null);
-                this.solidityByteCode += decoder.writeArgs(unit, args).toUpperCase();
-                return this;
-            }
-        }
-
         @SuppressWarnings("unchecked")
         public Contract build() {
             if (eventHandler == null)
@@ -139,45 +128,17 @@ public class ContractManager {
             return new ContractImpl(contractAddress, client, (Map<String, ContractUnit>) contractUnits.clone(), accountData, eventHandler);
         }
 
-        public Contract buildAndDeploy() {
+        public Contract buildAndDeploy(Object... args) {
             if (eventHandler == null)
                 throw new RuntimeException("EventHandler is not provided. Can't create contract.");
             if (client == null) throw new RuntimeException("RPCClient is not provided. Can't create contract.");
             if (accountData == null) throw new RuntimeException("Account is not provided. Can't create contract.");
             if (solidityByteCode == null)
                 throw new RuntimeException("Solidity byte code is not provided. Can't create contract");
-            return new ContractImpl(deploy().getResult().getCall_data().getCallee(),
+            ContractDeployer deployer = new ContractDeployer(client, accountData);
+            DeployResponse response = deployer.deploy(contractUnits.get(null), solidityByteCode, args);
+            return new ContractImpl(response.getResult().getCall_data().getCallee(),
                     client, (Map<String, ContractUnit>) contractUnits.clone(), accountData, eventHandler);
-        }
-
-        private DeployResponse deploy() {
-            try {
-                Map<String, Object> params = Params.transactionalCallParams(accountData.getPrivKey(),
-                        "", solidityByteCode);
-                RPCRequestEntity entity = ErisRPCRequestEntity.transactionalCallEntity(params);
-                String call = client.call(entity);
-                return deployParser(call);
-            } catch (IOException e) {
-                throw new ContractDeploymentException(e);
-            }
-        }
-
-        private DeployResponse deployParser(String json) throws IOException {
-            JsonNode jsonNode = mapper.readTree(json);
-            Error error = getError(jsonNode);
-            if (error == null) {
-                DeployResult deployResult = mapper.treeToValue(jsonNode.get("result"), DeployResult.class);
-                return new DeployResponse(jsonNode.get("id").asText(), deployResult, null, jsonNode.get("jsonrpc").asText());
-            } else {
-                throw new ContractDeploymentException(error.getMessage());
-            }
-        }
-
-        private Error getError(JsonNode res) throws IOException {
-            if (!res.has("error")) throw new ResponseParsingException("Wrong response. Error field is not presented.");
-            JsonNode error = res.get("error");
-            ObjectReader reader = mapper.readerFor(Error.class);
-            return reader.readValue(error);
         }
 
     }

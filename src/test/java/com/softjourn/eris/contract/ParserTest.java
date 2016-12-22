@@ -62,6 +62,10 @@ public class ParserTest {
             put("set", setFunction);
         }};
 
+        final ContractUnit constructor = new ContractUnit();
+        constructor.setType(ContractUnitType.constructor);
+        constructor.setInputs(new Variable[]{});
+
         final ContractUnit queryBalance = new ContractUnit();
         queryBalance.setName("queryBalance");
         queryBalance.setConstant(true);
@@ -100,6 +104,7 @@ public class ParserTest {
         });
 
         Map<String, ContractUnit> testUnits1 = new HashMap<String, ContractUnit>() {{
+            put(null, constructor);
             put("queryBalance", queryBalance);
             put("mint", mint);
             put("send", send);
@@ -237,7 +242,7 @@ public class ParserTest {
                 "    \"type\": \"event\"\n" +
                 "  }\n" +
                 "]";
-        assertEquals(testContract1, new ContractManager().parseContract(TEST_DATA_1)
+        assertEquals(testContract1.toString(), new ContractManager().parseContract(TEST_DATA_1)
                 .withEventHandler(eventHandler)
                 .withContractAddress("")
                 .withCallerAccount(account)
@@ -252,7 +257,7 @@ public class ParserTest {
 
                     }
                 })
-                .build());
+                .build().toString());
     }
 
     @Test

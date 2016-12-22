@@ -3,6 +3,7 @@ package com.softjourn.eris.rpc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
  * RPC entity to call eris contract
  */
 @Getter
+@EqualsAndHashCode
 public class ErisRPCRequestEntity implements RPCRequestEntity {
 
     private static final String CONSTANT_CALL_METHOD = "erisdb.call";
