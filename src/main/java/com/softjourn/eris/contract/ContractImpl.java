@@ -39,7 +39,7 @@ class ContractImpl implements Contract, Cloneable {
 
     @SuppressWarnings("unchecked")
     @Override
-    public  Response call(String function, Object... args) throws IOException {
+    public Response call(String function, Object... args) throws IOException {
         ResponseParser parser = Optional.ofNullable(contractUnits.get(function))
                 .map(ResponseParser::new)
                 .orElseThrow(() -> new RuntimeException("This contract doesn't have function \"" + function + "\""));
@@ -67,6 +67,11 @@ class ContractImpl implements Contract, Cloneable {
     @Override
     public void unsubscribe(String subscriptionId) {
         eventHandler.unsubscribe(subscriptionId);
+    }
+
+    @Override
+    public String getAddress() {
+        return this.contractAddress;
     }
 
     private Consumer<String> mapping(Consumer<Response> callBack) {

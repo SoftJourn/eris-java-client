@@ -11,8 +11,9 @@ public interface Contract extends Closeable, AutoCloseable {
 
     /**
      * Call contract function with passed arguments
+     *
      * @param function name of function to be called
-     * @param args arguments to pass to called functions(can be zero arguments)
+     * @param args     arguments to pass to called functions(can be zero arguments)
      * @return JSON representation of result of call
      */
     Response call(String function, Object... args) throws IOException;
@@ -25,4 +26,6 @@ public interface Contract extends Closeable, AutoCloseable {
     String subscribeToUserCall(String address, Consumer<Response> callBack);
 
     void unsubscribe(String subscriptionId);
+
+    String getAddress();
 }
