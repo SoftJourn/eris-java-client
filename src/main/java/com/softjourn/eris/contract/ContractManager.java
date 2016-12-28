@@ -17,19 +17,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.softjourn.eris.contract.Util.parseAbi;
+
 /**
  * Contract manager to create or deploy contract objects
  * for specified chain url and account
  */
 public class ContractManager {
 
-    ObjectMapper mapper;
-    private final ObjectReader contractUnitReader;
-
-
     public ContractManager() {
-        mapper = new ObjectMapper();
-        contractUnitReader = mapper.readerFor(ContractUnit.class);
     }
 
     public ContractBuilder contractBuilder(File contractAbiFile) throws IOException {
@@ -48,16 +44,7 @@ public class ContractManager {
 
     ContractBuilder parseContract(String abiJson) throws IOException {
         try {
-            HashMap<String, ContractUnit> result = new HashMap<>();
-            Iterator<ContractUnit> contractUnitIterator = contractUnitReader.readValues(abiJson);
-            while (contractUnitIterator.hasNext()) {
-                ContractUnit contractUnit = contractUnitIterator.next();
-                if (contractUnit.getType() == ContractUnitType.constructor ||
-                        contractUnit.getType() == ContractUnitType.function ||
-                        contractUnit.getType() == ContractUnitType.event)
-                    result.put(contractUnit.getName(), contractUnit);
-            }
-            return new ContractBuilder(result);
+            return new ContractBuilder(parseAbi(abiJson));
         } catch (IOException e) {
             throw new IOException("Can't read ABI file due to exception", e);
         }

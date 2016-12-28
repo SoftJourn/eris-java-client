@@ -1,13 +1,18 @@
 package com.softjourn.eris.contract;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.jcajce.provider.digest.RIPEMD160;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class Util {
 
@@ -29,6 +34,21 @@ public class Util {
     public static String sha3(byte[] value) {
         byte[] hash = SHA3_DIGEST.digest(value);
         return Hex.encodeHexString(hash);
+    }
+
+    public static HashMap<String, ContractUnit> parseAbi(String abi) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectReader objectReader = mapper.readerFor(ContractUnit.class);
+        HashMap<String, ContractUnit> result = new HashMap<>();
+        Iterator<ContractUnit> contractUnitIterator = objectReader.readValues(abi);
+        while (contractUnitIterator.hasNext()) {
+            ContractUnit contractUnit = contractUnitIterator.next();
+            if (contractUnit.getType() == ContractUnitType.constructor ||
+                    contractUnit.getType() == ContractUnitType.function ||
+                    contractUnit.getType() == ContractUnitType.event)
+                result.put(contractUnit.getName(), contractUnit);
+        }
+        return result;
     }
 
     /**
