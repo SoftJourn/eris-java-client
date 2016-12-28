@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-class ContractUnit {
+public class ContractUnit {
 
     private String name;
 
