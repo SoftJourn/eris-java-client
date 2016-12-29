@@ -22,12 +22,14 @@ public class ContractDeployer {
     private final RPCClient client;
     private final ObjectMapper mapper;
     private final ArgumentsDecoder decoder;
+    private ResultParser resultParser;
 
     /**
      * @param client      - needed to make http request to eris
      * @param accountData - eris's caller account
      */
     public ContractDeployer(RPCClient client, ErisAccountData accountData) {
+        resultParser = new ResultParser();
         this.accountData = accountData;
         this.client = client;
         this.mapper = new ObjectMapper();
@@ -59,7 +61,7 @@ public class ContractDeployer {
         JsonNode jsonNode = mapper.readTree(json);
         Error error = getError(jsonNode);
         if (error == null) {
-            DeployResult deployResult = mapper.treeToValue(jsonNode.get("result"), DeployResult.class);
+            DeployResult deployResult = mapper.treeToValue(resultParser.getResultObject(jsonNode.get("result")), DeployResult.class);
             return new DeployResponse(jsonNode.get("id").asText(), deployResult, null, jsonNode.get("jsonrpc").asText());
         } else {
             throw new ContractDeploymentException(error.getMessage());
