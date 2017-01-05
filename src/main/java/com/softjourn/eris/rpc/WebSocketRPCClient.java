@@ -4,6 +4,7 @@ import com.neovisionaries.ws.client.*;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,7 +51,7 @@ public class WebSocketRPCClient implements RPCClient, AutoCloseable {
     @Override
     public String call(RPCRequestEntity entity) throws IOException {
         try {
-            if (! socket.isOpen()) {
+            if (!socket.isOpen()) {
                 openConnection();
             }
             String id = genId();
@@ -80,6 +81,24 @@ public class WebSocketRPCClient implements RPCClient, AutoCloseable {
             handleResponse(text);
         }
 
+        @Override
+        public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+            reconnect(websocket);
+        }
+    }
+
+    private void reconnect(WebSocket webSocket) throws InterruptedException {
+        boolean succeed = false;
+        while (!succeed) {
+            try {
+                this.socket = webSocket.recreate();
+                openConnection();
+                succeed = true;
+            } catch (Exception e) {
+                // wait 10 seconds
+                Thread.sleep(10 * 1000);
+            }
+        }
     }
 
     private void handleResponse(String response) {
@@ -103,7 +122,7 @@ public class WebSocketRPCClient implements RPCClient, AutoCloseable {
 
     private synchronized void openConnection() {
         try {
-            if (! socket.isOpen()) {
+            if (!socket.isOpen()) {
                 socket.connect();
                 socket.addListener(listener);
             }
