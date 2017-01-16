@@ -28,7 +28,7 @@ public class ContractUnit {
 
     private Variable[] outputs;
 
-    String signature() {
+    public String signature() {
         return Util.hash(name + "(" + commaSeparatedInputVars() + ")").substring(0, 8);
     }
 

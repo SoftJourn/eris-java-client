@@ -23,11 +23,21 @@ public class ArgumentsDecoder {
      */
     public List<Object> readArgs(@NonNull ContractUnit unit, String value) {
         Variable[] variables = unit.getOutputs();
-        int[] offsets = getOffsets(unit);
+        int[] offsets = getOffsets(variables);
         return IntStream.range(0, variables.length)
                 .mapToObj(i -> processType(variables[i].getType(), offsets[i], value))
                 .collect(Collectors.toList());
     }
+
+
+    public List<Object> readInputArgs(@NonNull ContractUnit unit, String value) {
+        Variable[] variables = unit.getInputs();
+        int[] offsets = getOffsets(variables);
+        return IntStream.range(0, variables.length)
+                .mapToObj(i -> processType(variables[i].getType(), offsets[i], value))
+                .collect(Collectors.toList());
+    }
+
 
     /**
      * Write arguments of specified ContractUnit (function) to Eris(Solidity) formatted string
@@ -65,8 +75,8 @@ public class ArgumentsDecoder {
         return res.append(dynamicData).toString().toUpperCase();
     }
 
-    private int[] getOffsets(ContractUnit unit) {
-        int[] lengths = Stream.of(unit.getOutputs())
+    private int[] getOffsets(Variable[] variables) {
+        int[] lengths = Stream.of(variables)
                 .map(Variable::getType)
                 .mapToInt(Type::staticPartLength)
                 .map(this::roundTo32)
@@ -75,7 +85,7 @@ public class ArgumentsDecoder {
             lengths[i] += i== 0 ? 0 : lengths[i-1];
         }
         for (int i = 0; i < lengths.length; i++) {
-            lengths[i] -= roundTo32(unit.getOutputs()[i].getType().staticPartLength());
+            lengths[i] -= roundTo32(variables[i].getType().staticPartLength());
         }
         return lengths;
     }
