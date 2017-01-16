@@ -33,6 +33,10 @@ public class ErisRPCRequestEntity implements RPCRequestEntity {
 
     private Map<String, Object> params;
 
+    public ErisRPCRequestEntity(Map<String, Object> params, ErisRPCMethod method) {
+        this(params, method.name, "");
+    }
+
     public ErisRPCRequestEntity(Map<String, Object> params, String method) {
         this(params, method, "");
     }
@@ -41,10 +45,6 @@ public class ErisRPCRequestEntity implements RPCRequestEntity {
         this.params = params;
         this.method = method;
         this.id = id;
-    }
-
-    public ErisRPCRequestEntity setId(String id) {
-        return new ErisRPCRequestEntity(params, method, id);
     }
 
     /**
@@ -72,6 +72,10 @@ public class ErisRPCRequestEntity implements RPCRequestEntity {
      */
     public static ErisRPCRequestEntity sendCallEntity(Map<String, Object> params) {
         return new ErisRPCRequestEntity(params, SEND_CALL_METHOD);
+    }
+
+    public ErisRPCRequestEntity setId(String id) {
+        return new ErisRPCRequestEntity(params, method, id);
     }
 
     @Override
