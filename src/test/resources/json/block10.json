@@ -1,0 +1,40 @@
+{
+  "result": {
+    "header": {
+      "chain_id": "test",
+      "height": 10,
+      "time": "2017-01-12T11:52:41.290Z",
+      "num_txs": 0,
+      "last_block_hash": "345A6AE3465A4C4B94553157C12002184EC8416D",
+      "last_block_parts": {
+        "total": 1,
+        "hash": "04A020B1BB043B24ECD1F7C31C757CD739050270"
+      },
+      "last_commit_hash": "E3EAE68085953F6B8697D350079C94CD483BE5B3",
+      "data_hash": "",
+      "validators_hash": "2DDFC989899DD554AE0326C351BFBDBB6B738090",
+      "app_hash": "3FFF0E002F0AE7370E4A086A8E92F5946575E880"
+    },
+    "data": {
+      "txs": []
+    },
+    "last_commit": {
+      "precommits": [
+        {
+          "height": 9,
+          "round": 0,
+          "type": 2,
+          "block_hash": "345A6AE3465A4C4B94553157C12002184EC8416D",
+          "block_parts_header": {
+            "total": 1,
+            "hash": "04A020B1BB043B24ECD1F7C31C757CD739050270"
+          },
+          "signature": "A7627F9A60B0DF2FC9737C24F457F39EAD91793DDA013317124915C2D846813A36EBF7326E436F2B0327519E011492DF250E44FDBD2C2BFF09C76F8BE46B430A"
+        }
+      ]
+    }
+  },
+  "error": null,
+  "id": "",
+  "jsonrpc": "2.0"
+}
