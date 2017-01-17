@@ -1,6 +1,10 @@
 package com.softjourn.eris.transaction.type;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.Scanner;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -10,7 +14,18 @@ import static org.junit.Assert.assertNotNull;
  */
 public class TransactionTest {
 
-    private String transactionBinary = "0201011490CCB0132FA9287AB3C3283978C0E523FA1450A0000000000000000101070177F493FA8F938E09C077BAD480B77420DB6B4E82DA2BFF69C468CA3A8667DF6A6D49DE8BD2AD9FB19235A15D80238E47C08DCA693DBC5CA5DDC61195E8262B0A01CE92BABD1B4BEED36B5314DA468B2C16BE0E0380948C67ED2C352ADD8099E67301143E5C5EBAEAA66C24785D04F33F2B62667001474A00000000000F42400000000000000000014440C10F1900000000000000000000000090CCB0132FA9287AB3C3283978C0E523FA1450A0000000000000000000000000000000000000000000000000000000000000006E";
+    private String transactionBinary;
+    private String abi;
+
+    @Before
+    public void setUp() throws Exception {
+        File file;
+        file = new File("src/test/resources/json/coinsContractAbi.json");
+        this.abi = new Scanner(file).useDelimiter("\\Z").next();
+        file = new File("src/test/resources/TransactionBinary.txt");
+        this.transactionBinary = new Scanner(file).useDelimiter("\\Z").next();
+
+    }
 
     @Test
     public void newTransaction_NotNullTransaction() throws Exception {
@@ -26,10 +41,9 @@ public class TransactionTest {
     @Test
     public void parseCallingData() throws Exception {
         Transaction transaction = new Transaction(transactionBinary);
-        assertNotNull(transaction.parseCallingData());
-        transaction.parseCallingData();
-        System.out.println(transaction.parseCallingData());
-
+        assertNotNull(transaction.parseCallingData(abi));
+        transaction.parseCallingData(abi);
+        System.out.println(transaction.parseCallingData(abi));
 
     }
 }
