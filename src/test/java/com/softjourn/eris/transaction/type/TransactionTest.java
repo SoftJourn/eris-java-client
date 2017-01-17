@@ -39,7 +39,7 @@ public class TransactionTest {
     }
 
     @Test
-    public void parseCallingData() throws Exception {
+    public void parseCallingData_Abi() throws Exception {
         Transaction transaction = new Transaction(transactionBinary);
         assertNotNull(transaction.parseCallingData(abi));
         transaction.parseCallingData(abi);

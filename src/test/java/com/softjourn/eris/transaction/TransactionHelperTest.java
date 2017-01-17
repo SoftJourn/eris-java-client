@@ -5,6 +5,7 @@ import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCMethod;
 import com.softjourn.eris.transaction.type.Block;
+import com.softjourn.eris.transaction.type.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -39,9 +41,13 @@ public class TransactionHelperTest {
     private HTTPRPCClient httpRpcClient = mock(HTTPRPCClient.class);
     private double random = Math.random();
     private boolean isRealCallsToEris = false;
+    private String abi;
 
     @Before
     public void setUp() throws Exception {
+        File abiFile = new File("src/test/resources/json/coinsContractAbi.json");
+        this.abi = new Scanner(abiFile).useDelimiter("\\Z").next();
+
         if (!isRealCallsToEris) {
             Field field = transactionHelper.getClass().getDeclaredField("httpRpcClient");
             field.setAccessible(true);
@@ -154,5 +160,17 @@ public class TransactionHelperTest {
         System.out.println(latest);
         BigInteger greater = latest.add(BigInteger.TEN);
         assertNull(transactionHelper.getBlock(greater));
+    }
+
+    @Test
+    public void getTransactionFromBlock() throws Exception {
+        if (!isRealCallsToEris) {
+            String expected = "[90CCB0132FA9287AB3C3283978C0E523FA1450A0, 110]";
+            List<Transaction> transactions = transactionHelper.getBlock(blockNumber3847).getData().getTransactions();
+            assertEquals(1, transactions.size());
+            Transaction transaction = transactions.get(0);
+            List<Object> inputs = transaction.parseCallingData(abi);
+            assertEquals(expected, inputs.toString());
+        }
     }
 }
