@@ -1,11 +1,8 @@
 package com.softjourn.eris.transaction;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softjourn.eris.rpc.ErisRPCRequestEntity;
-import com.softjourn.eris.rpc.ErisRPCResponseEntity;
-import com.softjourn.eris.rpc.HTTPRPCClient;
-import com.softjourn.eris.rpc.RPCMethod;
+import com.softjourn.eris.rpc.*;
 import com.softjourn.eris.transaction.type.Block;
+import com.softjourn.eris.transaction.type.Height;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -18,39 +15,32 @@ import java.util.Map;
  */
 public class TransactionHelper {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-    private String host;
     private HTTPRPCClient httpRpcClient;
 
     public TransactionHelper(String host) {
-        this.host = host;
         this.httpRpcClient = new HTTPRPCClient(host);
     }
 
-    public Block getBlock(BigInteger blockNumber) throws IOException {
+    public Block getBlock(BigInteger blockNumber) throws IOException, ErisRPCError {
         String blockJSON = this.getBlockJSON(blockNumber);
-        return objectMapper.readValue(blockJSON, Block.class);
+        ErisRPCResponseEntity<Block> response = new ErisRPCResponseEntity<>(blockJSON, Block.class);
+        if (response.getError() != null) {
+            throw response.getError();
+        }
+        return response.getResult();
     }
 
     public String getBlockJSON(BigInteger blockNumber) throws IOException {
         Map<String, Object> param = new HashMap<>();
-        param.put("height", blockNumber.toString());
+        param.put("height", blockNumber);
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
-        ErisRPCResponseEntity response = ErisRPCResponseEntity.getInstance(httpRpcClient.call(entity));
-        System.out.println(response);
-        return "unused";
-    }
-
-    public Block getLatestBlock() throws IOException {
-        String endpoint = "/blockchain/latest_block";
-        String url = host + endpoint;
-//        String blockJSON = restTemplate.getForEntity(url, String.class).getBody();
-//        return objectMapper.readValue(blockJSON, Block.class);
-        return null;
+        return httpRpcClient.call(entity);
     }
 
     public BigInteger getLatestBlockNumber() throws IOException {
-        Block latestBlock = this.getLatestBlock();
-        return latestBlock.getHeader().getHeight();
+        ErisRPCRequestEntity entity = new ErisRPCRequestEntity(null, RPCMethod.GET_LATEST_BLOCK);
+        String json = httpRpcClient.call(entity);
+        ErisRPCResponseEntity<Height> response = new ErisRPCResponseEntity<>(json, Height.class);
+        return response.getResult().getHeight();
     }
 }

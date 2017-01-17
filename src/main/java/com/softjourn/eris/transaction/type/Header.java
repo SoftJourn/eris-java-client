@@ -2,6 +2,7 @@ package com.softjourn.eris.transaction.type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.time.format.DateTimeFormatter;
  * Created by vromanchuk on 12.01.17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class Header {
 
     @JsonProperty(value = "chain_id")
@@ -24,18 +26,6 @@ public class Header {
     private String time;
     private LocalDateTime dateTime;
 
-    public String getChainId() {
-        return chainId;
-    }
-
-    public BigInteger getHeight() {
-        return height;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
     @SuppressWarnings("unused")
     private void setTime(String time) {
         if (this.time == null) {
@@ -44,21 +34,4 @@ public class Header {
         }
     }
 
-    public Integer getNumTxs() {
-        return numTxs;
-    }
-
-    @Override
-    public String toString() {
-        return "Header{" +
-                "chainId='" + chainId + '\'' +
-                ", numTxs=" + numTxs +
-                ", height='" + height + '\'' +
-                ", time='" + time + '\'' +
-                '}';
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
 }

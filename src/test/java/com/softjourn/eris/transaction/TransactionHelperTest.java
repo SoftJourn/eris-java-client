@@ -1,7 +1,6 @@
 package com.softjourn.eris.transaction;
 
 
-import com.fasterxml.jackson.core.io.JsonEOFException;
 import com.softjourn.eris.transaction.type.Block;
 import org.junit.Test;
 
@@ -24,19 +23,9 @@ public class TransactionHelperTest {
     @Test
     public void getBlockJSON() throws Exception {
         String blockJSON = transactionHelper.getBlockJSON(blockNumber);
-
+        System.out.println(blockJSON);
         assertNotNull(blockJSON);
         assertFalse(blockJSON.isEmpty());
-//        System.out.println(blockJSON);
-//        //Check header
-//        System.out.println(block.getHeader());
-//        String stringTime = block.getHeader().getTime();
-//        //ISO_OFFSET_DATE_TIME or ISO_ZONED_DATE_TIME or ISO_DATE_TIME
-//        LocalDateTime localDateTime = LocalDateTime.parse(stringTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-//
-//        System.out.println(localDateTime);
-
-//        ContractUnit unit = contractUnits.get(contractUnitName);
     }
 
     @Test
@@ -59,21 +48,12 @@ public class TransactionHelperTest {
         assertEquals(blockN3847, block.getHeader().getHeight());
     }
 
-    @Test
-    public void getLatestBlock_Block() throws Exception {
-        assertThat(transactionHelper.getLatestBlock(), instanceOf(Block.class));
-        Block block = transactionHelper.getLatestBlock();
-        assertNotNull(block);
-        assertNotNull(block.getHeader());
-        assertNotNull(block.getHeader().getHeight());
-
-    }
 
     @Test
     public void getLatestBlock_After1sDifferentHeight() throws Exception {
-        BigInteger heightFirst = transactionHelper.getLatestBlock().getHeader().getHeight();
+        BigInteger heightFirst = transactionHelper.getLatestBlockNumber();
         Thread.sleep(1000L);
-        BigInteger heightLast = transactionHelper.getLatestBlock().getHeader().getHeight();
+        BigInteger heightLast = transactionHelper.getLatestBlockNumber();
         assertNotEquals(heightFirst, heightLast);
     }
 
@@ -96,10 +76,12 @@ public class TransactionHelperTest {
 
     }
 
-    @Test(expected = JsonEOFException.class)
-    public void getBlock_BlockGreaterThanLatest_Exception() throws Exception {
+    @Test
+    public void getBlock_BlockGreaterThanLatest_Null() throws Exception {
         BigInteger latest = transactionHelper.getLatestBlockNumber();
+        System.out.println(latest);
         BigInteger greater = latest.add(BigInteger.TEN);
-        transactionHelper.getBlock(greater);
+        assertNull(transactionHelper.getBlock(greater));
+
     }
 }

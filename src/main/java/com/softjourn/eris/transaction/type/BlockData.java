@@ -2,6 +2,7 @@ package com.softjourn.eris.transaction.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import lombok.Data;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
  * BlockData in Eris block
  * Created by vromanchuk on 12.01.17.
  */
+@Data
 public class BlockData {
 
     @JsonProperty(value = "txs")
