@@ -33,7 +33,7 @@ public class ErisRPCRequestEntity implements RPCRequestEntity {
 
     private Map<String, Object> params;
 
-    public ErisRPCRequestEntity(Map<String, Object> params, ErisRPCMethod method) {
+    public ErisRPCRequestEntity(Map<String, Object> params, RPCMethod method) {
         this(params, method.name, "");
     }
 

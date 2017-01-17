@@ -1,9 +1,10 @@
 package com.softjourn.eris.transaction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softjourn.eris.rpc.ErisRPCMethod;
 import com.softjourn.eris.rpc.ErisRPCRequestEntity;
+import com.softjourn.eris.rpc.ErisRPCResponseEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
+import com.softjourn.eris.rpc.RPCMethod;
 import com.softjourn.eris.transaction.type.Block;
 
 import java.io.IOException;
@@ -34,8 +35,10 @@ public class TransactionHelper {
     public String getBlockJSON(BigInteger blockNumber) throws IOException {
         Map<String, Object> param = new HashMap<>();
         param.put("height", blockNumber.toString());
-        ErisRPCRequestEntity entity = new ErisRPCRequestEntity(param, ErisRPCMethod.GET_BLOCK);
-        return httpRpcClient.call(entity);
+        ErisRPCRequestEntity entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
+        ErisRPCResponseEntity response = ErisRPCResponseEntity.getInstance(httpRpcClient.call(entity));
+        System.out.println(response);
+        return "unused";
     }
 
     public Block getLatestBlock() throws IOException {

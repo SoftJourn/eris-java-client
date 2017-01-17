@@ -1,15 +1,15 @@
 package com.softjourn.eris.rpc;
 
 /**
- * ErisRPCMethod list of rpc methods
+ * RPCMethod list of rpc methods
  * Created by vromanchuk on 16.01.17.
  */
-public enum ErisRPCMethod {
+public enum RPCMethod {
     GET_BLOCK("erisdb.getBlock"),
     GET_BLOCKS("erisdb.getBlocks");
     String name;
 
-    ErisRPCMethod(String name) {
+    RPCMethod(String name) {
         this.name = name;
     }
 }

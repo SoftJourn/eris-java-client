@@ -27,7 +27,7 @@ public class TransactionHelperTest {
 
         assertNotNull(blockJSON);
         assertFalse(blockJSON.isEmpty());
-        System.out.println(blockJSON);
+//        System.out.println(blockJSON);
 //        //Check header
 //        System.out.println(block.getHeader());
 //        String stringTime = block.getHeader().getTime();
