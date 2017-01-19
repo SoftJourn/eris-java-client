@@ -17,27 +17,28 @@ import static com.softjourn.eris.contract.Util.parseAbi;
 @Data
 public class ErisTransaction {
 
+    private static final String DELIMITER = "0114";
+
     private String identifier;
     private String amount;
     private String callerAddress;
     private String callerPubKey;
     private String contractAddress;
+    private String additionalInfo;
     private String callingData;
     private String hashCallingDataFunctionName;
-
-    public ErisTransaction() {
-    }
 
     public ErisTransaction(String transactionString) throws StringIndexOutOfBoundsException {
         // 4 digits of some identifier
         this.identifier = transactionString.substring(0, 4);
-        // 4 digits of delimiter 0114
+        // 4 digits of DELIMITER 0114
         this.callerAddress = transactionString.substring(8, 48);
         this.amount = transactionString.substring(48, 64);
         this.callerPubKey = transactionString.substring(200, 264);
         //delimiter 0114
         this.contractAddress = transactionString.substring(268, 308);
         // Some info gas_limit fee 0144 - some delimiter
+        this.additionalInfo = transactionString.substring(308, 344);
         this.hashCallingDataFunctionName = transactionString.substring(344, 352);
         this.callingData = transactionString.substring(352);
     }
