@@ -57,8 +57,7 @@ public class TransactionHelper {
         FilterData filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, to);
         filters.add(filterFrom);
         filters.add(filterTo);
-
-        ErisRPCRequestEntity entity = new ErisRPCRequestEntity(null, RPCMethod.GET_BLOCKS);
+        ErisRPCRequestEntity entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
         return null;
     }
 }

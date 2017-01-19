@@ -5,13 +5,9 @@ import com.softjourn.eris.filter.Operation;
 
 import java.math.BigInteger;
 
-/**
- * Created by vromanchuk on 19.01.17.
- */
-public class FilterHeight extends FilterData {
-    private static final String FIELD = "height";
 
+public class FilterHeight extends FilterData {
     public FilterHeight(Operation op, BigInteger value) {
-        super(FIELD, op, value.toString());
+        super("height", op, value.toString());
     }
 }

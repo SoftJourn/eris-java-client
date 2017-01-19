@@ -1,5 +1,7 @@
 package com.softjourn.eris.filter;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * Operations in filters
  * Created by vromanchuk on 19.01.17.
@@ -16,8 +18,8 @@ public enum Operation {
         val = s;
     }
 
-    @Override
-    public String toString() {
-        return this.val;
+    @JsonValue
+    public String getOp() {
+        return val;
     }
 }

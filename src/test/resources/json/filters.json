@@ -1,0 +1,19 @@
+{
+  "jsonrpc": "2.0",
+  "method": "erisdb.getBlocks",
+  "id": "",
+  "params": {
+    "filters": [
+      {
+        "field": "height",
+        "op": ">=",
+        "value": "0"
+      },
+      {
+        "field": "height",
+        "op": "<=",
+        "value": "10"
+      }
+    ]
+  }
+}

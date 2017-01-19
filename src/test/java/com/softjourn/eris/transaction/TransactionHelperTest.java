@@ -178,7 +178,7 @@ public class TransactionHelperTest {
 
     @Test
     public void getTransactionBlock_0_10() throws Exception {
-        System.out.println(new FilterData("a", Operation.GREATER, "1").getMap());
+        System.out.println(new FilterData("a", Operation.GREATER, "1"));
         assertNotNull(transactionHelper.getBlocks(BigInteger.ZERO, BigInteger.TEN));
     }
 }
