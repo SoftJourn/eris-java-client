@@ -2,11 +2,14 @@ package com.softjourn.eris.transaction;
 
 
 import com.softjourn.eris.filter.FilterData;
+import com.softjourn.eris.filter.Filters;
 import com.softjourn.eris.filter.Operation;
+import com.softjourn.eris.filter.type.FilterHeight;
 import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCMethod;
 import com.softjourn.eris.transaction.type.Block;
+import com.softjourn.eris.transaction.type.Blocks;
 import com.softjourn.eris.transaction.type.ErisTransaction;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +41,9 @@ public class TransactionHelperTest {
 
     private TransactionHelper transactionHelper = new TransactionHelper(chainUrl);
     private BigInteger blockNumberTen = BigInteger.TEN;
-    private BigInteger blockNumber3847 = new BigInteger("3847");
+    private BigInteger blockNumberWithTx3847 = new BigInteger("3847");
+    private BigInteger blockNumber3846 = new BigInteger("3846");
+    private BigInteger blockNumber3848 = new BigInteger("3848");
 
     private HTTPRPCClient httpRpcClient = mock(HTTPRPCClient.class);
     private double random = Math.random();
@@ -67,7 +72,7 @@ public class TransactionHelperTest {
 
             //Block 3847
             param = new HashMap<>();
-            param.put("height", blockNumber3847);
+            param.put("height", blockNumberWithTx3847);
             entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
             file = new File("src/test/resources/json/block3847.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
@@ -89,13 +94,22 @@ public class TransactionHelperTest {
             file = new File("src/test/resources/json/emptyResponse.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
 
+            //Blocks range
+            Filters filters = new Filters();
+            FilterData filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, blockNumber3846);
+            FilterData filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, blockNumber3848);
+            filters.add(filterFrom);
+            filters.add(filterTo);
+            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+            file = new File("src/test/resources/json/blocksRange3846-3848.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+
         }
     }
 
     @Test
     public void getBlockJSON() throws Exception {
-        String blockJSON = transactionHelper.getBlockJSON(blockNumber3847);
-        System.out.println(blockJSON);
+        String blockJSON = transactionHelper.getBlockJSON(blockNumberWithTx3847);
         assertNotNull(blockJSON);
         assertFalse(blockJSON.isEmpty());
     }
@@ -108,7 +122,6 @@ public class TransactionHelperTest {
         assertNotNull(block.getHeader());
         assertNotNull(block.getLastCommit());
         assertNotNull(block.getData());
-        System.out.println(block);
         assertEquals(blockNumberTen, block.getHeader().getHeight());
     }
 
@@ -117,7 +130,6 @@ public class TransactionHelperTest {
         BigInteger blockN3847 = new BigInteger("3847");
         assertThat(transactionHelper.getBlock(blockN3847), instanceOf(Block.class));
         Block block = transactionHelper.getBlock(blockN3847);
-        System.out.println(block.getData());
         assertEquals(blockN3847, block.getHeader().getHeight());
     }
 
@@ -139,7 +151,6 @@ public class TransactionHelperTest {
         BigInteger latestBlockNumber = transactionHelper.getLatestBlockNumber();
         assertThat(latestBlockNumber, instanceOf(BigInteger.class));
         assertNotNull(latestBlockNumber);
-        System.out.println(latestBlockNumber);
 
     }
 
@@ -159,7 +170,6 @@ public class TransactionHelperTest {
     @Test
     public void getBlock_BlockGreaterThanLatest_Null() throws Exception {
         BigInteger latest = transactionHelper.getLatestBlockNumber();
-        System.out.println(latest);
         BigInteger greater = latest.add(BigInteger.TEN);
         assertNull(transactionHelper.getBlock(greater));
     }
@@ -168,7 +178,7 @@ public class TransactionHelperTest {
     public void getTransactionFromBlock() throws Exception {
         if (!isRealCallsToEris) {
             String expected = "[90CCB0132FA9287AB3C3283978C0E523FA1450A0, 110]";
-            List<ErisTransaction> erisTransactions = transactionHelper.getBlock(blockNumber3847).getData().getErisTransactions();
+            List<ErisTransaction> erisTransactions = transactionHelper.getBlock(blockNumberWithTx3847).getData().getErisTransactions();
             assertEquals(1, erisTransactions.size());
             ErisTransaction erisTransaction = erisTransactions.get(0);
             List<Object> inputs = erisTransaction.parseCallingData(abi);
@@ -178,7 +188,10 @@ public class TransactionHelperTest {
 
     @Test
     public void getTransactionBlock_0_10() throws Exception {
-        System.out.println(new FilterData("a", Operation.GREATER, "1"));
-        assertNotNull(transactionHelper.getBlocks(BigInteger.ZERO, BigInteger.TEN));
+        Blocks blocks = transactionHelper.getBlocks(blockNumber3846, blockNumber3848);
+        assertEquals(3, blocks.getBlockMetas().size());
+        List<BigInteger> blockNumbersWithTx = blocks.getBlockNumbersWithTransaction();
+        assertEquals(1, blockNumbersWithTx.size());
+        assertEquals(blockNumberWithTx3847, blockNumbersWithTx.get(0));
     }
 }

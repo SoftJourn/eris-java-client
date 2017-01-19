@@ -1,0 +1,77 @@
+{
+  "result": {
+    "min_height": 3848,
+    "max_height": 3846,
+    "block_metas": [
+      {
+        "hash": "93EED0FAB61D487E905974B98A0C6A8D841F5BB9",
+        "header": {
+          "chain_id": "test",
+          "height": 3848,
+          "time": "2017-01-12T12:57:31.340Z",
+          "num_txs": 0,
+          "last_block_hash": "2347D7EDFCBE1B16B923E6C4AD89A68F0CF8C836",
+          "last_block_parts": {
+            "total": 1,
+            "hash": "884FF8975168FCB7226ECEDCB0F25B9A7A255024"
+          },
+          "last_commit_hash": "669C83F090863D24DB1F7E3CC74799146A7288DF",
+          "data_hash": "",
+          "validators_hash": "77C6CFF10D6BCD81FBB89C8F1E05534DCBC14111",
+          "app_hash": "936CC3752BE7B9851828000FDC525B76929D7F23"
+        },
+        "parts_header": {
+          "total": 1,
+          "hash": "1148890125DD3EC6B5510A7E4CA403DC23AFAD0F"
+        }
+      },
+      {
+        "hash": "2347D7EDFCBE1B16B923E6C4AD89A68F0CF8C836",
+        "header": {
+          "chain_id": "test",
+          "height": 3847,
+          "time": "2017-01-12T12:57:30.323Z",
+          "num_txs": 1,
+          "last_block_hash": "BEF1FFB7E6BA03430CC99B84FA63F4AA48BBE611",
+          "last_block_parts": {
+            "total": 1,
+            "hash": "01036B2E2C198E0477CC2F218BE021BC78ED5067"
+          },
+          "last_commit_hash": "D3A0C64DD856F6844409664BDE454D7D9B8B12AC",
+          "data_hash": "C0C2368E4E4560501BB8D9B24F184F5B8A6581D9",
+          "validators_hash": "24741F32460A331BFAFB71CE5C17871799C32069",
+          "app_hash": "FCF4E8CF751816EB48DA10A9294339BD4BC9E44D"
+        },
+        "parts_header": {
+          "total": 1,
+          "hash": "884FF8975168FCB7226ECEDCB0F25B9A7A255024"
+        }
+      },
+      {
+        "hash": "BEF1FFB7E6BA03430CC99B84FA63F4AA48BBE611",
+        "header": {
+          "chain_id": "test",
+          "height": 3846,
+          "time": "2017-01-12T12:57:29.311Z",
+          "num_txs": 0,
+          "last_block_hash": "3E49726CF4F5EE8F249B24B86F05EA45BBA90701",
+          "last_block_parts": {
+            "total": 1,
+            "hash": "358CF10AFB52C43482010D88CC2F3D36DCFA2740"
+          },
+          "last_commit_hash": "4D18A4E57EB091EB0445A81533E9CF35A495A6DF",
+          "data_hash": "",
+          "validators_hash": "15855AD64EC6CECC9DF0798A7A153A363E61AC6F",
+          "app_hash": "FCF4E8CF751816EB48DA10A9294339BD4BC9E44D"
+        },
+        "parts_header": {
+          "total": 1,
+          "hash": "01036B2E2C198E0477CC2F218BE021BC78ED5067"
+        }
+      }
+    ]
+  },
+  "error": null,
+  "id": "",
+  "jsonrpc": "2.0"
+}

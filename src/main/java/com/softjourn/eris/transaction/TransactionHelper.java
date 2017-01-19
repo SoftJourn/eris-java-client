@@ -7,11 +7,11 @@ import com.softjourn.eris.filter.Operation;
 import com.softjourn.eris.filter.type.FilterHeight;
 import com.softjourn.eris.rpc.*;
 import com.softjourn.eris.transaction.type.Block;
+import com.softjourn.eris.transaction.type.Blocks;
 import com.softjourn.eris.transaction.type.Height;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +20,7 @@ import java.util.Map;
  */
 public class TransactionHelper {
 
+    private static final int MAX_BLOCKS_PER_REQUEST = 50;
     private HTTPRPCClient httpRpcClient;
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -51,13 +52,15 @@ public class TransactionHelper {
         return response.getResult().getHeight();
     }
 
-    public List<Block> getBlocks(BigInteger from, BigInteger to) {
+    public Blocks getBlocks(BigInteger from, BigInteger to) throws IOException {
         Filters filters = new Filters();
         FilterData filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, from);
         FilterData filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, to);
         filters.add(filterFrom);
         filters.add(filterTo);
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-        return null;
+        ErisRPCResponseEntity<Blocks> blocksResponse =
+                new ErisRPCResponseEntity<>(this.httpRpcClient.call(entity), Blocks.class);
+        return blocksResponse.getResult();
     }
 }

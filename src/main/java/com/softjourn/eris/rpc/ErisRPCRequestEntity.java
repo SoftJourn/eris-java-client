@@ -13,6 +13,9 @@ import java.util.Map;
  */
 @Getter
 @EqualsAndHashCode
+// TODO 1. migrate all methods to enum RPCMethod.
+// TODO 2. Set returned class to enum RPCMethod.
+// TODO 3. Modify call method to return class that was declared at enum RPCMethod
 public class ErisRPCRequestEntity implements RPCRequestEntity {
 
     private static final String CONSTANT_CALL_METHOD = "erisdb.call";

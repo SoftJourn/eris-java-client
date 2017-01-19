@@ -33,6 +33,7 @@ public class ErisRPCResponseEntity<T> {
 
     public ErisRPCResponseEntity(String json, Class<?> result) throws IOException {
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ErisRPCResponseEntity.class, result);
+//        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SnakeCaseStrategy.SNAKE_CASE);
         ErisRPCResponseEntity<T> object = objectMapper.readValue(json, javaType);
 
         this.result = object.result;
