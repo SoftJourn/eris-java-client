@@ -15,20 +15,20 @@ import static com.softjourn.eris.contract.Util.parseAbi;
  * Created by vromanchuk on 12.01.17.
  */
 @Data
-public class Transaction {
+public class ErisTransaction {
 
-    private final String transactionString;
+    private String identifier;
+    private String amount;
+    private String callerAddress;
+    private String callerPubKey;
+    private String contractAddress;
+    private String callingData;
+    private String hashCallingDataFunctionName;
 
-    private final String identifier;
-    private final String amount;
-    private final String callerAddress;
-    private final String callerPubKey;
-    private final String contractAddress;
-    private final String callingData;
-    private final String hashCallingDataFunctionName;
+    public ErisTransaction() {
+    }
 
-    public Transaction(String transactionString) throws StringIndexOutOfBoundsException {
-        this.transactionString = transactionString;
+    public ErisTransaction(String transactionString) throws StringIndexOutOfBoundsException {
         // 4 digits of some identifier
         this.identifier = transactionString.substring(0, 4);
         // 4 digits of delimiter 0114

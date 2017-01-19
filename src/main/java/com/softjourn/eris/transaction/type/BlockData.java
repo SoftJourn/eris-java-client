@@ -17,7 +17,7 @@ public class BlockData {
     @JsonProperty(value = "txs")
     private List<String> transactionsBites;
 
-    private List<Transaction> transactions;
+    private List<ErisTransaction> erisTransactions;
 
     public List<String> getTransactionsBites() {
         return transactionsBites;
@@ -26,13 +26,13 @@ public class BlockData {
     @SuppressWarnings("unused")
     @JsonSetter(value = "txs")
     private void setTransactionsBites(List<String> transactionsBites) {
-        if (this.transactions == null) {
+        if (this.erisTransactions == null) {
             this.transactionsBites = transactionsBites;
-            this.transactions = transactionsBites.stream().map(Transaction::new).collect(Collectors.toList());
+            this.erisTransactions = transactionsBites.stream().map(ErisTransaction::new).collect(Collectors.toList());
         }
     }
 
-    public List<Transaction> getTransactions() {
-        return transactions;
+    public List<ErisTransaction> getErisTransactions() {
+        return erisTransactions;
     }
 }

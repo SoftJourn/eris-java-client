@@ -5,7 +5,7 @@ import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCMethod;
 import com.softjourn.eris.transaction.type.Block;
-import com.softjourn.eris.transaction.type.Transaction;
+import com.softjourn.eris.transaction.type.ErisTransaction;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -166,10 +166,10 @@ public class TransactionHelperTest {
     public void getTransactionFromBlock() throws Exception {
         if (!isRealCallsToEris) {
             String expected = "[90CCB0132FA9287AB3C3283978C0E523FA1450A0, 110]";
-            List<Transaction> transactions = transactionHelper.getBlock(blockNumber3847).getData().getTransactions();
-            assertEquals(1, transactions.size());
-            Transaction transaction = transactions.get(0);
-            List<Object> inputs = transaction.parseCallingData(abi);
+            List<ErisTransaction> erisTransactions = transactionHelper.getBlock(blockNumber3847).getData().getErisTransactions();
+            assertEquals(1, erisTransactions.size());
+            ErisTransaction erisTransaction = erisTransactions.get(0);
+            List<Object> inputs = erisTransaction.parseCallingData(abi);
             assertEquals(expected, inputs.toString());
         }
     }

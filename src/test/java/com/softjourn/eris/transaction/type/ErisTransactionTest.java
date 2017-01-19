@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
  * TransactionTest
  * Created by vromanchuk on 13.01.17.
  */
-public class TransactionTest {
+public class ErisTransactionTest {
 
     private String transactionBinary;
     private String abi;
@@ -29,21 +29,21 @@ public class TransactionTest {
 
     @Test
     public void newTransaction_NotNullTransaction() throws Exception {
-        assertNotNull(new Transaction(transactionBinary));
-        System.out.println(new Transaction(transactionBinary));
+        assertNotNull(new ErisTransaction(transactionBinary));
+        System.out.println(new ErisTransaction(transactionBinary));
     }
 
     @Test(expected = StringIndexOutOfBoundsException.class)
     public void newTransaction_fakeString_StringIndexOutOfBoundsException() throws Exception {
-        new Transaction("fake transaction");
+        new ErisTransaction("fake transaction");
     }
 
     @Test
     public void parseCallingData_Abi() throws Exception {
-        Transaction transaction = new Transaction(transactionBinary);
-        assertNotNull(transaction.parseCallingData(abi));
-        transaction.parseCallingData(abi);
-        System.out.println(transaction.parseCallingData(abi));
+        ErisTransaction erisTransaction = new ErisTransaction(transactionBinary);
+        assertNotNull(erisTransaction.parseCallingData(abi));
+        erisTransaction.parseCallingData(abi);
+        System.out.println(erisTransaction.parseCallingData(abi));
 
     }
 }
