@@ -5,12 +5,13 @@ package com.softjourn.eris.rpc;
  * https://monax.io/docs/documentation/db/latest/specifications/api/#methods
  *
  * GET_BLOCK("erisdb.getBlock")
- * param { height: <number> }
+ * param Height.class
  *
  * GET_LATEST_BLOCK("erisdb.getLatestBlockHeight")
  * no param
  *
- *
+ * GET_BLOCKS("erisdb.getBlocks")
+ * param Filters
  * Created by vromanchuk on 16.01.17.
  */
 public enum RPCMethod {

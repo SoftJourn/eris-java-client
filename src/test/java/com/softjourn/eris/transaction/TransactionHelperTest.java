@@ -1,6 +1,8 @@
 package com.softjourn.eris.transaction;
 
 
+import com.softjourn.eris.filter.FilterData;
+import com.softjourn.eris.filter.Operation;
 import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCMethod;
@@ -172,5 +174,11 @@ public class TransactionHelperTest {
             List<Object> inputs = erisTransaction.parseCallingData(abi);
             assertEquals(expected, inputs.toString());
         }
+    }
+
+    @Test
+    public void getTransactionBlock_0_10() throws Exception {
+        System.out.println(new FilterData("a", Operation.GREATER, "1").getMap());
+        assertNotNull(transactionHelper.getBlocks(BigInteger.ZERO, BigInteger.TEN));
     }
 }

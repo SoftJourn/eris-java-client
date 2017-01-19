@@ -4,8 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 import java.util.Scanner;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -42,8 +44,15 @@ public class ErisTransactionTest {
     public void parseCallingData_Abi() throws Exception {
         ErisTransaction erisTransaction = new ErisTransaction(transactionBinary);
         assertNotNull(erisTransaction.parseCallingData(abi));
-        erisTransaction.parseCallingData(abi);
-        System.out.println(erisTransaction.parseCallingData(abi));
+        List<Object> parseData = erisTransaction.parseCallingData(abi);
+        System.out.println(parseData);
+        String expected = "[90CCB0132FA9287AB3C3283978C0E523FA1450A0, 110]";
+        assertEquals(expected, parseData.toString());
+    }
 
+    @Test
+    public void generateTxCode() throws Exception {
+        ErisTransaction erisTransaction = new ErisTransaction(transactionBinary);
+        assertEquals(transactionBinary, erisTransaction.generateTxCode());
     }
 }
