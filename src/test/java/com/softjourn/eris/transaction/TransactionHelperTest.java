@@ -12,7 +12,9 @@ import com.softjourn.eris.transaction.type.Block;
 import com.softjourn.eris.transaction.type.Blocks;
 import com.softjourn.eris.transaction.type.ErisTransaction;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -37,17 +39,17 @@ import static org.mockito.Mockito.when;
 @RunWith(JUnit4.class)
 public class TransactionHelperTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
     private String chainUrl = "http://172.17.0.1:1337";
-
     private TransactionHelper transactionHelper = new TransactionHelper(chainUrl);
     private BigInteger blockNumberTen = BigInteger.TEN;
     private BigInteger blockNumberWithTx3847 = new BigInteger("3847");
     private BigInteger blockNumber3846 = new BigInteger("3846");
     private BigInteger blockNumber3848 = new BigInteger("3848");
-
     private HTTPRPCClient httpRpcClient = mock(HTTPRPCClient.class);
     private double random = Math.random();
-    private boolean isRealCallsToEris = false;
+    private boolean isRealCallsToEris = true;
     private String abi;
 
     @Before
@@ -94,14 +96,28 @@ public class TransactionHelperTest {
             file = new File("src/test/resources/json/emptyResponse.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
 
-            //Blocks range
-            Filters filters = new Filters();
-            FilterData filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, blockNumber3846);
-            FilterData filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, blockNumber3848);
+            Filters filters;
+            FilterData filterFrom;
+            FilterData filterTo;
+
+            //Blocks range 3846-3848
+            filters = new Filters();
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, blockNumber3846);
+            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, blockNumber3848);
             filters.add(filterFrom);
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
             file = new File("src/test/resources/json/blocksRange3846-3848.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+
+            //Blocks range 0-10
+            filters = new Filters();
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, BigInteger.ZERO);
+            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, BigInteger.TEN);
+            filters.add(filterFrom);
+            filters.add(filterTo);
+            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+            file = new File("src/test/resources/json/blockRange0-10.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
 
         }
@@ -187,11 +203,32 @@ public class TransactionHelperTest {
     }
 
     @Test
-    public void getTransactionBlock_0_10() throws Exception {
+    public void getTransactionBlock_3846_3848() throws Exception {
         Blocks blocks = transactionHelper.getBlocks(blockNumber3846, blockNumber3848);
         assertEquals(3, blocks.getBlockMetas().size());
         List<BigInteger> blockNumbersWithTx = blocks.getBlockNumbersWithTransaction();
         assertEquals(1, blockNumbersWithTx.size());
         assertEquals(blockNumberWithTx3847, blockNumbersWithTx.get(0));
+    }
+
+    @Test
+    public void getTransactionBlock_0_10_IllegalArgumentException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("From height can't be less then 1");
+        transactionHelper.getBlocks(BigInteger.ZERO, BigInteger.TEN);
+    }
+
+    @Test
+    public void getTransactionBlock_10_0_IllegalArgumentException() throws Exception {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("From height can't be grater then To height");
+        transactionHelper.getBlocks(BigInteger.TEN, BigInteger.ZERO);
+    }
+
+    @Test
+    public void getTransactionBlock_1_75_IllegalArgumentException() throws Exception {
+        Blocks blocks = transactionHelper.getBlocks(BigInteger.ONE, BigInteger.valueOf(75));
+        assertEquals(75, blocks.getBlockMetas().size());
+
     }
 }

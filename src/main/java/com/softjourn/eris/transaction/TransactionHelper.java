@@ -53,14 +53,29 @@ public class TransactionHelper {
     }
 
     public Blocks getBlocks(BigInteger from, BigInteger to) throws IOException {
+        if (from.compareTo(BigInteger.ONE) < 0)
+            throw new IllegalArgumentException("From height can't be less then 1");
+        if (from.compareTo(to) > 0)
+            throw new IllegalArgumentException("From height can't be grater then To height");
+        Blocks recursiveBlock = null;
+        if (to.subtract(from).compareTo(MAX_BLOCKS_PER_REQUEST) > 0) {
+            recursiveBlock = getBlocks(from.add(MAX_BLOCKS_PER_REQUEST).add(BigInteger.ONE), to);
+            to = from.add(MAX_BLOCKS_PER_REQUEST);
+        }
         Filters filters = new Filters();
         FilterData filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, from);
         FilterData filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, to);
         filters.add(filterFrom);
         filters.add(filterTo);
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+        String resultJSON = this.httpRpcClient.call(entity);
+        System.out.println(resultJSON);
         ErisRPCResponseEntity<Blocks> blocksResponse =
-                new ErisRPCResponseEntity<>(this.httpRpcClient.call(entity), Blocks.class);
-        return blocksResponse.getResult();
+                new ErisRPCResponseEntity<>(resultJSON, Blocks.class);
+        Blocks currentBlocks = blocksResponse.getResult();
+        if (recursiveBlock != null) {
+            currentBlocks.getBlockMetas().addAll(recursiveBlock.getBlockMetas());
+        }
+        return currentBlocks;
     }
 }

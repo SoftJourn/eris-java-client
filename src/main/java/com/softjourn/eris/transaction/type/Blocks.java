@@ -23,6 +23,7 @@ public class Blocks {
 
     public List<BigInteger> getBlockNumbersWithTransaction() {
         return blockMetas.stream()
+                .filter(Objects::nonNull)
                 .filter(BlockMeta::haveTransaction)
                 .map(BlockMeta::getHeader)
                 .filter(Objects::nonNull)

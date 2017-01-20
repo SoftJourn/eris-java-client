@@ -12,8 +12,8 @@ import java.time.format.DateTimeFormatter;
  * Header of block in blockchain
  * Created by vromanchuk on 12.01.17.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Header {
 
     @JsonProperty(value = "chain_id")
