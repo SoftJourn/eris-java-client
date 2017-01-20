@@ -49,7 +49,7 @@ public class TransactionHelperTest {
     private BigInteger blockNumber3848 = new BigInteger("3848");
     private HTTPRPCClient httpRpcClient = mock(HTTPRPCClient.class);
     private double random = Math.random();
-    private boolean isRealCallsToEris = false;
+    private boolean isRealCallsToEris = true;
     private String abi;
 
     @Before
@@ -145,7 +145,8 @@ public class TransactionHelperTest {
 
     @Test
     public void getBlockJSON() throws Exception {
-        String blockJSON = transactionHelper.getBlockJSON(blockNumberWithTx3847);
+        String blockJSON = transactionHelper.getBlockJSON(BigInteger.valueOf(27));
+        System.out.println(blockJSON);
         assertNotNull(blockJSON);
         assertFalse(blockJSON.isEmpty());
     }
@@ -249,7 +250,9 @@ public class TransactionHelperTest {
     public void getTransactionBlock_1_75_75Elements() throws Exception {
         Blocks blocks = transactionHelper.getBlocks(BigInteger.ONE, BigInteger.valueOf(75));
         assertEquals(75, blocks.getBlockMetas().size());
-        assertEquals(3, blocks.getBlockNumbersWithTransaction().size());
+        List<BigInteger> transactionBlocks = blocks.getBlockNumbersWithTransaction();
+        System.out.println(transactionBlocks);
+        assertEquals(3, transactionBlocks.size());
     }
 
 }
