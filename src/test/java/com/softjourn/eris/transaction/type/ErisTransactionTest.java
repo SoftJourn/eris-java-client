@@ -45,7 +45,6 @@ public class ErisTransactionTest {
         ErisTransaction erisTransaction = new ErisTransaction(transactionBinary);
         assertNotNull(erisTransaction.parseCallingData(abi));
         List<Object> parseData = erisTransaction.parseCallingData(abi);
-        System.out.println(parseData);
         String expected = "[90CCB0132FA9287AB3C3283978C0E523FA1450A0, 110]";
         assertEquals(expected, parseData.toString());
     }

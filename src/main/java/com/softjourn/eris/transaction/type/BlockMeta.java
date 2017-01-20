@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BlockMeta {
+class BlockMeta {
     String hash;
     Header header;
 

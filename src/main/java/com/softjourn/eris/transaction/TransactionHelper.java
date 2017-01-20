@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class TransactionHelper {
 
-    private static final int MAX_BLOCKS_PER_REQUEST = 50;
+    public static final BigInteger MAX_BLOCKS_PER_REQUEST = new BigInteger("50");
     private HTTPRPCClient httpRpcClient;
     private ObjectMapper objectMapper = new ObjectMapper();
 
