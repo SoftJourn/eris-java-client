@@ -49,7 +49,7 @@ public class TransactionHelperTest {
     private BigInteger blockNumber3848 = new BigInteger("3848");
     private HTTPRPCClient httpRpcClient = mock(HTTPRPCClient.class);
     private double random = Math.random();
-    private boolean isRealCallsToEris = true;
+    private boolean isRealCallsToEris = false;
     private String abi;
 
     @Before
@@ -107,7 +107,7 @@ public class TransactionHelperTest {
             filters.add(filterFrom);
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-            file = new File("src/test/resources/json/blocksRange3846-3848.json");
+            file = new File("src/test/resources/json/blockRange3846-3848.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
 
             //Blocks range 0-10
@@ -118,6 +118,26 @@ public class TransactionHelperTest {
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
             file = new File("src/test/resources/json/blockRange0-10.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+
+            //Blocks range 1-51
+            filters = new Filters();
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, BigInteger.ONE);
+            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, BigInteger.valueOf(51));
+            filters.add(filterFrom);
+            filters.add(filterTo);
+            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+            file = new File("src/test/resources/json/blockRange1-51.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+
+            //Blocks range 51-75
+            filters = new Filters();
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, BigInteger.valueOf(52));
+            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, BigInteger.valueOf(75));
+            filters.add(filterFrom);
+            filters.add(filterTo);
+            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+            file = new File("src/test/resources/json/blockRange52-75.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
 
         }
@@ -226,9 +246,10 @@ public class TransactionHelperTest {
     }
 
     @Test
-    public void getTransactionBlock_1_75_IllegalArgumentException() throws Exception {
+    public void getTransactionBlock_1_75_75Elements() throws Exception {
         Blocks blocks = transactionHelper.getBlocks(BigInteger.ONE, BigInteger.valueOf(75));
         assertEquals(75, blocks.getBlockMetas().size());
-
+        assertEquals(3, blocks.getBlockNumbersWithTransaction().size());
     }
+
 }

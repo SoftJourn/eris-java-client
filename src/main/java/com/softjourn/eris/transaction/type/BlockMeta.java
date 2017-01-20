@@ -15,6 +15,6 @@ public class BlockMeta {
     Header header;
 
     public boolean haveTransaction() {
-        return header.getNumTxs() > 0;
+        return header != null && header.getNumTxs() > 0;
     }
 }

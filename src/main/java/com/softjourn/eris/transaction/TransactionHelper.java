@@ -69,7 +69,6 @@ public class TransactionHelper {
         filters.add(filterTo);
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
         String resultJSON = this.httpRpcClient.call(entity);
-        System.out.println(resultJSON);
         ErisRPCResponseEntity<Blocks> blocksResponse =
                 new ErisRPCResponseEntity<>(resultJSON, Blocks.class);
         Blocks currentBlocks = blocksResponse.getResult();
