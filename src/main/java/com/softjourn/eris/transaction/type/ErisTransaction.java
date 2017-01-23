@@ -50,12 +50,10 @@ public class ErisTransaction {
         shift += 128;
         //SEQUENCE_END "01"
         shift += 2;
-        System.out.println(shift);
         this.callerPubKey = transactionString.substring(shift, shift + 64);
         shift += 64;
         //DELIMITER1 "0114"
         shift += 4;
-        System.out.println(shift);
         this.contractAddress = transactionString.substring(shift, shift + 40);
         shift += 40;
         this.gasLimit = transactionString.substring(shift, shift + 16);
@@ -67,14 +65,6 @@ public class ErisTransaction {
         this.functionNameHash = transactionString.substring(shift, shift + 8);
         shift += 8;
         this.callingData = transactionString.substring(shift);
-    }
-
-    public List<Object> parseCallingData(String abi) throws IOException {
-        HashMap<String, ContractUnit> contractUnitHashMap = parseAbi(abi);
-
-        ArgumentsDecoder argumentsDecoder = new ArgumentsDecoder();
-        ContractUnit unit = contractUnitHashMap.get("mint");
-        return argumentsDecoder.readInputArgs(unit, this.callingData);
     }
 
     public String generateTxCode() {
@@ -97,4 +87,13 @@ public class ErisTransaction {
         result += this.callingData;
         return result;
     }
+
+    public List<Object> parseCallingData(String abi) throws IOException {
+        HashMap<String, ContractUnit> contractUnitHashMap = parseAbi(abi);
+
+        ArgumentsDecoder argumentsDecoder = new ArgumentsDecoder();
+        ContractUnit unit = contractUnitHashMap.get("mint");
+        return argumentsDecoder.readInputArgs(unit, this.callingData);
+    }
+
 }
