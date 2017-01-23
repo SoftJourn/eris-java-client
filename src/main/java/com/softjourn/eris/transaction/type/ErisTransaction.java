@@ -18,14 +18,19 @@ import static com.softjourn.eris.contract.Util.parseAbi;
 public class ErisTransaction {
 
     private static final String DELIMITER = "0114";
+    private static final String DELIMITER2 = "0144";
+    private static final String SEQUENCE_END = "01";
 
     private String identifier;
     private String callerAddress;
     private String amount;
-    private String unknownData;
+    private String sequenceSize;
+    private String sequence;
+    private String transactionSignature;
     private String callerPubKey;
     private String contractAddress;
-    private String additionalInfo;
+    private String gasLimit;
+    private String fee;
     private String functionNameHash;
     private String callingData;
 
@@ -35,14 +40,33 @@ public class ErisTransaction {
         // 4 digits of DELIMITER 0114
         this.callerAddress = transactionString.substring(8, 48);
         this.amount = transactionString.substring(48, 64);
-        this.unknownData = transactionString.substring(64, 200);
-        this.callerPubKey = transactionString.substring(200, 264);
-        //delimiter 0114
-        this.contractAddress = transactionString.substring(268, 308);
-        // Some info gas_limit fee 0144 - some delimiter
-        this.additionalInfo = transactionString.substring(308, 344);
-        this.functionNameHash = transactionString.substring(344, 352);
-        this.callingData = transactionString.substring(352);
+        this.sequenceSize = transactionString.substring(64, 66);
+        int shift = new Byte(this.sequenceSize) * 2;
+        shift += 66;
+        this.sequence = transactionString.substring(66, shift);
+        //SEQUENCE_END "01"
+        shift += 2;
+        this.transactionSignature = transactionString.substring(shift, shift + 128);
+        shift += 128;
+        //SEQUENCE_END "01"
+        shift += 2;
+        System.out.println(shift);
+        this.callerPubKey = transactionString.substring(shift, shift + 64);
+        shift += 64;
+        //DELIMITER1 "0114"
+        shift += 4;
+        System.out.println(shift);
+        this.contractAddress = transactionString.substring(shift, shift + 40);
+        shift += 40;
+        this.gasLimit = transactionString.substring(shift, shift + 16);
+        shift += 16;
+        this.fee = transactionString.substring(shift, shift + 16);
+        shift += 16;
+        // DELIMITER2 "0144"
+        shift += 4;
+        this.functionNameHash = transactionString.substring(shift, shift + 8);
+        shift += 8;
+        this.callingData = transactionString.substring(shift);
     }
 
     public List<Object> parseCallingData(String abi) throws IOException {
@@ -58,11 +82,17 @@ public class ErisTransaction {
         result += ErisTransaction.DELIMITER;
         result += this.callerAddress;
         result += this.amount;
-        result += this.unknownData;
+        result += this.sequenceSize;
+        result += this.sequence;
+        result += ErisTransaction.SEQUENCE_END;
+        result += this.transactionSignature;
+        result += ErisTransaction.SEQUENCE_END;
         result += this.callerPubKey;
         result += ErisTransaction.DELIMITER;
         result += this.contractAddress;
-        result += this.additionalInfo;
+        result += this.gasLimit;
+        result += this.fee;
+        result += ErisTransaction.DELIMITER2;
         result += this.functionNameHash;
         result += this.callingData;
         return result;

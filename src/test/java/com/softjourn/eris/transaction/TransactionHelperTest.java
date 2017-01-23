@@ -145,7 +145,7 @@ public class TransactionHelperTest {
 
     @Test
     public void getBlockJSON() throws Exception {
-        String blockJSON = transactionHelper.getBlockJSON(BigInteger.valueOf(33));
+        String blockJSON = transactionHelper.getBlockJSON(BigInteger.valueOf(15));
         System.out.println(blockJSON);
         assertNotNull(blockJSON);
         assertFalse(blockJSON.isEmpty());
