@@ -7,6 +7,7 @@ import lombok.Data;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.softjourn.eris.contract.Util.parseAbi;
 
@@ -89,10 +90,15 @@ public class ErisTransaction {
     }
 
     public List<Object> parseCallingData(String abi) throws IOException {
-        HashMap<String, ContractUnit> contractUnitHashMap = parseAbi(abi);
-
+        Map<String, ContractUnit> contractUnitHashMap = parseAbi(abi);
+        Map<String, String> hashFunctionMap = new HashMap<>(contractUnitHashMap.size());
+        contractUnitHashMap.forEach((s, contractUnit) -> hashFunctionMap.put(contractUnit.signature(), s));
+        System.out.println(hashFunctionMap);
         ArgumentsDecoder argumentsDecoder = new ArgumentsDecoder();
+        String name = hashFunctionMap.get(this.functionNameHash.toLowerCase());
+        System.out.println(name);
         ContractUnit unit = contractUnitHashMap.get("mint");
+        System.out.println(unit.signature());
         return argumentsDecoder.readInputArgs(unit, this.callingData);
     }
 
