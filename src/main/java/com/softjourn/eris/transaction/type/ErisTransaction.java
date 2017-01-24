@@ -2,6 +2,7 @@ package com.softjourn.eris.transaction.type;
 
 import com.softjourn.eris.contract.ArgumentsDecoder;
 import com.softjourn.eris.contract.ContractUnit;
+import com.softjourn.eris.contract.Variable;
 import lombok.Data;
 
 import java.io.IOException;
@@ -89,9 +90,18 @@ public class ErisTransaction {
         return result;
     }
 
-    public List<Object> parseCallingData(ContractUnit unit) {
+    public Map<String, String> parseCallingData(ContractUnit unit) {
         ArgumentsDecoder argumentsDecoder = new ArgumentsDecoder();
-        return argumentsDecoder.readInputArgs(unit, this.callingData);
+        List<Object> inputArgs = argumentsDecoder.readInputArgs(unit, this.callingData);
+        Variable[] inputParams = unit.getInputs();
+        if (inputParams.length != inputArgs.size())
+            throw new IllegalArgumentException("Incorrect contract unit. " +
+                    "Length of contactUnit inputs and values are different");
+        Map<String, String> callingData = new HashMap<>();
+        for (int i = 0; i < inputParams.length; i++) {
+            callingData.put(inputParams[i].getName(), inputArgs.get(i).toString());
+        }
+        return callingData;
     }
 
     public ContractUnit getContractUnit(String abi) throws IOException {

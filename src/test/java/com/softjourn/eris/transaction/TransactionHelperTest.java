@@ -220,7 +220,7 @@ public class TransactionHelperTest {
             assertEquals(1, erisTransactions.size());
             ErisTransaction erisTransaction = erisTransactions.get(0);
             ContractUnit unit = erisTransaction.getContractUnit(abi);
-            List<Object> inputs = erisTransaction.parseCallingData(unit);
+            Map<String, String> inputs = erisTransaction.parseCallingData(unit);
             assertEquals(expected, inputs.toString());
         }
     }
