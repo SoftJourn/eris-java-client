@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This object returned by method RPCMethod.GET_BLOCKS "erisdb.getBlocks"
@@ -21,13 +22,20 @@ public class Blocks {
     private Integer maxHeight;
     private List<BlockMeta> blockMetas = new ArrayList<>();
 
-    public List<BigInteger> getBlockNumbersWithTransaction() {
-        return blockMetas.stream()
+    public static Stream<BigInteger> getBlockNumbersWithTransaction(Stream<BlockMeta> blockMetaStream) {
+        return blockMetaStream
                 .filter(Objects::nonNull)
                 .filter(BlockMeta::haveTransaction)
                 .map(BlockMeta::getHeader)
                 .filter(Objects::nonNull)
-                .map(Header::getHeight)
-                .collect(Collectors.toList());
+                .map(Header::getHeight);
+    }
+
+    public static List<BigInteger> getBlockNumbersWithTransaction(List<BlockMeta> blockMeta) {
+        return Blocks.getBlockNumbersWithTransaction(blockMeta.stream()).collect(Collectors.toList());
+    }
+
+    public Stream<BigInteger> getBlockNumbersWithTransaction() {
+        return Blocks.getBlockNumbersWithTransaction(blockMetas.stream());
     }
 }

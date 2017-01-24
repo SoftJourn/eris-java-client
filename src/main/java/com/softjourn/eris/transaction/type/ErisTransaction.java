@@ -36,6 +36,9 @@ public class ErisTransaction {
     private String functionNameHash;
     private String callingData;
 
+    public ErisTransaction() {
+    }
+
     public ErisTransaction(String transactionString) throws StringIndexOutOfBoundsException {
         // 4 digits of some identifier
         this.identifier = transactionString.substring(0, 4);

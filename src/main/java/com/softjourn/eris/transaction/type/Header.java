@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Header {
 
+    //TODO change to naming strategy
     @JsonProperty(value = "chain_id")
     private String chainId;
 
@@ -23,15 +24,11 @@ public class Header {
     private Integer numTxs;
 
     private BigInteger height;
-    private String time;
     private LocalDateTime dateTime;
 
     @SuppressWarnings("unused")
     private void setTime(String time) {
-        if (this.time == null) {
-            this.time = time;
-            this.dateTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        }
+        this.dateTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
 }

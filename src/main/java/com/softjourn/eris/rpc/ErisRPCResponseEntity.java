@@ -31,15 +31,22 @@ public class ErisRPCResponseEntity<T> {
 
     }
 
-    public ErisRPCResponseEntity(String json, Class<?> result) throws IOException {
+    public ErisRPCResponseEntity(String json, Class<T> result) {
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ErisRPCResponseEntity.class, result);
-//        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.SnakeCaseStrategy.SNAKE_CASE);
-        ErisRPCResponseEntity<T> object = objectMapper.readValue(json, javaType);
+        ErisRPCResponseEntity<T> object = null;
+        try {
+            object = objectMapper.readValue(json, javaType);
 
-        this.result = object.result;
-        this.error = object.error;
-        this.id = object.id;
-        this.jsonRpc = object.jsonRpc;
+            this.result = object.result;
+            this.error = object.error;
+            this.id = object.id;
+            this.jsonRpc = object.jsonRpc;
+
+        } catch (IOException e) {
+            throw new ErisRPCResponseException("Response have different structure ", e);
+        }
+
+
     }
 
 }

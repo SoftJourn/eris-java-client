@@ -28,15 +28,15 @@ public class HTTPRPCClient implements RPCClient {
     }
 
     @Override
-    public String call(RPCRequestEntity entity) throws IOException {
-        HttpResponse response =  makeRequest(URL + "/rpc", entity.toString());
+    public String call(RPCRequestEntity entity) {
         try {
+            HttpResponse response = makeRequest(URL + "/rpc", entity.toString());
             StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() >= 400) throw new IOException(statusLine.getReasonPhrase());
             BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             return reader.lines().collect(Collectors.joining("\n"));
         } catch (IOException e) {
-            throw new IOException("Can't read response from server due to exception.", e);
+            throw new ErisRPCRequestException("Request failed \n" + entity.toString(), e);
         }
     }
 

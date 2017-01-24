@@ -10,6 +10,7 @@ import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCMethod;
 import com.softjourn.eris.transaction.type.Block;
+import com.softjourn.eris.transaction.type.BlockMeta;
 import com.softjourn.eris.transaction.type.Blocks;
 import com.softjourn.eris.transaction.type.ErisTransaction;
 import org.junit.Before;
@@ -146,7 +147,7 @@ public class TransactionHelperTest {
 
     @Test
     public void getBlockJSON() throws Exception {
-        String blockJSON = transactionHelper.getBlockJSON(BigInteger.valueOf(15));
+        String blockJSON = transactionHelper.getBlockJSON(BigInteger.valueOf(1030101));
         System.out.println(blockJSON);
         assertNotNull(blockJSON);
         assertFalse(blockJSON.isEmpty());
@@ -227,9 +228,9 @@ public class TransactionHelperTest {
 
     @Test
     public void getTransactionBlock_3846_3848() throws Exception {
-        Blocks blocks = transactionHelper.getBlocks(blockNumber3846, blockNumber3848);
-        assertEquals(3, blocks.getBlockMetas().size());
-        List<BigInteger> blockNumbersWithTx = blocks.getBlockNumbersWithTransaction();
+        List<BlockMeta> blocks = transactionHelper.getBlocks(blockNumber3846, blockNumber3848);
+        assertEquals(2, blocks.size());
+        List<BigInteger> blockNumbersWithTx = Blocks.getBlockNumbersWithTransaction(blocks);
         assertEquals(1, blockNumbersWithTx.size());
         assertEquals(blockNumberWithTx3847, blockNumbersWithTx.get(0));
     }
@@ -244,17 +245,24 @@ public class TransactionHelperTest {
     @Test
     public void getTransactionBlock_10_0_IllegalArgumentException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("From height can't be grater then To height");
+        thrown.expectMessage("From height can't be grater or equals To height");
         transactionHelper.getBlocks(BigInteger.TEN, BigInteger.ZERO);
     }
 
     @Test
     public void getTransactionBlock_1_75_75Elements() throws Exception {
-        Blocks blocks = transactionHelper.getBlocks(BigInteger.ONE, BigInteger.valueOf(75));
-        assertEquals(75, blocks.getBlockMetas().size());
-        List<BigInteger> transactionBlocks = blocks.getBlockNumbersWithTransaction();
+        List<BlockMeta> blocks = transactionHelper.getBlocks(BigInteger.ONE, BigInteger.valueOf(75));
+        assertEquals(74, blocks.size());
+        List<BigInteger> transactionBlocks = Blocks.getBlockNumbersWithTransaction(blocks);
         System.out.println(transactionBlocks);
         assertEquals(3, transactionBlocks.size());
+    }
+
+    @Test
+    public void getBlocks() throws Exception {
+        BigInteger to = BigInteger.valueOf(55);
+        System.out.println("block to param = " + to);
+        System.out.println(transactionHelper.getBlocks(BigInteger.ONE, to).size());
     }
 
 }
