@@ -1,6 +1,7 @@
 package com.softjourn.eris.transaction;
 
 
+import com.softjourn.eris.contract.ContractUnit;
 import com.softjourn.eris.filter.FilterData;
 import com.softjourn.eris.filter.Filters;
 import com.softjourn.eris.filter.Operation;
@@ -218,7 +219,8 @@ public class TransactionHelperTest {
             List<ErisTransaction> erisTransactions = transactionHelper.getBlock(blockNumberWithTx3847).getData().getErisTransactions();
             assertEquals(1, erisTransactions.size());
             ErisTransaction erisTransaction = erisTransactions.get(0);
-            List<Object> inputs = erisTransaction.parseCallingData(abi);
+            ContractUnit unit = erisTransaction.getContractUnit(abi);
+            List<Object> inputs = erisTransaction.parseCallingData(unit);
             assertEquals(expected, inputs.toString());
         }
     }

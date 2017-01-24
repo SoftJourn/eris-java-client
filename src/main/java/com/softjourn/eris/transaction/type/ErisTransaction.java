@@ -89,17 +89,19 @@ public class ErisTransaction {
         return result;
     }
 
-    public List<Object> parseCallingData(String abi) throws IOException {
+    public List<Object> parseCallingData(ContractUnit unit) {
+        ArgumentsDecoder argumentsDecoder = new ArgumentsDecoder();
+        return argumentsDecoder.readInputArgs(unit, this.callingData);
+    }
+
+    public ContractUnit getContractUnit(String abi) throws IOException {
         Map<String, ContractUnit> contractUnitHashMap = parseAbi(abi);
         Map<String, String> hashFunctionMap = new HashMap<>(contractUnitHashMap.size());
         contractUnitHashMap.forEach((s, contractUnit) -> hashFunctionMap.put(contractUnit.signature(), s));
-        ArgumentsDecoder argumentsDecoder = new ArgumentsDecoder();
         String name = hashFunctionMap.get(this.functionNameHash.toLowerCase());
         if (name == null) {
             throw new IllegalArgumentException("Wrong abi file. Transaction refers to another");
         }
-        ContractUnit unit = contractUnitHashMap.get(name);
-        return argumentsDecoder.readInputArgs(unit, this.callingData);
+        return contractUnitHashMap.get(name);
     }
-
 }
