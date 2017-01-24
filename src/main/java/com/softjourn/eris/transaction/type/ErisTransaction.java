@@ -93,12 +93,12 @@ public class ErisTransaction {
         Map<String, ContractUnit> contractUnitHashMap = parseAbi(abi);
         Map<String, String> hashFunctionMap = new HashMap<>(contractUnitHashMap.size());
         contractUnitHashMap.forEach((s, contractUnit) -> hashFunctionMap.put(contractUnit.signature(), s));
-        System.out.println(hashFunctionMap);
         ArgumentsDecoder argumentsDecoder = new ArgumentsDecoder();
         String name = hashFunctionMap.get(this.functionNameHash.toLowerCase());
-        System.out.println(name);
-        ContractUnit unit = contractUnitHashMap.get("mint");
-        System.out.println(unit.signature());
+        if (name == null) {
+            throw new IllegalArgumentException("Wrong abi file. Transaction refers to another");
+        }
+        ContractUnit unit = contractUnitHashMap.get(name);
         return argumentsDecoder.readInputArgs(unit, this.callingData);
     }
 
