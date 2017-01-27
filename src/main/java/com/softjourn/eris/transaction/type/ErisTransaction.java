@@ -26,30 +26,27 @@ public class ErisTransaction {
 
     private String identifier;
     private String callerAddress;
-    private Integer amount;
-    private Integer sequence;
+    private String amount;
+    private String sequence;
     private String transactionSignature;
     private String callerPubKey;
     private String contractAddress;
-    private Integer gasLimit;
-    private Integer fee;
+    private String gasLimit;
+    private String fee;
     private String functionNameHash;
     private String callingData;
 
-    public ErisTransaction() {
-    }
 
     public ErisTransaction(String transactionString) throws StringIndexOutOfBoundsException {
         // 4 digits of some identifier
         this.identifier = transactionString.substring(0, 4);
         // 4 digits of DELIMITER 0114
         this.callerAddress = transactionString.substring(8, 48);
-//        this.amount = transactionString.substring(48, 64);
-        this.amount = Integer.valueOf(transactionString.substring(48, 64), 16);
+        this.amount = transactionString.substring(48, 64);
         byte sequenceSize = Byte.valueOf(transactionString.substring(64, 66), 16);
         int shift = sequenceSize * 2;
         shift += 66;
-        this.sequence = Integer.valueOf(transactionString.substring(66, shift), 16);
+        this.sequence = transactionString.substring(66, shift);
         //SEQUENCE_END "01"
         shift += 2;
         this.transactionSignature = transactionString.substring(shift, shift + 128);
@@ -62,9 +59,9 @@ public class ErisTransaction {
         shift += 4;
         this.contractAddress = transactionString.substring(shift, shift + 40);
         shift += 40;
-        this.gasLimit = Integer.valueOf(transactionString.substring(shift, shift + 16), 16);
+        this.gasLimit = transactionString.substring(shift, shift + 16);
         shift += 16;
-        this.fee = Integer.valueOf(transactionString.substring(shift, shift + 16), 16);
+        this.fee = transactionString.substring(shift, shift + 16);
         shift += 16;
         // DELIMITER2 "0144"
         shift += 4;
@@ -77,47 +74,53 @@ public class ErisTransaction {
         String result = this.identifier;
         result += ErisTransaction.DELIMITER;
         result += this.callerAddress;
-        result += ErisTransaction.toHexString(this.amount, INT_SIZE_BYTES);
+        result += this.amount;
         result += ErisTransaction.getSizeHexString(this.sequence);
-        result += ErisTransaction.toHexString(this.sequence);
+        result += this.sequence;
         result += ErisTransaction.SEQUENCE_END;
         result += this.transactionSignature;
         result += ErisTransaction.SEQUENCE_END;
         result += this.callerPubKey;
         result += ErisTransaction.DELIMITER;
         result += this.contractAddress;
-        result += ErisTransaction.toHexString(this.gasLimit, INT_SIZE_BYTES);
-        result += ErisTransaction.toHexString(this.fee, INT_SIZE_BYTES);
+        result += this.gasLimit;
+        result += this.fee;
         result += ErisTransaction.DELIMITER2;
         result += this.functionNameHash;
         result += this.callingData;
         return result;
     }
 
-    private static String toHexString(int i) {
+    private static String toHexString(long i) {
         StringBuilder sb = new StringBuilder();
-        sb.append(Integer.toHexString(i).toUpperCase());
+        sb.append(Long.toHexString(i).toUpperCase());
         if (sb.length() % 2 > 0) {
             sb.insert(0, '0'); // pad with leading zero if needed
         }
         return sb.toString();
     }
 
-    private static String toHexString(int i, int size) {
+
+    private static String toHexString(long i, long size) {
         StringBuilder sb = new StringBuilder();
-        sb.append(Integer.toHexString(i).toUpperCase());
-        int bits = size * 8;
+        sb.append(Long.toHexString(i).toUpperCase());
+        long bits = size * 8;
         while (sb.length() < bits)
             sb.insert(0, '0');
         return sb.toString();
     }
 
+    private static String getSizeHexString(String hexString) {
+        if (hexString == null || hexString.isEmpty())
+            return "";
+        return toHexString(hexString.length() / 2);
+    }
 
-    private static String getSizeHexString(int i) {
+    private static String getSizeHexString(long i) {
         if (i < 0)
             return "";
         int size = 1;
-        while ( i > 255) {
+        while (i > 255) {
             i /= 256;
             size++;
         }
@@ -147,5 +150,40 @@ public class ErisTransaction {
             throw new IllegalArgumentException("Wrong abi file. Transaction refers to another");
         }
         return contractUnitHashMap.get(name);
+    }
+
+    public Long getAmountLongValue() throws NotValidTransactionException {
+        try {
+            return Long.valueOf(this.amount, 16);
+        } catch (Exception e) {
+            throw new NotValidTransactionException(e);
+        }
+    }
+
+    public Long getSequenceLongValue() throws NotValidTransactionException {
+        try {
+            return Long.valueOf(this.sequence, 16);
+        } catch (Exception e) {
+            throw new NotValidTransactionException(e);
+        }
+    }
+
+    public Long getGasLimitLongValue() throws NotValidTransactionException{
+        try {
+            return Long.valueOf(this.gasLimit, 16);
+        } catch (Exception e) {
+            throw new NotValidTransactionException(e);
+        }
+    }
+
+    public Long getFeeLongValue() throws NotValidTransactionException{
+        try {
+            return Long.valueOf(this.fee, 16);
+        } catch (Exception e) {
+            throw new NotValidTransactionException(e);
+        }
+    }
+
+    public ErisTransaction() {
     }
 }

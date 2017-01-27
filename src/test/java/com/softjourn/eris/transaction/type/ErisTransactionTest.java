@@ -22,6 +22,7 @@ public class ErisTransactionTest {
     private String abi;
     private String wrongAbi;
     private String largeSequenceTransaction;
+    private String deploy;
 
     @Before
     public void setUp() throws Exception {
@@ -38,6 +39,9 @@ public class ErisTransactionTest {
 
         file = new File("src/test/resources/binary/LargeSequenceTransaction.txt");
         this.largeSequenceTransaction = new Scanner(file).useDelimiter("\\Z").next();
+
+        file = new File("src/test/resources/binary/DeplyTransaction.txt");
+        this.deploy = new Scanner(file).useDelimiter("\\Z").next();
 
         this.transaction = new ErisTransaction(transactionBinary);
     }
@@ -85,5 +89,6 @@ public class ErisTransactionTest {
 
         erisTransaction = new ErisTransaction(largeSequenceTransaction);
         assertEquals(largeSequenceTransaction, erisTransaction.generateTxCode());
+
     }
 }
