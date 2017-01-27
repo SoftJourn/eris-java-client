@@ -22,17 +22,17 @@ public class ErisTransaction {
     private static final String DELIMITER = "0114";
     private static final String DELIMITER2 = "0144";
     private static final String SEQUENCE_END = "01";
+    private static final Integer INT_SIZE_BYTES = 2;
 
     private String identifier;
     private String callerAddress;
-    private String amount;
-    private String sequenceSize;
-    private String sequence;
+    private Integer amount;
+    private Integer sequence;
     private String transactionSignature;
     private String callerPubKey;
     private String contractAddress;
-    private String gasLimit;
-    private String fee;
+    private Integer gasLimit;
+    private Integer fee;
     private String functionNameHash;
     private String callingData;
 
@@ -44,11 +44,12 @@ public class ErisTransaction {
         this.identifier = transactionString.substring(0, 4);
         // 4 digits of DELIMITER 0114
         this.callerAddress = transactionString.substring(8, 48);
-        this.amount = transactionString.substring(48, 64);
-        this.sequenceSize = transactionString.substring(64, 66);
-        int shift = new Byte(this.sequenceSize) * 2;
+//        this.amount = transactionString.substring(48, 64);
+        this.amount = Integer.valueOf(transactionString.substring(48, 64), 16);
+        byte sequenceSize = Byte.valueOf(transactionString.substring(64, 66), 16);
+        int shift = sequenceSize * 2;
         shift += 66;
-        this.sequence = transactionString.substring(66, shift);
+        this.sequence = Integer.valueOf(transactionString.substring(66, shift), 16);
         //SEQUENCE_END "01"
         shift += 2;
         this.transactionSignature = transactionString.substring(shift, shift + 128);
@@ -61,9 +62,9 @@ public class ErisTransaction {
         shift += 4;
         this.contractAddress = transactionString.substring(shift, shift + 40);
         shift += 40;
-        this.gasLimit = transactionString.substring(shift, shift + 16);
+        this.gasLimit = Integer.valueOf(transactionString.substring(shift, shift + 16), 16);
         shift += 16;
-        this.fee = transactionString.substring(shift, shift + 16);
+        this.fee = Integer.valueOf(transactionString.substring(shift, shift + 16), 16);
         shift += 16;
         // DELIMITER2 "0144"
         shift += 4;
@@ -76,21 +77,51 @@ public class ErisTransaction {
         String result = this.identifier;
         result += ErisTransaction.DELIMITER;
         result += this.callerAddress;
-        result += this.amount;
-        result += this.sequenceSize;
-        result += this.sequence;
+        result += ErisTransaction.toHexString(this.amount, INT_SIZE_BYTES);
+        result += ErisTransaction.getSizeHexString(this.sequence);
+        result += ErisTransaction.toHexString(this.sequence);
         result += ErisTransaction.SEQUENCE_END;
         result += this.transactionSignature;
         result += ErisTransaction.SEQUENCE_END;
         result += this.callerPubKey;
         result += ErisTransaction.DELIMITER;
         result += this.contractAddress;
-        result += this.gasLimit;
-        result += this.fee;
+        result += ErisTransaction.toHexString(this.gasLimit, INT_SIZE_BYTES);
+        result += ErisTransaction.toHexString(this.fee, INT_SIZE_BYTES);
         result += ErisTransaction.DELIMITER2;
         result += this.functionNameHash;
         result += this.callingData;
         return result;
+    }
+
+    private static String toHexString(int i) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Integer.toHexString(i).toUpperCase());
+        if (sb.length() % 2 > 0) {
+            sb.insert(0, '0'); // pad with leading zero if needed
+        }
+        return sb.toString();
+    }
+
+    private static String toHexString(int i, int size) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Integer.toHexString(i).toUpperCase());
+        int bits = size * 8;
+        while (sb.length() < bits)
+            sb.insert(0, '0');
+        return sb.toString();
+    }
+
+
+    private static String getSizeHexString(int i) {
+        if (i < 0)
+            return "";
+        int size = 1;
+        while ( i > 255) {
+            i /= 256;
+            size++;
+        }
+        return toHexString(size);
     }
 
     public Map<String, String> parseCallingData(ContractUnit unit) {
