@@ -8,8 +8,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.Scanner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * TransactionTest
@@ -24,26 +23,20 @@ public class ErisTransactionTest {
     private String largeSequenceTransaction;
     private String deploy;
 
-    @Before
-    public void setUp() throws Exception {
-        File file;
+    @Test
+    public void isDeployContractTx() throws Exception {
+        assertTrue(ErisTransaction.isDeployContractTx(deploy));
+        assertFalse(ErisTransaction.isDeployContractTx(transactionBinary));
 
-        file = new File("src/test/resources/json/coinsContractAbi.json");
-        this.abi = new Scanner(file).useDelimiter("\\Z").next();
+        ErisTransaction transaction;
 
-        file = new File("src/test/resources/json/wrong_abi.json");
-        this.wrongAbi = new Scanner(file).useDelimiter("\\Z").next();
+        transaction = new ErisTransaction(deploy);
+        assertTrue(transaction.getIsDeploy());
+        assertEquals(transaction.getCallingData(), deploy);
 
-        file = new File("src/test/resources/binary/TransactionBinary.txt");
-        this.transactionBinary = new Scanner(file).useDelimiter("\\Z").next();
+        transaction = new ErisTransaction(transactionBinary);
+        assertFalse(transaction.getIsDeploy());
 
-        file = new File("src/test/resources/binary/LargeSequenceTransaction.txt");
-        this.largeSequenceTransaction = new Scanner(file).useDelimiter("\\Z").next();
-
-        file = new File("src/test/resources/binary/DeplyTransaction.txt");
-        this.deploy = new Scanner(file).useDelimiter("\\Z").next();
-
-        this.transaction = new ErisTransaction(transactionBinary);
     }
 
     @Test
@@ -90,5 +83,27 @@ public class ErisTransactionTest {
         erisTransaction = new ErisTransaction(largeSequenceTransaction);
         assertEquals(largeSequenceTransaction, erisTransaction.generateTxCode());
 
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        File file;
+
+        file = new File("src/test/resources/json/coinsContractAbi.json");
+        this.abi = new Scanner(file).useDelimiter("\\Z").next();
+
+        file = new File("src/test/resources/json/wrong_abi.json");
+        this.wrongAbi = new Scanner(file).useDelimiter("\\Z").next();
+
+        file = new File("src/test/resources/binary/TransactionBinary.txt");
+        this.transactionBinary = new Scanner(file).useDelimiter("\\Z").next();
+
+        file = new File("src/test/resources/binary/LargeSequenceTransaction.txt");
+        this.largeSequenceTransaction = new Scanner(file).useDelimiter("\\Z").next();
+
+        file = new File("src/test/resources/binary/DeployTransaction.txt");
+        this.deploy = new Scanner(file).useDelimiter("\\Z").next();
+
+        this.transaction = new ErisTransaction(transactionBinary);
     }
 }

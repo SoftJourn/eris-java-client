@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static com.softjourn.eris.contract.Util.parseAbi;
 
@@ -23,6 +24,7 @@ public class ErisTransaction {
     private static final String DELIMITER2 = "0144";
     private static final String SEQUENCE_END = "01";
     private static final Integer INT_SIZE_BYTES = 2;
+    private static final String DEPLOY_MARKER = "6060604052";
 
     private String identifier;
     private String callerAddress;
@@ -35,39 +37,47 @@ public class ErisTransaction {
     private String fee;
     private String functionNameHash;
     private String callingData;
+    private Boolean isDeploy;
 
 
     public ErisTransaction(String transactionString) throws StringIndexOutOfBoundsException {
-        // 4 digits of some identifier
-        this.identifier = transactionString.substring(0, 4);
-        // 4 digits of DELIMITER 0114
-        this.callerAddress = transactionString.substring(8, 48);
-        this.amount = transactionString.substring(48, 64);
-        byte sequenceSize = Byte.valueOf(transactionString.substring(64, 66), 16);
-        int shift = sequenceSize * 2;
-        shift += 66;
-        this.sequence = transactionString.substring(66, shift);
-        //SEQUENCE_END "01"
-        shift += 2;
-        this.transactionSignature = transactionString.substring(shift, shift + 128);
-        shift += 128;
-        //SEQUENCE_END "01"
-        shift += 2;
-        this.callerPubKey = transactionString.substring(shift, shift + 64);
-        shift += 64;
-        //DELIMITER1 "0114"
-        shift += 4;
-        this.contractAddress = transactionString.substring(shift, shift + 40);
-        shift += 40;
-        this.gasLimit = transactionString.substring(shift, shift + 16);
-        shift += 16;
-        this.fee = transactionString.substring(shift, shift + 16);
-        shift += 16;
-        // DELIMITER2 "0144"
-        shift += 4;
-        this.functionNameHash = transactionString.substring(shift, shift + 8);
-        shift += 8;
-        this.callingData = transactionString.substring(shift);
+
+        if (ErisTransaction.isDeployContractTx(transactionString)) {
+            this.isDeploy = true;
+            this.callingData = transactionString;
+        } else {
+            this.isDeploy = false;
+            // 4 digits of some identifier
+            this.identifier = transactionString.substring(0, 4);
+            // 4 digits of DELIMITER 0114
+            this.callerAddress = transactionString.substring(8, 48);
+            this.amount = transactionString.substring(48, 64);
+            byte sequenceSize = Byte.valueOf(transactionString.substring(64, 66), 16);
+            int shift = sequenceSize * 2;
+            shift += 66;
+            this.sequence = transactionString.substring(66, shift);
+            //SEQUENCE_END "01"
+            shift += 2;
+            this.transactionSignature = transactionString.substring(shift, shift + 128);
+            shift += 128;
+            //SEQUENCE_END "01"
+            shift += 2;
+            this.callerPubKey = transactionString.substring(shift, shift + 64);
+            shift += 64;
+            //DELIMITER1 "0114"
+            shift += 4;
+            this.contractAddress = transactionString.substring(shift, shift + 40);
+            shift += 40;
+            this.gasLimit = transactionString.substring(shift, shift + 16);
+            shift += 16;
+            this.fee = transactionString.substring(shift, shift + 16);
+            shift += 16;
+            // DELIMITER2 "0144"
+            shift += 4;
+            this.functionNameHash = transactionString.substring(shift, shift + 8);
+            shift += 8;
+            this.callingData = transactionString.substring(shift);
+        }
     }
 
     public String generateTxCode() {
@@ -168,7 +178,7 @@ public class ErisTransaction {
         }
     }
 
-    public Long getGasLimitLongValue() throws NotValidTransactionException{
+    public Long getGasLimitLongValue() throws NotValidTransactionException {
         try {
             return Long.valueOf(this.gasLimit, 16);
         } catch (Exception e) {
@@ -176,12 +186,17 @@ public class ErisTransaction {
         }
     }
 
-    public Long getFeeLongValue() throws NotValidTransactionException{
+    public Long getFeeLongValue() throws NotValidTransactionException {
         try {
             return Long.valueOf(this.fee, 16);
         } catch (Exception e) {
             throw new NotValidTransactionException(e);
         }
+    }
+
+    public static boolean isDeployContractTx(String transaction) {
+        Pattern pattern = Pattern.compile(ErisTransaction.DEPLOY_MARKER + ".*" + ErisTransaction.DEPLOY_MARKER);
+        return pattern.matcher(transaction).find();
     }
 
     public ErisTransaction() {
