@@ -51,7 +51,7 @@ public class TransactionHelperTest {
     private BigInteger blockNumber3848 = new BigInteger("3848");
     private HTTPRPCClient httpRpcClient = mock(HTTPRPCClient.class);
     private double random = Math.random();
-    private boolean isRealCallsToEris = true;
+    private boolean isRealCallsToEris = false;
     private String abi;
 
     @Before
@@ -105,11 +105,11 @@ public class TransactionHelperTest {
             //Blocks range 3846-3848
             filters = new Filters();
             filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, blockNumber3846);
-            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, blockNumber3848);
+            filterTo = new FilterHeight(Operation.LESS, blockNumber3848);
             filters.add(filterFrom);
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-            file = new File("src/test/resources/json/blockRange3846-3848.json");
+            file = new File("src/test/resources/json/blockRange3846-3847.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
 
             //Blocks range 0-10
@@ -122,24 +122,24 @@ public class TransactionHelperTest {
             file = new File("src/test/resources/json/blockRange0-10.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
 
-            //Blocks range 1-51
+            //Blocks range 1-53
             filters = new Filters();
             filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, BigInteger.ONE);
-            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, BigInteger.valueOf(51));
+            filterTo = new FilterHeight(Operation.LESS, BigInteger.valueOf(53));
             filters.add(filterFrom);
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-            file = new File("src/test/resources/json/blockRange1-51.json");
+            file = new File("src/test/resources/json/blockRange1-52.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
 
-            //Blocks range 51-75
+            //Blocks range 52-75
             filters = new Filters();
             filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, BigInteger.valueOf(52));
-            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, BigInteger.valueOf(75));
+            filterTo = new FilterHeight(Operation.LESS, BigInteger.valueOf(76));
             filters.add(filterFrom);
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-            file = new File("src/test/resources/json/blockRange52-75.json");
+            file = new File("src/test/resources/json/blockRange53-75.json");
             when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
 
         }
@@ -147,7 +147,7 @@ public class TransactionHelperTest {
 
     @Test
     public void getBlockJSON() throws Exception {
-        String blockJSON = transactionHelper.getBlockJSON(BigInteger.valueOf(1030101));
+        String blockJSON = transactionHelper.getBlockJSON(blockNumberWithTx3847);
         System.out.println(blockJSON);
         assertNotNull(blockJSON);
         assertFalse(blockJSON.isEmpty());
@@ -216,7 +216,7 @@ public class TransactionHelperTest {
     @Test
     public void getTransactionFromBlock() throws Exception {
         if (!isRealCallsToEris) {
-            String expected = "[90CCB0132FA9287AB3C3283978C0E523FA1450A0, 110]";
+            String expected = "{owner=90CCB0132FA9287AB3C3283978C0E523FA1450A0, amount=110}";
             List<ErisTransaction> erisTransactions = transactionHelper.getBlock(blockNumberWithTx3847).getData().getErisTransactions();
             assertEquals(1, erisTransactions.size());
             ErisTransaction erisTransaction = erisTransactions.get(0);
@@ -251,8 +251,8 @@ public class TransactionHelperTest {
 
     @Test
     public void getTransactionBlock_1_75_75Elements() throws Exception {
-        List<BlockMeta> blocks = transactionHelper.getBlocks(BigInteger.ONE, BigInteger.valueOf(75));
-        assertEquals(74, blocks.size());
+        List<BlockMeta> blocks = transactionHelper.getBlocks(BigInteger.ONE, BigInteger.valueOf(76));
+        assertEquals(75, blocks.size());
         List<BigInteger> transactionBlocks = Blocks.getBlockNumbersWithTransaction(blocks);
         System.out.println(transactionBlocks);
         assertEquals(3, transactionBlocks.size());
@@ -260,7 +260,7 @@ public class TransactionHelperTest {
 
     @Test
     public void getBlocks() throws Exception {
-        BigInteger to = BigInteger.valueOf(55);
+        BigInteger to = BigInteger.valueOf(53);
         System.out.println("block to param = " + to);
         System.out.println(transactionHelper.getBlocks(BigInteger.ONE, to).size());
     }

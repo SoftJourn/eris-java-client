@@ -508,28 +508,6 @@
           "total": 1,
           "hash": "9D70FFD2268A5C771ED2F749EE2C9AC3C0147107"
         }
-      },
-      {
-        "hash": "EC33DB6FF2BA91718DC10FE8E0B5BF212AFE579C",
-        "header": {
-          "chain_id": "test",
-          "height": 52,
-          "time": "2017-01-12T11:53:23.900Z",
-          "num_txs": 0,
-          "last_block_hash": "6CA8912EE6BFAA5CFC3464D35571A67C7B7CE010",
-          "last_block_parts": {
-            "total": 1,
-            "hash": "6D9CB4CCF10D79FA573DE72D08AB3CE7DA2AF438"
-          },
-          "last_commit_hash": "97E5E39A0FEE1C16B966F7E3122EBB29DECA2201",
-          "data_hash": "",
-          "validators_hash": "50F6A77E82FDA98715EC8EA98F11CEBA8C1B13FF",
-          "app_hash": "3DB04B42FB63A7F9A4C5F00EF9671AD5122642F5"
-        },
-        "parts_header": {
-          "total": 1,
-          "hash": "3D1B8F5B87D11D88DAD0E0ABF5886270FDB53A02"
-        }
       }
     ]
   },
