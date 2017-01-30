@@ -21,9 +21,8 @@ import java.util.stream.Stream;
  * TransactionHelper
  * Created by vromanchuk on 12.01.17.
  */
-public class TransactionHelper {
+public class TransactionHelper implements ITransactionHelper {
 
-    public static final Long MAX_BLOCKS_PER_REQUEST = new Long("51");
     private HTTPRPCClient httpRpcClient;
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -31,6 +30,7 @@ public class TransactionHelper {
         this.httpRpcClient = new HTTPRPCClient(host);
     }
 
+    @Override
     public Block getBlock(Long blockNumber) throws ErisRPCError {
         String blockJSON = this.getBlockJSON(blockNumber);
         ErisRPCResponseEntity<Block> response = new ErisRPCResponseEntity<>(blockJSON, Block.class);
@@ -40,6 +40,7 @@ public class TransactionHelper {
         return response.getResult();
     }
 
+    @Override
     public String getBlockJSON(Long blockNumber) {
         Height height = new Height(blockNumber);
         Map<String, Object> param = objectMapper.convertValue(height, Map.class);
@@ -47,6 +48,7 @@ public class TransactionHelper {
         return httpRpcClient.call(entity);
     }
 
+    @Override
     public Long getLatestBlockNumber() {
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(null, RPCMethod.GET_LATEST_BLOCK);
         String json = httpRpcClient.call(entity);
@@ -85,6 +87,7 @@ public class TransactionHelper {
         return mod > 0 ? temp / MAX_BLOCKS_PER_REQUEST + 1 : temp / MAX_BLOCKS_PER_REQUEST;
     }
 
+    @Override
     public Stream<BlockMeta> getBlockStream(Long from, final Long to) {
         this.validateGetBlocksParams(from, to);
         return Stream.iterate(from, i -> i + MAX_BLOCKS_PER_REQUEST)
@@ -97,6 +100,7 @@ public class TransactionHelper {
                 .flatMap(Collection::stream);
     }
 
+    @Override
     public List<BlockMeta> getBlocks(Long from, Long to) {
         return this.getBlockStream(from, to).collect(Collectors.toList());
     }

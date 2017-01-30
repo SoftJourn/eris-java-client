@@ -1,6 +1,8 @@
 package com.softjourn.eris.transaction.type;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.softjourn.eris.transaction.deserializer.BlockDataDeserializer;
 import lombok.Data;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
  * Created by vromanchuk on 12.01.17.
  */
 @Data
+@JsonDeserialize(using = BlockDataDeserializer.class)
 public class BlockData {
 
     private List<ErisTransaction> erisTransactions;

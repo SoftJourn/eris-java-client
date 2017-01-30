@@ -45,7 +45,7 @@ public class ErisTransactionTest {
         System.out.println(transaction);
     }
 
-    @Test(expected = StringIndexOutOfBoundsException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void newTransaction_fakeString_StringIndexOutOfBoundsException() throws Exception {
         new ErisTransaction("fake transaction");
     }
@@ -89,10 +89,10 @@ public class ErisTransactionTest {
     public void setUp() throws Exception {
         File file;
 
-        file = new File("src/test/resources/json/coinsContractAbi.json");
+        file = new File("src/test/resources/json/v12/coinsContractAbi.json");
         this.abi = new Scanner(file).useDelimiter("\\Z").next();
 
-        file = new File("src/test/resources/json/wrong_abi.json");
+        file = new File("src/test/resources/json/v12/wrong_abi.json");
         this.wrongAbi = new Scanner(file).useDelimiter("\\Z").next();
 
         file = new File("src/test/resources/binary/TransactionBinary.txt");

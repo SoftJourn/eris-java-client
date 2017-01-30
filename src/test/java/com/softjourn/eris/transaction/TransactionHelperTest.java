@@ -52,113 +52,38 @@ public class TransactionHelperTest {
     private double random = Math.random();
     private boolean isRealCallsToEris = false;
     private String abi;
-
-    @Before
-    public void setUp() throws Exception {
-        File abiFile = new File("src/test/resources/json/coinsContractAbi.json");
-        this.abi = new Scanner(abiFile).useDelimiter("\\Z").next();
-
-        if (!isRealCallsToEris) {
-            Field field = transactionHelper.getClass().getDeclaredField("httpRpcClient");
-            field.setAccessible(true);
-            field.set(transactionHelper, httpRpcClient);
-
-            Map<String, Object> param;
-            ErisRPCRequestEntity entity;
-            File file;
-            //Block 10
-            param = new HashMap<>();
-            param.put("height", blockNumberTen);
-            entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
-            file = new File("src/test/resources/json/block10.json");
-            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
-
-            //Block 3847
-            param = new HashMap<>();
-            param.put("height", blockNumberWithTx3847);
-            entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
-            file = new File("src/test/resources/json/block3847.json");
-            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
-
-            //Get latest block
-            entity = new ErisRPCRequestEntity(null, RPCMethod.GET_LATEST_BLOCK);
-            file = new File("src/test/resources/json/height3847.json");
-            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
-
-            //Random
-            this.random = 1;
-
-            //Greater block
-            Long latest = transactionHelper.getLatestBlockNumber();
-            Long greater = latest + 10;
-            param = new HashMap<>();
-            param.put("height", greater);
-            entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
-            file = new File("src/test/resources/json/emptyResponse.json");
-            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
-
-            Filters filters;
-            FilterData filterFrom;
-            FilterData filterTo;
-
-            //Blocks range 3846-3848
-            filters = new Filters();
-            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, blockNumber3846);
-            filterTo = new FilterHeight(Operation.LESS, blockNumber3848);
-            filters.add(filterFrom);
-            filters.add(filterTo);
-            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-            file = new File("src/test/resources/json/blockRange3846-3847.json");
-            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
-
-            //Blocks range 0-10
-            filters = new Filters();
-            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 0L);
-            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, 10L);
-            filters.add(filterFrom);
-            filters.add(filterTo);
-            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-            file = new File("src/test/resources/json/blockRange0-10.json");
-            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
-
-            //Blocks range 1-53
-            filters = new Filters();
-            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 1L);
-            filterTo = new FilterHeight(Operation.LESS, 53L);
-            filters.add(filterFrom);
-            filters.add(filterTo);
-            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-            file = new File("src/test/resources/json/blockRange1-52.json");
-            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
-
-            //Blocks range 52-75
-            filters = new Filters();
-            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 52L);
-            filterTo = new FilterHeight(Operation.LESS, 76L);
-            filters.add(filterFrom);
-            filters.add(filterTo);
-            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-            file = new File("src/test/resources/json/blockRange53-75.json");
-            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
-
-        }
-    }
+    private Long blockSixtyTwo=62L;
 
     @Test
     public void getBlockJSON() throws Exception {
-        String blockJSON = transactionHelper.getBlockJSON(blockNumberWithTx3847);
+        String blockJSON;
+
+        blockJSON = transactionHelper.getBlockJSON(blockNumberWithTx3847);
         System.out.println(blockJSON);
         assertNotNull(blockJSON);
         assertFalse(blockJSON.isEmpty());
+
+        blockJSON = transactionHelper.getBlockJSON(blockSixtyTwo);
+        assertNotNull(blockJSON);
+        System.out.println(blockJSON);
     }
 
     @Test
+    public void getBlock_BlockN62_BlockN62() throws Exception {
+        Block block = transactionHelper.getBlock(blockSixtyTwo);
+
+        assertNotNull(block);
+        assertNotNull(block.getHeader());
+        assertNotNull(block.getData());
+        assertEquals(blockSixtyTwo, block.getHeader().getHeight());
+    }
+
+        @Test
     public void getBlock_BlockN10_BlockN10() throws Exception {
         assertThat(transactionHelper.getBlock(blockNumberTen), instanceOf(Block.class));
         Block block = transactionHelper.getBlock(blockNumberTen);
         assertNotNull(block);
         assertNotNull(block.getHeader());
-        assertNotNull(block.getLastCommit());
         assertNotNull(block.getData());
         assertEquals(blockNumberTen, block.getHeader().getHeight());
     }
@@ -177,7 +102,7 @@ public class TransactionHelperTest {
         Long heightFirst = transactionHelper.getLatestBlockNumber();
         Thread.sleep(1000L);
         if (!isRealCallsToEris) {
-            File file = new File("src/test/resources/json/height10.json");
+            File file = new File("src/test/resources/json/v12/height10.json");
             when(httpRpcClient.call(any())).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
         }
         Long heightLast = transactionHelper.getLatestBlockNumber();
@@ -264,9 +189,102 @@ public class TransactionHelperTest {
         System.out.println(transactionHelper.getBlocks(1L, to).size());
     }
 
-    @Test
-    public void name() throws Exception {
-        System.out.println(53%51);
+    @Before
+    public void setUp() throws Exception {
+        File abiFile = new File("src/test/resources/json/v12/coinsContractAbi.json");
+        this.abi = new Scanner(abiFile).useDelimiter("\\Z").next();
 
+        if (!isRealCallsToEris) {
+            Field field = transactionHelper.getClass().getDeclaredField("httpRpcClient");
+            field.setAccessible(true);
+            field.set(transactionHelper, httpRpcClient);
+
+            Map<String, Object> param;
+            ErisRPCRequestEntity entity;
+            File file;
+            //Block 10
+            param = new HashMap<>();
+            param.put("height", blockNumberTen);
+            entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
+            file = new File("src/test/resources/json/v12/block10.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
+
+            //Block 62 v11
+            param = new HashMap<>();
+            param.put("height", blockSixtyTwo);
+            entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
+            file = new File("src/test/resources/json/v11/block62.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
+
+            //Block 3847
+            param = new HashMap<>();
+            param.put("height", blockNumberWithTx3847);
+            entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
+            file = new File("src/test/resources/json/v12/block3847.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
+
+            //Get latest block
+            entity = new ErisRPCRequestEntity(null, RPCMethod.GET_LATEST_BLOCK);
+            file = new File("src/test/resources/json/v12/height3847.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
+
+            //Random
+            this.random = 1;
+
+            //Greater block
+            Long latest = transactionHelper.getLatestBlockNumber();
+            Long greater = latest + 10;
+            param = new HashMap<>();
+            param.put("height", greater);
+            entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
+            file = new File("src/test/resources/json/v12/emptyResponse.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
+
+            Filters filters;
+            FilterData filterFrom;
+            FilterData filterTo;
+
+            //Blocks range 3846-3848
+            filters = new Filters();
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, blockNumber3846);
+            filterTo = new FilterHeight(Operation.LESS, blockNumber3848);
+            filters.add(filterFrom);
+            filters.add(filterTo);
+            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+            file = new File("src/test/resources/json/v12/blockRange3846-3847.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+
+            //Blocks range 0-10
+            filters = new Filters();
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 0L);
+            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, 10L);
+            filters.add(filterFrom);
+            filters.add(filterTo);
+            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+            file = new File("src/test/resources/json/v12/blockRange0-10.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+
+            //Blocks range 1-53
+            filters = new Filters();
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 1L);
+            filterTo = new FilterHeight(Operation.LESS, 53L);
+            filters.add(filterFrom);
+            filters.add(filterTo);
+            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+            file = new File("src/test/resources/json/v12/blockRange1-52.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+
+            //Blocks range 52-75
+            filters = new Filters();
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 52L);
+            filterTo = new FilterHeight(Operation.LESS, 76L);
+            filters.add(filterFrom);
+            filters.add(filterTo);
+            entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
+            file = new File("src/test/resources/json/v12/blockRange53-75.json");
+            when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+
+        }
     }
+
 }

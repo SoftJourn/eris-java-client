@@ -21,7 +21,7 @@ public class FiltersTest {
         filters.add(filterFrom);
         filters.add(filterTo);
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-        File file = new File("src/test/resources/json/filters.json");
+        File file = new File("src/test/resources/json/v12/filters.json");
         String expectedJSON = new Scanner(file).useDelimiter("\\Z").next().replaceAll("[\\n ]", "");
         assertEquals(expectedJSON, entity.toString());
     }

@@ -1,5 +1,7 @@
 package com.softjourn.eris.transaction.type;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softjourn.eris.contract.ArgumentsDecoder;
 import com.softjourn.eris.contract.ContractUnit;
 import com.softjourn.eris.contract.Variable;
@@ -25,6 +27,7 @@ public class ErisTransaction {
     private static final String SEQUENCE_END = "01";
     private static final Integer INT_SIZE_BYTES = 2;
     private static final String DEPLOY_MARKER = "6060604052";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private String identifier;
     private String callerAddress;
@@ -40,13 +43,94 @@ public class ErisTransaction {
     private Boolean isDeploy;
 
 
-    public ErisTransaction(String transactionString) throws StringIndexOutOfBoundsException {
+    public ErisTransaction(String transactionString) throws IllegalArgumentException{
+        boolean initialized = tryToInitializeWithJSON(transactionString);
+        if(!initialized) {
+            if (ErisTransaction.isDeployContractTx(transactionString)) {
+                this.isDeploy = true;
+                this.callingData = transactionString;
+            } else {
+                this.isDeploy = false;
+                boolean binaryInitialication = tryToInitializeWithBinary(transactionString);
+                if(!binaryInitialication)
+                    throw new IllegalArgumentException("Illegal string. Format is not supported");
+            }
+        }
+    }
 
-        if (ErisTransaction.isDeployContractTx(transactionString)) {
-            this.isDeploy = true;
-            this.callingData = transactionString;
-        } else {
-            this.isDeploy = false;
+    public String generateTxCode() {
+        String result = this.identifier;
+        result += ErisTransaction.DELIMITER;
+        result += this.callerAddress;
+        result += this.amount;
+        result += ErisTransaction.getSizeHexString(this.sequence);
+        result += this.sequence;
+        result += ErisTransaction.SEQUENCE_END;
+        result += this.transactionSignature;
+        result += ErisTransaction.SEQUENCE_END;
+        result += this.callerPubKey;
+        result += ErisTransaction.DELIMITER;
+        result += this.contractAddress;
+        result += this.gasLimit;
+        result += this.fee;
+        result += ErisTransaction.DELIMITER2;
+        result += this.functionNameHash;
+        result += this.callingData;
+        return result;
+    }
+
+    @Data
+    private static class ErisTransactionV11{
+        @Data
+        class Input{
+            private String address;
+            private Long amount;
+            private Long sequence;
+            private Object[] signature;
+            private Object[] pub_key;
+        }
+        private Input input;
+        private Long gas_limit;
+        private Long fee;
+        private String data;
+        private String address;
+    }
+
+    /**
+     * This transaction can occur in Eris version 12
+     * @param textValue
+     * @return true if initialization is successful. False otherwise.
+     */
+    private boolean tryToInitializeWithJSON(String textValue)  {
+        try {
+            JsonNode node = objectMapper.readTree(textValue);
+            Integer txType = node.get(0).intValue();
+            JsonNode transactionMetaData = node.get(1);
+            ErisTransactionV11 erisTransactionV11 = objectMapper
+                    .readValue(transactionMetaData.toString(),ErisTransactionV11.class);
+            this.callingData = erisTransactionV11.getData();
+            this.fee = toHexString(erisTransactionV11.getFee(),16);
+            this.contractAddress = erisTransactionV11.getAddress();
+            this.gasLimit = toHexString(erisTransactionV11.getGas_limit(),16);
+            ErisTransactionV11.Input input = erisTransactionV11.getInput();
+            this.transactionSignature = input.getSignature()[1].toString();
+            this.callerPubKey = input.getPub_key()[1].toString();
+            this.callerAddress = input.getAddress();
+            this.sequence = toHexString(input.getSequence(),16);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * This transaction can occur in Eris version 12
+     * @param transactionString
+     * @return true if initialization is successful. False otherwise.
+     */
+    private boolean tryToInitializeWithBinary(String transactionString)  {
+
+        try {
             // 4 digits of some identifier
             this.identifier = transactionString.substring(0, 4);
             // 4 digits of DELIMITER 0114
@@ -77,29 +161,13 @@ public class ErisTransaction {
             this.functionNameHash = transactionString.substring(shift, shift + 8);
             shift += 8;
             this.callingData = transactionString.substring(shift);
+
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
-    public String generateTxCode() {
-        String result = this.identifier;
-        result += ErisTransaction.DELIMITER;
-        result += this.callerAddress;
-        result += this.amount;
-        result += ErisTransaction.getSizeHexString(this.sequence);
-        result += this.sequence;
-        result += ErisTransaction.SEQUENCE_END;
-        result += this.transactionSignature;
-        result += ErisTransaction.SEQUENCE_END;
-        result += this.callerPubKey;
-        result += ErisTransaction.DELIMITER;
-        result += this.contractAddress;
-        result += this.gasLimit;
-        result += this.fee;
-        result += ErisTransaction.DELIMITER2;
-        result += this.functionNameHash;
-        result += this.callingData;
-        return result;
-    }
 
     private static String toHexString(long i) {
         StringBuilder sb = new StringBuilder();
