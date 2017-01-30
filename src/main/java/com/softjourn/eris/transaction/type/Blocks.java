@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,7 @@ public class Blocks {
     private Integer maxHeight;
     private List<BlockMeta> blockMetas = new ArrayList<>();
 
-    public static Stream<BigInteger> getBlockNumbersWithTransaction(Stream<BlockMeta> blockMetaStream) {
+    public static Stream<Long> getBlockNumbersWithTransaction(Stream<BlockMeta> blockMetaStream) {
         return blockMetaStream
                 .filter(Objects::nonNull)
                 .filter(BlockMeta::haveTransaction)
@@ -31,11 +30,11 @@ public class Blocks {
                 .map(Header::getHeight);
     }
 
-    public static List<BigInteger> getBlockNumbersWithTransaction(List<BlockMeta> blockMeta) {
+    public static List<Long> getBlockNumbersWithTransaction(List<BlockMeta> blockMeta) {
         return Blocks.getBlockNumbersWithTransaction(blockMeta.stream()).collect(Collectors.toList());
     }
 
-    public Stream<BigInteger> getBlockNumbersWithTransaction() {
+    public Stream<Long> getBlockNumbersWithTransaction() {
         return Blocks.getBlockNumbersWithTransaction(blockMetas.stream());
     }
 }

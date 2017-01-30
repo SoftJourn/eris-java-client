@@ -6,7 +6,6 @@ import com.softjourn.eris.rpc.RPCMethod;
 import org.junit.Test;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
@@ -14,8 +13,8 @@ import static org.junit.Assert.assertEquals;
 public class FiltersTest {
     @Test
     public void getMap() throws Exception {
-        BigInteger from = BigInteger.ZERO;
-        BigInteger to = BigInteger.TEN;
+        Long from = 0L;
+        Long to = 10L;
         Filters filters = new Filters();
         FilterData filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, from);
         FilterData filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, to);

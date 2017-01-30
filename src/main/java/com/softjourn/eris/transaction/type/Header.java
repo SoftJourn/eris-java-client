@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -23,7 +22,7 @@ public class Header {
     @JsonProperty(value = "num_txs")
     private Integer numTxs;
 
-    private BigInteger height;
+    private Long height;
     private LocalDateTime dateTime;
 
     @SuppressWarnings("unused")

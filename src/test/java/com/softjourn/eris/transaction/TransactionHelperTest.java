@@ -22,7 +22,6 @@ import org.junit.runners.JUnit4;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,10 +44,10 @@ public class TransactionHelperTest {
     public ExpectedException thrown = ExpectedException.none();
     private String chainUrl = "http://172.17.0.1:1337";
     private TransactionHelper transactionHelper = new TransactionHelper(chainUrl);
-    private BigInteger blockNumberTen = BigInteger.TEN;
-    private BigInteger blockNumberWithTx3847 = new BigInteger("3847");
-    private BigInteger blockNumber3846 = new BigInteger("3846");
-    private BigInteger blockNumber3848 = new BigInteger("3848");
+    private Long blockNumberTen = 10L;
+    private Long blockNumberWithTx3847 = new Long("3847");
+    private Long blockNumber3846 = new Long("3846");
+    private Long blockNumber3848 = new Long("3848");
     private HTTPRPCClient httpRpcClient = mock(HTTPRPCClient.class);
     private double random = Math.random();
     private boolean isRealCallsToEris = false;
@@ -90,8 +89,8 @@ public class TransactionHelperTest {
             this.random = 1;
 
             //Greater block
-            BigInteger latest = transactionHelper.getLatestBlockNumber();
-            BigInteger greater = latest.add(BigInteger.TEN);
+            Long latest = transactionHelper.getLatestBlockNumber();
+            Long greater = latest + 10;
             param = new HashMap<>();
             param.put("height", greater);
             entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
@@ -114,8 +113,8 @@ public class TransactionHelperTest {
 
             //Blocks range 0-10
             filters = new Filters();
-            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, BigInteger.ZERO);
-            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, BigInteger.TEN);
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 0L);
+            filterTo = new FilterHeight(Operation.LESS_OR_EQUALS, 10L);
             filters.add(filterFrom);
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
@@ -124,8 +123,8 @@ public class TransactionHelperTest {
 
             //Blocks range 1-53
             filters = new Filters();
-            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, BigInteger.ONE);
-            filterTo = new FilterHeight(Operation.LESS, BigInteger.valueOf(53));
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 1L);
+            filterTo = new FilterHeight(Operation.LESS, 53L);
             filters.add(filterFrom);
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
@@ -134,8 +133,8 @@ public class TransactionHelperTest {
 
             //Blocks range 52-75
             filters = new Filters();
-            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, BigInteger.valueOf(52));
-            filterTo = new FilterHeight(Operation.LESS, BigInteger.valueOf(76));
+            filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, 52L);
+            filterTo = new FilterHeight(Operation.LESS, 76L);
             filters.add(filterFrom);
             filters.add(filterTo);
             entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
@@ -166,7 +165,7 @@ public class TransactionHelperTest {
 
     @Test
     public void getBlock_BlockN3847_BlockN3847() throws Exception {
-        BigInteger blockN3847 = new BigInteger("3847");
+        Long blockN3847 = new Long("3847");
         assertThat(transactionHelper.getBlock(blockN3847), instanceOf(Block.class));
         Block block = transactionHelper.getBlock(blockN3847);
         assertEquals(blockN3847, block.getHeader().getHeight());
@@ -175,30 +174,30 @@ public class TransactionHelperTest {
 
     @Test
     public void getLatestBlock_After1sDifferentHeight() throws Exception {
-        BigInteger heightFirst = transactionHelper.getLatestBlockNumber();
+        Long heightFirst = transactionHelper.getLatestBlockNumber();
         Thread.sleep(1000L);
         if (!isRealCallsToEris) {
             File file = new File("src/test/resources/json/height10.json");
             when(httpRpcClient.call(any())).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
         }
-        BigInteger heightLast = transactionHelper.getLatestBlockNumber();
+        Long heightLast = transactionHelper.getLatestBlockNumber();
         assertNotEquals(heightFirst, heightLast);
     }
 
     @Test
-    public void getLatestBlockNumber_BigInteger() throws Exception {
-        BigInteger latestBlockNumber = transactionHelper.getLatestBlockNumber();
-        assertThat(latestBlockNumber, instanceOf(BigInteger.class));
+    public void getLatestBlockNumber_Long() throws Exception {
+        Long latestBlockNumber = transactionHelper.getLatestBlockNumber();
+        assertThat(latestBlockNumber, instanceOf(Long.class));
         assertNotNull(latestBlockNumber);
 
     }
 
     @Test
     public void getBlock_RandBlockNLessThanLatest_Block() throws Exception {
-        BigInteger latest = transactionHelper.getLatestBlockNumber();
+        Long latest = transactionHelper.getLatestBlockNumber();
         double doubleRandom = latest.doubleValue() * this.random;
         Integer integerRandom = (int) doubleRandom;
-        BigInteger rand = new BigInteger(integerRandom.toString());
+        Long rand = new Long(integerRandom.toString());
         assertNotNull(transactionHelper.getBlock(rand));
         assertNotNull(transactionHelper.getBlock(rand).getHeader());
         assertNotNull(transactionHelper.getBlock(rand).getHeader().getHeight());
@@ -208,8 +207,8 @@ public class TransactionHelperTest {
 
     @Test
     public void getBlock_BlockGreaterThanLatest_Null() throws Exception {
-        BigInteger latest = transactionHelper.getLatestBlockNumber();
-        BigInteger greater = latest.add(BigInteger.TEN);
+        Long latest = transactionHelper.getLatestBlockNumber();
+        Long greater = latest+10L;
         assertNull(transactionHelper.getBlock(greater));
     }
 
@@ -230,7 +229,7 @@ public class TransactionHelperTest {
     public void getTransactionBlock_3846_3848() throws Exception {
         List<BlockMeta> blocks = transactionHelper.getBlocks(blockNumber3846, blockNumber3848);
         assertEquals(2, blocks.size());
-        List<BigInteger> blockNumbersWithTx = Blocks.getBlockNumbersWithTransaction(blocks);
+        List<Long> blockNumbersWithTx = Blocks.getBlockNumbersWithTransaction(blocks);
         assertEquals(1, blockNumbersWithTx.size());
         assertEquals(blockNumberWithTx3847, blockNumbersWithTx.get(0));
     }
@@ -239,30 +238,35 @@ public class TransactionHelperTest {
     public void getTransactionBlock_0_10_IllegalArgumentException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("From height can't be less then 1");
-        transactionHelper.getBlocks(BigInteger.ZERO, BigInteger.TEN);
+        transactionHelper.getBlocks(0L, 10L);
     }
 
     @Test
     public void getTransactionBlock_10_0_IllegalArgumentException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("From height can't be grater or equals To height");
-        transactionHelper.getBlocks(BigInteger.TEN, BigInteger.ZERO);
+        transactionHelper.getBlocks(10L, 0L);
     }
 
     @Test
     public void getTransactionBlock_1_75_75Elements() throws Exception {
-        List<BlockMeta> blocks = transactionHelper.getBlocks(BigInteger.ONE, BigInteger.valueOf(76));
+        List<BlockMeta> blocks = transactionHelper.getBlocks(1L, 76L);
         assertEquals(75, blocks.size());
-        List<BigInteger> transactionBlocks = Blocks.getBlockNumbersWithTransaction(blocks);
+        List<Long> transactionBlocks = Blocks.getBlockNumbersWithTransaction(blocks);
         System.out.println(transactionBlocks);
         assertEquals(3, transactionBlocks.size());
     }
 
     @Test
     public void getBlocks() throws Exception {
-        BigInteger to = BigInteger.valueOf(53);
+        Long to = 53L;
         System.out.println("block to param = " + to);
-        System.out.println(transactionHelper.getBlocks(BigInteger.ONE, to).size());
+        System.out.println(transactionHelper.getBlocks(1L, to).size());
     }
 
+    @Test
+    public void name() throws Exception {
+        System.out.println(53%51);
+
+    }
 }
