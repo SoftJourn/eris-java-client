@@ -113,7 +113,7 @@ public class ArgumentsDecoder {
         int roundedLength = (length * type.staticPartLength() + 31) / 32;
         //get current value string from whole string
         String currentValueString = value.substring(dynamicOffset * 2, dynamicOffset * 2 + ( 1 + roundedLength) * 64);
-        //parse value by type
+        //parse value by pojo
         return type.formatOutput(currentValueString);
     }
 

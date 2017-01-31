@@ -65,9 +65,9 @@ public class HTTPRPCClientTest extends TestCase {
         Mockito.when(cl.execute(any())).then(invocationOnMock -> {
             HttpRequest request = (HttpRequest) invocationOnMock.getArguments()[0];
             Header[] contentTypeHeader = request.getHeaders(HttpHeaders.CONTENT_TYPE);
-            if (! (request instanceof HttpPost)) throw new RuntimeException("Request type should be POST");
+            if (! (request instanceof HttpPost)) throw new RuntimeException("Request pojo should be POST");
             if(contentTypeHeader.length == 0 || ! contentTypeHeader[0].getValue().equals("application/json"))
-                throw new RuntimeException("Request content type should be JSON");
+                throw new RuntimeException("Request content pojo should be JSON");
 
             String reqBody = new BufferedReader(new InputStreamReader(((HttpPost)request).getEntity().getContent())).lines().collect(Collectors.joining("\n"));
 

@@ -1,4 +1,4 @@
-package com.softjourn.eris.transaction.type;
+package com.softjourn.eris.transaction.pojo;
 
 public class NotValidTransactionException extends Exception{
     public NotValidTransactionException() {

@@ -6,10 +6,10 @@ import com.softjourn.eris.filter.Filters;
 import com.softjourn.eris.filter.Operation;
 import com.softjourn.eris.filter.type.FilterHeight;
 import com.softjourn.eris.rpc.*;
-import com.softjourn.eris.transaction.type.Block;
-import com.softjourn.eris.transaction.type.BlockMeta;
-import com.softjourn.eris.transaction.type.Blocks;
-import com.softjourn.eris.transaction.type.Height;
+import com.softjourn.eris.transaction.pojo.Block;
+import com.softjourn.eris.transaction.pojo.BlockMeta;
+import com.softjourn.eris.transaction.pojo.Blocks;
+import com.softjourn.eris.transaction.pojo.Height;
 
 import java.util.Collection;
 import java.util.List;

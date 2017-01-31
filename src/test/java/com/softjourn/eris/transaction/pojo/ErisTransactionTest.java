@@ -1,4 +1,4 @@
-package com.softjourn.eris.transaction.type;
+package com.softjourn.eris.transaction.pojo;
 
 import com.softjourn.eris.contract.ContractUnit;
 import org.junit.Before;

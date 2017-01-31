@@ -1,4 +1,4 @@
-package com.softjourn.eris.transaction.type;
+package com.softjourn.eris.transaction.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

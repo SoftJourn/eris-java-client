@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public abstract class Type<T> {
 
     /**
-     * Format given value in accordance with this type
+     * Format given value in accordance with this pojo
      * to be passed to ERIS
      *
      * @param value value to be formatted
@@ -18,7 +18,7 @@ public abstract class Type<T> {
     public abstract String formatInput(T value);
 
     /**
-     * Format given value in accordance with this type
+     * Format given value in accordance with this pojo
      * that is passed from ERIS
      *
      * @param value value to be formatted
@@ -27,22 +27,22 @@ public abstract class Type<T> {
     public abstract T formatOutput(String value);
 
     /**
-     * Check if value can be instance of this type
+     * Check if value can be instance of this pojo
      *
      * @param value value to be checked
-     * @return true if this value can be represented by this type
+     * @return true if this value can be represented by this pojo
      */
     public abstract boolean canRepresent(String value);
 
     /**
-     * Returns name of type with length (i.e. uint256, bytes32)
+     * Returns name of pojo with length (i.e. uint256, bytes32)
      *
-     * @return full name of this type
+     * @return full name of this pojo
      */
     public abstract String toString();
 
     /**
-     * @return true if this type is dynamic(has not predefined byte length like array)
+     * @return true if this pojo is dynamic(has not predefined byte length like array)
      * and else otherwise
      */
     public abstract boolean isDynamic();
@@ -53,8 +53,8 @@ public abstract class Type<T> {
     public abstract Class<T> valueClass();
 
     /**
-     * @param name Name of type in compiled contract
-     * @return true if this Type object is for this type name
+     * @param name Name of pojo in compiled contract
+     * @return true if this Type object is for this pojo name
      */
     public abstract boolean isType(String name);
 

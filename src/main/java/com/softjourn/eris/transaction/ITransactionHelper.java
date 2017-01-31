@@ -1,8 +1,8 @@
 package com.softjourn.eris.transaction;
 
 import com.softjourn.eris.rpc.ErisRPCError;
-import com.softjourn.eris.transaction.type.Block;
-import com.softjourn.eris.transaction.type.BlockMeta;
+import com.softjourn.eris.transaction.pojo.Block;
+import com.softjourn.eris.transaction.pojo.BlockMeta;
 
 import java.util.List;
 import java.util.stream.Stream;

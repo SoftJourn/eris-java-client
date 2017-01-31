@@ -1,10 +1,10 @@
-package com.softjourn.eris.transaction.type;
+package com.softjourn.eris.transaction.pojo;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softjourn.eris.contract.ArgumentsDecoder;
 import com.softjourn.eris.contract.ContractUnit;
 import com.softjourn.eris.contract.Variable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.IOException;
@@ -20,6 +20,7 @@ import static com.softjourn.eris.contract.Util.parseAbi;
  * Created by vromanchuk on 12.01.17.
  */
 @Data
+@AllArgsConstructor
 public class ErisTransaction {
 
     private static final String DELIMITER = "0114";
@@ -27,7 +28,6 @@ public class ErisTransaction {
     private static final String SEQUENCE_END = "01";
     private static final Integer INT_SIZE_BYTES = 2;
     private static final String DEPLOY_MARKER = "6060604052";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private String identifier;
     private String callerAddress;
@@ -41,6 +41,7 @@ public class ErisTransaction {
     private String functionNameHash;
     private String callingData;
     private Boolean isDeploy;
+
 
 
     public ErisTransaction(String transactionString) throws IllegalArgumentException{
@@ -267,6 +268,4 @@ public class ErisTransaction {
         return pattern.matcher(transaction).find();
     }
 
-    public ErisTransaction() {
-    }
 }

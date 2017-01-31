@@ -1,4 +1,4 @@
-package com.softjourn.eris.transaction.type;
+package com.softjourn.eris.transaction.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

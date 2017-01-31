@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.softjourn.eris.transaction.type.BlockData;
-import com.softjourn.eris.transaction.type.ErisTransaction;
+import com.softjourn.eris.transaction.pojo.BlockData;
+import com.softjourn.eris.transaction.pojo.ErisTransaction;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ public class BlockDataDeserializer extends JsonDeserializer<BlockData> {
                 s = jsonNode.textValue();
             }
             ErisTransaction transaction = new ErisTransaction(s);
+            transaction.getFeeLongValue();
             data.add(transaction);
         });
         blockData.setErisTransactions(data);

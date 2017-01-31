@@ -75,7 +75,7 @@ public class Bytes extends Type<byte[]> {
 
     @Override
     public Type<byte[]> createFromName(String name) {
-        if (!isType(name)) throw new IllegalArgumentException("Can't create Bytes type for name \"" + name + "\"");
+        if (!isType(name)) throw new IllegalArgumentException("Can't create Bytes pojo for name \"" + name + "\"");
         return new Bytes(getLength(name));
     }
 

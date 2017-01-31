@@ -18,7 +18,7 @@ public class ResultParser {
     public JsonNode getResultObject(JsonNode resultObjectOrArray) throws ResponseParsingException {
         if (resultObjectOrArray.isNull()) return null;
         if (!(resultObjectOrArray.isObject() || resultObjectOrArray.isArray()))
-            throw new ResponseParsingException("Wrong response. Result field is not object type.");
+            throw new ResponseParsingException("Wrong response. Result field is not object pojo.");
         JsonNode result = null;
         if (resultObjectOrArray.isArray()) {
             result = StreamSupport.stream(resultObjectOrArray.spliterator(), false)

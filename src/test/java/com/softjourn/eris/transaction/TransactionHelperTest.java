@@ -9,10 +9,10 @@ import com.softjourn.eris.filter.type.FilterHeight;
 import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCMethod;
-import com.softjourn.eris.transaction.type.Block;
-import com.softjourn.eris.transaction.type.BlockMeta;
-import com.softjourn.eris.transaction.type.Blocks;
-import com.softjourn.eris.transaction.type.ErisTransaction;
+import com.softjourn.eris.transaction.pojo.Block;
+import com.softjourn.eris.transaction.pojo.BlockMeta;
+import com.softjourn.eris.transaction.pojo.Blocks;
+import com.softjourn.eris.transaction.pojo.ErisTransaction;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class TransactionHelperTest {
     private double random = Math.random();
     private boolean isRealCallsToEris = false;
     private String abi;
-    private Long blockSixtyTwo=62L;
+    private Long blockSixtyTwo = 62L;
 
     @Test
     public void getBlockJSON() throws Exception {
@@ -75,10 +75,16 @@ public class TransactionHelperTest {
         assertNotNull(block);
         assertNotNull(block.getHeader());
         assertNotNull(block.getData());
+
         assertEquals(blockSixtyTwo, block.getHeader().getHeight());
+        //Checking parsed transaction
+        assertEquals(1,block.getData().getErisTransactions().size());
+        ErisTransaction transaction = block.getData().getErisTransactions().get(0);
+        transaction.getFeeLongValue();
+//        assertEquals(1234L, transaction.getFeeLongValue());
     }
 
-        @Test
+    @Test
     public void getBlock_BlockN10_BlockN10() throws Exception {
         assertThat(transactionHelper.getBlock(blockNumberTen), instanceOf(Block.class));
         Block block = transactionHelper.getBlock(blockNumberTen);
@@ -133,7 +139,7 @@ public class TransactionHelperTest {
     @Test
     public void getBlock_BlockGreaterThanLatest_Null() throws Exception {
         Long latest = transactionHelper.getLatestBlockNumber();
-        Long greater = latest+10L;
+        Long greater = latest + 10L;
         assertNull(transactionHelper.getBlock(greater));
     }
 
