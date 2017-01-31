@@ -1,8 +1,6 @@
 package com.softjourn.eris.contract;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.softjourn.eris.ErisAccountData;
 import com.softjourn.eris.contract.event.EventHandler;
 import com.softjourn.eris.contract.response.DeployResponse;
@@ -13,7 +11,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -109,7 +106,7 @@ public class ContractManager {
         }
 
         /**
-         * Deploys new instance of solidity contract and build new contract object
+         * Deploys new instance of solidity contract and create new contract object
          *
          * @param args - parameters of contract constructor(If constructor does not have any parameters, just call
          *             this method like this "buildAndDeploy()", else if constructor has parameters, than put these

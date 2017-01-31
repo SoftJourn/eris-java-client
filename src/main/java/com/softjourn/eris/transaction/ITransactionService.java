@@ -7,7 +7,7 @@ import com.softjourn.eris.transaction.pojo.BlockMeta;
 import java.util.List;
 import java.util.stream.Stream;
 
-public interface ITransactionHelper {
+public interface ITransactionService {
     Long MAX_BLOCKS_PER_REQUEST = new Long("51");
 
     Block getBlock(Long blockNumber) throws ErisRPCError;

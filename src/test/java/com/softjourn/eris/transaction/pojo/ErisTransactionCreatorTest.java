@@ -6,22 +6,24 @@ import org.junit.Test;
 import java.io.File;
 import java.util.Scanner;
 
-public class ErisTransactionBuilderTest {
+public class ErisTransactionCreatorTest {
     private String transactionBinary;
-    private ErisTransactionBuilder erisTransactionBuilder;
+    private ErisTransactionCreator erisTransactionCreator;
 
     @Test
     public void parse() throws Exception {
-        ErisTransactionBuilder.parse()
+
     }
 
     @Before
     public void setUp() throws Exception {
-        erisTransactionBuilder = new ErisTransactionBuilder();
+        erisTransactionCreator = new ErisTransactionCreator();
 
         File file;
         file = new File("src/test/resources/binary/TransactionBinary.txt");
         this.transactionBinary = new Scanner(file).useDelimiter("\\Z").next();
+
+
 
     }
 }

@@ -45,8 +45,6 @@ public class ErisRPCResponseEntity<T> {
         } catch (IOException e) {
             throw new ErisRPCResponseException("Response have different structure ", e);
         }
-
-
     }
 
 }

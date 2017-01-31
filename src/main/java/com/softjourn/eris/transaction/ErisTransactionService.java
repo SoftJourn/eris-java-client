@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * TransactionHelper
+ * ErisTransactionService
  * Created by vromanchuk on 12.01.17.
  */
-public class TransactionHelper implements ITransactionHelper {
+public class ErisTransactionService implements ITransactionService {
 
     private HTTPRPCClient httpRpcClient;
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public TransactionHelper(String host) {
+    public ErisTransactionService(String host) {
         this.httpRpcClient = new HTTPRPCClient(host);
     }
 

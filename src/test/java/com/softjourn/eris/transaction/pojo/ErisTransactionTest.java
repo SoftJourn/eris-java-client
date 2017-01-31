@@ -25,16 +25,13 @@ public class ErisTransactionTest {
 
     @Test
     public void isDeployContractTx() throws Exception {
-        assertTrue(ErisTransaction.isDeployContractTx(deploy));
-        assertFalse(ErisTransaction.isDeployContractTx(transactionBinary));
-
         ErisTransaction transaction;
 
-        transaction = new ErisTransaction(deploy);
+        transaction = ErisTransactionCreator.create(transactionBinary);
         assertTrue(transaction.getIsDeploy());
         assertEquals(transaction.getCallingData(), deploy);
 
-        transaction = new ErisTransaction(transactionBinary);
+        transaction = ErisTransactionCreator.create(transactionBinary);
         assertFalse(transaction.getIsDeploy());
 
     }
@@ -47,7 +44,7 @@ public class ErisTransactionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void newTransaction_fakeString_StringIndexOutOfBoundsException() throws Exception {
-        new ErisTransaction("fake transaction");
+        ErisTransactionCreator.create("fake transaction");
     }
 
     @Test
@@ -76,11 +73,11 @@ public class ErisTransactionTest {
     public void generateTxCode() throws Exception {
         ErisTransaction erisTransaction;
 
-        erisTransaction = new ErisTransaction(transactionBinary);
+        erisTransaction = ErisTransactionCreator.create(transactionBinary);
         assertEquals(transactionBinary, erisTransaction.generateTxCode());
         System.out.println(erisTransaction.getContractAddress());
 
-        erisTransaction = new ErisTransaction(largeSequenceTransaction);
+        erisTransaction = ErisTransactionCreator.create(largeSequenceTransaction);
         assertEquals(largeSequenceTransaction, erisTransaction.generateTxCode());
 
     }
@@ -104,6 +101,6 @@ public class ErisTransactionTest {
         file = new File("src/test/resources/binary/DeployTransaction.txt");
         this.deploy = new Scanner(file).useDelimiter("\\Z").next();
 
-        this.transaction = new ErisTransaction(transactionBinary);
+        this.transaction = ErisTransactionCreator.create(transactionBinary);
     }
 }

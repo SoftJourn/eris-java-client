@@ -1,28 +1,29 @@
 package com.softjourn.eris.transaction.pojo;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.softjourn.eris.transaction.deserializer.BlockDataDeserializer;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * BlockData in Eris block
  * Created by vromanchuk on 12.01.17.
  */
 @Data
-@JsonDeserialize(using = BlockDataDeserializer.class)
 public class BlockData {
 
     private List<ErisTransaction> erisTransactions;
 
     @SuppressWarnings("unused")
     @JsonSetter(value = "txs")
-    private void setTransactionsBites(List<String> transactionsBites) {
-        if (this.erisTransactions == null) {
-            this.erisTransactions = transactionsBites.stream().map(ErisTransaction::new).collect(Collectors.toList());
+    private void setTransactions(List<Object> transactions) throws NotValidTransactionException {
+        erisTransactions = new ArrayList<>();
+        if (transactions != null) {
+            for (Object tx:
+                 transactions) {
+                    erisTransactions.add(ErisTransactionCreator.create(tx));
+            }
         }
     }
 
