@@ -22,14 +22,15 @@ public class ErisTransactionTest {
     private String wrongAbi;
     private String largeSequenceTransaction;
     private String deploy;
+    private String deployCallingData;
 
     @Test
     public void isDeployContractTx() throws Exception {
         ErisTransaction transaction;
 
-        transaction = ErisTransactionCreator.create(transactionBinary);
+        transaction = ErisTransactionCreator.create(deploy);
         assertTrue(transaction.getIsDeploy());
-        assertEquals(transaction.getCallingData(), deploy);
+        assertEquals(transaction.getCallingData(), deployCallingData);
 
         transaction = ErisTransactionCreator.create(transactionBinary);
         assertFalse(transaction.getIsDeploy());
@@ -42,7 +43,7 @@ public class ErisTransactionTest {
         System.out.println(transaction);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NotValidTransactionException.class)
     public void newTransaction_fakeString_StringIndexOutOfBoundsException() throws Exception {
         ErisTransactionCreator.create("fake transaction");
     }
@@ -98,8 +99,11 @@ public class ErisTransactionTest {
         file = new File("src/test/resources/binary/LargeSequenceTransaction.txt");
         this.largeSequenceTransaction = new Scanner(file).useDelimiter("\\Z").next();
 
-        file = new File("src/test/resources/binary/DeployTransaction.txt");
+        file = new File("src/test/resources/binary/TransactionDeployBinary.txt");
         this.deploy = new Scanner(file).useDelimiter("\\Z").next();
+
+        file = new File("src/test/resources/binary/TransactionDeployBinaryCallingData.txt");
+        this.deployCallingData = new Scanner(file).useDelimiter("\\Z").next();
 
         this.transaction = ErisTransactionCreator.create(transactionBinary);
     }

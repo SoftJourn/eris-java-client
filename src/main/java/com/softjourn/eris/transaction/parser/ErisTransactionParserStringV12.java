@@ -19,7 +19,7 @@ public class ErisTransactionParserStringV12 implements IErisTransactionParser {
                 ErisTransaction transaction =
                         ErisTransaction.builder()
                                 // 4 digits of some identifier
-                                .identifier(inputString.substring(0, 4))
+                                .txTypeCall(Byte.valueOf(inputString.substring(0, 2),16))
                                 .callerAddress(inputString.substring(8, 48))
                                 .amount(Long.valueOf(inputString.substring(48, 64), 16)).build();
                 byte sequenceSize = Byte.valueOf(inputString.substring(64, 66), 16);
@@ -67,7 +67,7 @@ public class ErisTransactionParserStringV12 implements IErisTransactionParser {
                 }
                 return transaction;
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new NotValidTransactionException(e);
             }
         }
         return null;

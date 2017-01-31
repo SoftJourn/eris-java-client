@@ -129,12 +129,12 @@ public class ParserTest {
                 "    \"inputs\": [\n" +
                 "      {\n" +
                 "        \"name\": \"x\",\n" +
-                "        \"pojo\": \"uint256\"\n" +
+                "        \"type\": \"uint256\"\n" +
                 "      }\n" +
                 "    ],\n" +
                 "    \"name\": \"set\",\n" +
                 "    \"outputs\": [],\n" +
-                "    \"pojo\": \"function\"\n" +
+                "    \"type\": \"function\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"constant\": true,\n" +
@@ -143,10 +143,10 @@ public class ParserTest {
                 "    \"outputs\": [\n" +
                 "      {\n" +
                 "        \"name\": \"retVal\",\n" +
-                "        \"pojo\": \"uint256\"\n" +
+                "        \"type\": \"uint256\"\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"pojo\": \"function\"\n" +
+                "    \"type\": \"function\"\n" +
                 "  }\n" +
                 "]";
         assertEquals(testContract, new ContractManager().parseContract(TEST_DATA)
@@ -171,53 +171,53 @@ public class ParserTest {
                 "    \"inputs\": [\n" +
                 "      {\n" +
                 "        \"name\": \"addr\",\n" +
-                "        \"pojo\": \"address\"\n" +
+                "        \"type\": \"address\"\n" +
                 "      }\n" +
                 "    ],\n" +
                 "    \"name\": \"queryBalance\",\n" +
                 "    \"outputs\": [\n" +
                 "      {\n" +
                 "        \"name\": \"balance\",\n" +
-                "        \"pojo\": \"uint256\"\n" +
+                "        \"type\": \"uint256\"\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"pojo\": \"function\"\n" +
+                "    \"type\": \"function\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"constant\": false,\n" +
                 "    \"inputs\": [\n" +
                 "      {\n" +
                 "        \"name\": \"owner\",\n" +
-                "        \"pojo\": \"address\"\n" +
+                "        \"type\": \"address\"\n" +
                 "      },\n" +
                 "      {\n" +
                 "        \"name\": \"amount\",\n" +
-                "        \"pojo\": \"uint256\"\n" +
+                "        \"type\": \"uint256\"\n" +
                 "      }\n" +
                 "    ],\n" +
                 "    \"name\": \"mint\",\n" +
                 "    \"outputs\": [],\n" +
-                "    \"pojo\": \"function\"\n" +
+                "    \"type\": \"function\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"constant\": false,\n" +
                 "    \"inputs\": [\n" +
                 "      {\n" +
                 "        \"name\": \"receiver\",\n" +
-                "        \"pojo\": \"address\"\n" +
+                "        \"type\": \"address\"\n" +
                 "      },\n" +
                 "      {\n" +
                 "        \"name\": \"amount\",\n" +
-                "        \"pojo\": \"uint256\"\n" +
+                "        \"type\": \"uint256\"\n" +
                 "      }\n" +
                 "    ],\n" +
                 "    \"name\": \"send\",\n" +
                 "    \"outputs\": [],\n" +
-                "    \"pojo\": \"function\"\n" +
+                "    \"type\": \"function\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"inputs\": [],\n" +
-                "    \"pojo\": \"constructor\"\n" +
+                "    \"type\": \"constructor\"\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"anonymous\": false,\n" +
@@ -225,24 +225,24 @@ public class ParserTest {
                 "      {\n" +
                 "        \"indexed\": false,\n" +
                 "        \"name\": \"from\",\n" +
-                "        \"pojo\": \"address\"\n" +
+                "        \"type\": \"address\"\n" +
                 "      },\n" +
                 "      {\n" +
                 "        \"indexed\": false,\n" +
                 "        \"name\": \"to\",\n" +
-                "        \"pojo\": \"address\"\n" +
+                "        \"type\": \"address\"\n" +
                 "      },\n" +
                 "      {\n" +
                 "        \"indexed\": false,\n" +
                 "        \"name\": \"value\",\n" +
-                "        \"pojo\": \"uint256\"\n" +
+                "        \"type\": \"uint256\"\n" +
                 "      }\n" +
                 "    ],\n" +
                 "    \"name\": \"Send\",\n" +
-                "    \"pojo\": \"event\"\n" +
+                "    \"type\": \"event\"\n" +
                 "  }\n" +
                 "]";
-        assertEquals(testContract1, new ContractManager().parseContract(TEST_DATA_1)
+        assertEquals(testContract1.toString(), new ContractManager().parseContract(TEST_DATA_1)
                 .withEventHandler(eventHandler)
                 .withContractAddress("")
                 .withCallerAccount(account)
@@ -257,7 +257,7 @@ public class ParserTest {
 
                     }
                 })
-                .build());
+                .build().toString());
     }
 
     @Test
@@ -268,21 +268,21 @@ public class ParserTest {
                 "    \"inputs\": [\n" +
                 "      {\n" +
                 "        \"name\": \"accounts\",\n" +
-                "        \"pojo\": \"uint256[]\"\n" +
+                "        \"type\": \"uint256[]\"\n" +
                 "      },\n" +
                 "      {\n" +
                 "        \"name\": \"amount\",\n" +
-                "        \"pojo\": \"uint256\"\n" +
+                "        \"type\": \"uint256\"\n" +
                 "      }\n" +
                 "    ],\n" +
                 "    \"name\": \"distribute\",\n" +
                 "    \"outputs\": [\n" +
                 "      {\n" +
                 "        \"name\": \"success\",\n" +
-                "        \"pojo\": \"bool\"\n" +
+                "        \"type\": \"bool\"\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"pojo\": \"function\"\n" +
+                "    \"type\": \"function\"\n" +
                 "  }\n" +
                 "]";
         assertEquals(arrayTestContract, new ContractManager().parseContract(TEST_DATA)

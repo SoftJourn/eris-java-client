@@ -31,7 +31,7 @@ public class ErisTransaction {
     private static final String SEQUENCE_END = "01";
     private static final Integer CHARS_IN_BYTE = 2;
 
-    private String identifier;
+    private Byte txTypeCall;
     private String callerAddress;
     private Long amount;
     private Long sequence;
@@ -45,7 +45,8 @@ public class ErisTransaction {
     private Boolean isDeploy;
 
     public String generateTxCode() {
-        String result = this.identifier;
+        String result = toHexString(this.txTypeCall);
+        result += SEQUENCE_END;
         result += DELIMITER;
         result += this.callerAddress;
         result += toHexString(this.amount);
@@ -72,98 +73,6 @@ public class ErisTransaction {
         }
         return result;
     }
-
-    @Data
-    private static class ErisTransactionV11 {
-        @Data
-        class Input {
-            private String address;
-            private Long amount;
-            private Long sequence;
-            private Object[] signature;
-            private Object[] pub_key;
-        }
-
-        private Input input;
-        private Long gas_limit;
-        private Long fee;
-        private String data;
-        private String address;
-    }
-
-//    /**
-//     * This transaction can occur in Eris version 12
-//     * @param textValue
-//     * @return true if initialization is successful. False otherwise.
-//     */
-//    private boolean tryToInitializeWithJSON(String textValue)  {
-//        try {
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            JsonNode node = objectMapper.readTree(textValue);
-//            Integer txType = node.get(0).intValue();
-//            JsonNode transactionMetaData = node.get(1);
-//            ErisTransactionV11 erisTransactionV11 = objectMapper
-//                    .readValue(transactionMetaData.toString(),ErisTransactionV11.class);
-//            this.callingData = erisTransactionV11.getData();
-//            this.fee = toHexString(erisTransactionV11.getFee(),16);
-//            this.contractAddress = erisTransactionV11.getAddress();
-//            this.gasLimit = toHexString(erisTransactionV11.getGas_limit(),16);
-//            ErisTransactionV11.Input input = erisTransactionV11.getInput();
-//            this.transactionSignature = input.getSignature()[1].toString();
-//            this.callerPubKey = input.getPub_key()[1].toString();
-//            this.callerAddress = input.getAddress();
-//            this.sequence = toHexString(input.getSequence(),16);
-//            return true;
-//        } catch (Exception e) {
-//            return false;
-//        }
-//    }
-
-//    /**
-//     * This transaction can occur in Eris version 12
-//     * @param transactionString
-//     * @return true if initialization is successful. False otherwise.
-//     */
-//    private boolean tryToInitializeWithBinary(String transactionString)  {
-//
-//        try {
-//            // 4 digits of some identifier
-//            this.identifier = transactionString.substring(0, 4);
-//            // 4 digits of DELIMITER 0114
-//            this.callerAddress = transactionString.substring(8, 48);
-//            this.amount = transactionString.substring(48, 64);
-//            byte sequenceSize = Byte.valueOf(transactionString.substring(64, 66), 16);
-//            int shift = sequenceSize * 2;
-//            shift += 66;
-//            this.sequence = transactionString.substring(66, shift);
-//            //SEQUENCE_END "01"
-//            shift += 2;
-//            this.transactionSignature = transactionString.substring(shift, shift + 128);
-//            shift += 128;
-//            //SEQUENCE_END "01"
-//            shift += 2;
-//            this.callerPubKey = transactionString.substring(shift, shift + 64);
-//            shift += 64;
-//            //DELIMITER1 "0114"
-//            shift += 4;
-//            this.contractAddress = transactionString.substring(shift, shift + 40);
-//            shift += 40;
-//            this.gasLimit = transactionString.substring(shift, shift + 16);
-//            shift += 16;
-//            this.fee = transactionString.substring(shift, shift + 16);
-//            shift += 16;
-//            // DELIMITER2 "0144"
-//            shift += 4;
-//            this.functionNameHash = transactionString.substring(shift, shift + 8);
-//            shift += 8;
-//            this.callingData = transactionString.substring(shift);
-//
-//            return true;
-//        } catch (Exception e) {
-//            return false;
-//        }
-//    }
-
 
     private static String toHexString(long i) {
         return toHexString(i,Long.BYTES);
