@@ -42,7 +42,7 @@ public class ErisTransactionParserStringV12 implements IErisTransactionParser {
                     shift += 40;
                     transaction.setGasLimit(Long.valueOf(inputString.substring(shift, shift + 16),16));
                     shift += 16;
-                    transaction.setFee(Long.valueOf(inputString.substring(shift, shift + 16)));
+                    transaction.setFee(Long.valueOf(inputString.substring(shift, shift + 16),16));
                     shift += 16;
                     // DELIMITER2 "0144"
                     shift += 4;
