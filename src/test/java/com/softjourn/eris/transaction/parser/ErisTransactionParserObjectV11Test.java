@@ -18,10 +18,12 @@ public class ErisTransactionParserObjectV11Test {
     private String transactionJson;
     private ErisTransactionParserObjectV11 parser;
     private JsonNode transactionArray;
+    private Object transactionArrayList;
 
     @Test
     public void parse() throws Exception {
-        ErisTransaction transaction = parser.parse(transactionArray);
+        ErisTransaction transaction = parser.parse(transactionArrayList);
+
         assertNotNull(transaction);
         assertNotNull(transaction.getAmount());
         assertEquals(9999L,transaction.getAmount().longValue());
@@ -44,5 +46,6 @@ public class ErisTransactionParserObjectV11Test {
 
         transactionArray = objectMapper.readTree(transactionJson);
 
+        transactionArrayList = objectMapper.readValue(transactionJson,Object.class);
     }
 }
