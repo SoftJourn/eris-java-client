@@ -19,6 +19,7 @@ public class ErisTransactionParserObjectV11Test {
     private ErisTransactionParserObjectV11 parser;
     private JsonNode transactionArray;
     private Object transactionArrayList;
+    private Object transactionArrayList2;
 
     @Test
     public void parse() throws Exception {
@@ -28,6 +29,16 @@ public class ErisTransactionParserObjectV11Test {
         assertNotNull(transaction.getAmount());
         assertEquals(9999L,transaction.getAmount().longValue());
         assertTrue(transaction.getIsDeploy());
+    }
+
+    @Test
+    public void parseWithoutPubKey() throws Exception {
+        ErisTransaction transaction = parser.parse(transactionArrayList2);
+
+        assertNotNull(transaction);
+        assertNotNull(transaction.getAmount());
+        assertEquals(1L,transaction.getAmount().longValue());
+        assertFalse(transaction.getIsDeploy());
     }
 
     @Test(expected = NotValidTransactionException.class)
@@ -46,6 +57,8 @@ public class ErisTransactionParserObjectV11Test {
 
         transactionArray = objectMapper.readTree(transactionJson);
 
-        transactionArrayList = objectMapper.readValue(transactionJson,Object.class);
+        transactionArrayList = objectMapper.readValue(file,Object.class);
+
+        transactionArrayList2 = objectMapper.readValue(new File("src/test/resources/json/v11/txWithoutPubKey.json"),Object.class);
     }
 }

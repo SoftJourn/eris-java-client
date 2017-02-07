@@ -46,13 +46,17 @@ public class ErisTransactionParserObjectV11 implements IErisTransactionParser {
                     .amount(transactionV11.getInput().getAmount())
                     .sequence(transactionV11.getInput().getSequence())
                     .transactionSignature(transactionV11.getInput().getSignature()[0].toString())
-                    .callerPubKey(transactionV11.getInput().getPub_key()[0].toString())
+                    .callerPubKey(getPublickKey(transactionV11))
                     .isDeploy(transactionV11.getAddress().isEmpty())
                     .build();
 
         } catch (JsonProcessingException | IndexOutOfBoundsException e) {
             throw new NotValidTransactionException("Unsupported format of input param", e);
         }
+    }
+
+    private String getPublickKey(ErisTransactionV11 tx) {
+        return tx.getInput().getPub_key() == null ? "" : tx.getInput().getPub_key()[0].toString();
     }
 
     @Data
