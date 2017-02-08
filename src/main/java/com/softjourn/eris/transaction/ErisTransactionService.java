@@ -96,8 +96,17 @@ public class ErisTransactionService implements ITransactionService {
                 .map(httpRpcClient::call)
                 .map(resultJSON -> new ErisRPCResponseEntity<>(resultJSON, Blocks.class))
                 .map(ErisRPCResponseEntity::getResult)
+                .peek(this::delayRequests)
                 .map(Blocks::getBlockMetas)
                 .flatMap(Collection::stream);
+    }
+
+    private void delayRequests(Object o) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Execution of getting blocks was interrupted.", e);
+        }
     }
 
     @Override
