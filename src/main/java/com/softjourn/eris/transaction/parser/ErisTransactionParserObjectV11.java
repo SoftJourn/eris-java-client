@@ -45,9 +45,10 @@ public class ErisTransactionParserObjectV11 implements IErisTransactionParser {
                     .callerAddress(transactionV11.getInput().getAddress())
                     .amount(transactionV11.getInput().getAmount())
                     .sequence(transactionV11.getInput().getSequence())
-                    .transactionSignature(transactionV11.getInput().getSignature()[0].toString())
-                    .callerPubKey(getPublickKey(transactionV11))
+                    .transactionSignature(transactionV11.getInput().getSignature()[1].toString())
+                    .callerPubKey(getPublicKey(transactionV11))
                     .isDeploy(transactionV11.getAddress().isEmpty())
+                    .functionNameHash(getFunctionNameHash(transactionV11))
                     .build();
 
         } catch (JsonProcessingException | IndexOutOfBoundsException e) {
@@ -55,8 +56,15 @@ public class ErisTransactionParserObjectV11 implements IErisTransactionParser {
         }
     }
 
-    private String getPublickKey(ErisTransactionV11 tx) {
-        return tx.getInput().getPub_key() == null ? "" : tx.getInput().getPub_key()[0].toString();
+    private String getFunctionNameHash(ErisTransactionV11 txData) {
+        if (!(txData.getAddress() == null || txData.getAddress().isEmpty())) {
+            return txData.getData().substring(0, 8);
+        }
+        return null;
+    }
+
+    private String getPublicKey(ErisTransactionV11 tx) {
+        return tx.getInput().getPub_key() == null ? "" : tx.getInput().getPub_key()[1].toString();
     }
 
     @Data
