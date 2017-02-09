@@ -110,11 +110,10 @@ public class ErisTransaction {
 
     public Map<String, String> parseCallingData(ContractUnit unit) {
         ArgumentsDecoder argumentsDecoder = new ArgumentsDecoder();
-        List<Object> inputArgs = argumentsDecoder.readInputArgs(unit, this.callingData);
+        List<Object> inputArgs = argumentsDecoder.readInputArgs(unit, this.callingData.substring(8));
         Variable[] inputParams = unit.getInputs();
         if (inputParams.length != inputArgs.size())
-            throw new IllegalArgumentException("Incorrect contract unit. " +
-                    "Length of contactUnit inputs and values are different");
+            throw new IllegalArgumentException("Incorrect contract unit. Length of contactUnit inputs and values are different");
         Map<String, String> callingData = new HashMap<>();
         for (int i = 0; i < inputParams.length; i++) {
             callingData.put(inputParams[i].getName(), inputArgs.get(i).toString());

@@ -24,6 +24,8 @@ public class Header {
 
     private Long height;
     private LocalDateTime dateTime;
+    @JsonProperty("data_hash")
+    private String dataHash;
 
     @SuppressWarnings("unused")
     private void setTime(String time) {

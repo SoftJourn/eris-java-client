@@ -47,7 +47,6 @@ public class ErisTransactionParserStringV12 implements IErisTransactionParser {
                     // DELIMITER2 "0144"
                     shift += 4;
                     transaction.setFunctionNameHash(inputString.substring(shift, shift + 8));
-                    shift += 8;
                     transaction.setCallingData(inputString.substring(shift));
                     transaction.setIsDeploy(false);
                 } else {

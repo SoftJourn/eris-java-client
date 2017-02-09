@@ -58,7 +58,7 @@ public class KeyService {
 
 
     private static String getAddress(byte[] publicKey) {
-        return Util.tendermintRIPEDM160Hash(publicKey);
+        return Util.tendermintAddressRipeMd160Hash(publicKey);
     }
 
 

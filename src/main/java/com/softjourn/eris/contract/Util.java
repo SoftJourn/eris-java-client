@@ -20,6 +20,9 @@ public class Util {
 
     private static final MessageDigest RIPEDM160 = new RIPEMD160.Digest();
 
+    private static final byte[] ADDRESS_HASH_CUSTOM_PREFIX_BYTES = new byte[]{1, 1, 32};
+    private static final byte[] TRANSACTION_HASH_CUSTOM_PREFIX_BYTES = new byte[]{2, 1, 101};
+
 
 
     /**
@@ -56,13 +59,40 @@ public class Util {
      * @param value public key value
      * @return addess value
      */
-    public static String tendermintRIPEDM160Hash(byte[] value) {
-        byte[] withType = new byte[value.length+3];
-        //Some strange custom values
-        withType[0] = 1;
-        withType[1] = 1;
-        withType[2] = 32;
+    public static String tendermintAddressRipeMd160Hash(byte[] value) {
+        return tendermintRIPEDM160Hash(value, ADDRESS_HASH_CUSTOM_PREFIX_BYTES);
+    }
 
+    /**
+     * Get Eris(temdermint) specific Ripedm160 Hash as account address
+     * @param value public key value
+     * @return addess value
+     */
+    public static String tendermintTransactionV11RipeMd160Hash(byte[] value) {
+        return tendermintRIPEDM160Hash(value, TRANSACTION_HASH_CUSTOM_PREFIX_BYTES);
+    }
+
+    /**
+     * Get Eris(temdermint) specific Ripedm160 Hash as account address
+     * @param value public key value
+     * @return addess value
+     */
+    public static String tendermintTransactionV12RipeMd160Hash(byte[] value) {
+        byte[] hash = RIPEDM160.digest(value);
+        return Hex.encodeHexString(hash);
+    }
+
+    /**
+     * Get Eris(temdermint) specific Ripedm160 Hash
+     * Eris add some 3 custom bytes.
+     * For different hashes different bytes
+     * @param value public key value
+     * @return addess value
+     */
+    public static String tendermintRIPEDM160Hash(byte[] value, byte[] prefix) {
+        byte[] withType = new byte[value.length+3];
+
+        System.arraycopy(prefix, 0, withType, 0, 3);
         System.arraycopy(value, 0, withType, 3, value.length);
         byte[] hash = RIPEDM160.digest(withType);
         return Hex.encodeHexString(hash);
