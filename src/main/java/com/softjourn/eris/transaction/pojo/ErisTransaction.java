@@ -62,7 +62,6 @@ public class ErisTransaction {
             result += toHexString(this.gasLimit);
             result += toHexString(this.fee);
             result += DELIMITER2;
-            result += this.functionNameHash;
             result += this.callingData;
         } else {
             result += DELIMITER3;
