@@ -1,13 +1,16 @@
-package com.softjourn.eris.transaction.pojo;
+package com.softjourn.eris.block.pojo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -17,24 +20,26 @@ import java.util.stream.Stream;
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Blocks {
+
     private Integer minHeight;
     private Integer maxHeight;
-    private List<BlockMeta> blockMetas = new ArrayList<>();
 
-    public static Stream<Long> getBlockNumbersWithTransaction(Stream<BlockMeta> blockMetaStream) {
+    @Setter(AccessLevel.PACKAGE)
+    @Getter(AccessLevel.PACKAGE)
+    @JsonProperty("block_metas")
+    @SuppressWarnings({"SpellCheckingInspection", "MismatchedQueryAndUpdateOfCollection"})
+    private List<BlockMeta> blockMetaList = new ArrayList<>();
+
+    private static Stream<Long> getBlockNumbersWithTransaction(Stream<BlockMeta> blockMetaStream) {
         return blockMetaStream
                 .filter(Objects::nonNull)
                 .filter(BlockMeta::haveTransaction)
                 .map(BlockMeta::getHeader)
                 .filter(Objects::nonNull)
-                .map(Header::getHeight);
-    }
-
-    public static List<Long> getBlockNumbersWithTransaction(List<BlockMeta> blockMeta) {
-        return Blocks.getBlockNumbersWithTransaction(blockMeta.stream()).collect(Collectors.toList());
+                .map(BlockHeader::getHeight);
     }
 
     public Stream<Long> getBlockNumbersWithTransaction() {
-        return Blocks.getBlockNumbersWithTransaction(blockMetas.stream());
+        return Blocks.getBlockNumbersWithTransaction(blockMetaList.stream());
     }
 }

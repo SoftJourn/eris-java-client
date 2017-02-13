@@ -1,4 +1,4 @@
-package com.softjourn.eris.transaction.pojo;
+package com.softjourn.eris.block.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Header of block in blockchain
+ * BlockHeader of block in blockchain
  * Created by vromanchuk on 12.01.17.
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Header {
+public class BlockHeader {
 
     //TODO change to naming strategy
     @JsonProperty(value = "chain_id")

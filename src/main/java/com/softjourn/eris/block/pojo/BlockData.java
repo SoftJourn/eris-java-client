@@ -1,6 +1,9 @@
-package com.softjourn.eris.transaction.pojo;
+package com.softjourn.eris.block.pojo;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.softjourn.eris.transaction.pojo.ClassifiableErisTransaction;
+import com.softjourn.eris.transaction.pojo.ErisTransactionCreator;
+import com.softjourn.eris.transaction.pojo.NotValidTransactionException;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,9 +14,9 @@ import java.util.List;
  * Created by vromanchuk on 12.01.17.
  */
 @Data
-public class BlockData {
+class BlockData {
 
-    private List<ErisTransaction> erisTransactions;
+    private List<ClassifiableErisTransaction> erisTransactions;
 
     @SuppressWarnings("unused")
     @JsonSetter(value = "txs")
@@ -27,7 +30,7 @@ public class BlockData {
         }
     }
 
-    public List<ErisTransaction> getErisTransactions() {
+    public List<ClassifiableErisTransaction> getErisTransactions() {
         return erisTransactions;
     }
 }

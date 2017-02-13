@@ -29,7 +29,7 @@ public class ErisTransactionParserObjectV11Test {
         assertNotNull(transaction.getAmount());
         assertEquals(9999L,transaction.getAmount().longValue());
         assertEquals("ED7FE795D8A0B9DA6921EDBF2EEFB6E04BA76CB23B38BC43B846E77C3EA22AC8", transaction.getCallerPubKey());
-        assertEquals("1301C446A0B00EF431BBBB55D09D6C41A8CF7E5AADF4C9394194731FBD96F882098A5170D5A2C33458279817D685600E842519FEC72D1BB065606F04AA1CE304", transaction.getTransactionSignature());
+        assertEquals("1301C446A0B00EF431BBBB55D09D6C41A8CF7E5AADF4C9394194731FBD96F882098A5170D5A2C33458279817D685600E842519FEC72D1BB065606F04AA1CE304", transaction.getSignature());
         assertTrue(transaction.getIsDeploy());
     }
 

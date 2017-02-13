@@ -28,7 +28,7 @@ public class ErisTransactionParserStringV12 implements IErisTransactionParser {
                 transaction.setSequence(Long.valueOf(inputString.substring(66, shift), 16));
                 //SEQUENCE_END "01"
                 shift += 2;
-                transaction.setTransactionSignature(inputString.substring(shift, shift + 128));
+                transaction.setSignature(inputString.substring(shift, shift + 128));
                 shift += 128;
                 //SEQUENCE_END "01"
                 shift += 2;

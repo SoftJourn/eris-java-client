@@ -1,4 +1,4 @@
-package com.softjourn.eris.transaction.pojo;
+package com.softjourn.eris.block.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -10,9 +10,9 @@ import lombok.Data;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BlockMeta {
+class BlockMeta {
     String hash;
-    Header header;
+    BlockHeader header;
 
     public boolean haveTransaction() {
         return header != null && header.getNumTxs() > 0;

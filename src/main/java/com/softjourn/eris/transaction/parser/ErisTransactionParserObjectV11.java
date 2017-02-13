@@ -45,7 +45,7 @@ public class ErisTransactionParserObjectV11 implements IErisTransactionParser {
                     .callerAddress(transactionV11.getInput().getAddress())
                     .amount(transactionV11.getInput().getAmount())
                     .sequence(transactionV11.getInput().getSequence())
-                    .transactionSignature(transactionV11.getInput().getSignature()[1].toString())
+                    .signature(transactionV11.getInput().getSignature()[1].toString())
                     .callerPubKey(getPublicKey(transactionV11))
                     .isDeploy(transactionV11.getAddress().isEmpty())
                     .functionNameHash(getFunctionNameHash(transactionV11))

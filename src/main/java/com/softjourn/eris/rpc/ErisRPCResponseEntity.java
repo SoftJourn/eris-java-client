@@ -33,9 +33,8 @@ public class ErisRPCResponseEntity<T> {
 
     public ErisRPCResponseEntity(String json, Class<T> result) {
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(ErisRPCResponseEntity.class, result);
-        ErisRPCResponseEntity<T> object = null;
         try {
-            object = objectMapper.readValue(json, javaType);
+            ErisRPCResponseEntity<T> object = objectMapper.readValue(json, javaType);
 
             this.result = object.result;
             this.error = object.error;

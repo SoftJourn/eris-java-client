@@ -3,10 +3,7 @@ package com.softjourn.eris.transaction.pojo;
 import com.softjourn.eris.contract.ArgumentsDecoder;
 import com.softjourn.eris.contract.ContractUnit;
 import com.softjourn.eris.contract.Variable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,11 +16,13 @@ import static com.softjourn.eris.contract.Util.parseAbi;
  * Transaction structure in Eris chain
  * Created by vromanchuk on 12.01.17.
  */
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErisTransaction {
+@EqualsAndHashCode(callSuper = false)
+public class ErisTransaction extends ErisCallTransaction {
 
     private static final String DELIMITER = "0114";
     private static final String DELIMITER2 = "0144";
@@ -35,7 +34,7 @@ public class ErisTransaction {
     private String callerAddress;
     private Long amount;
     private Long sequence;
-    private String transactionSignature;
+    private String signature;
     private String callerPubKey;
     private String contractAddress;
     private Long gasLimit;
@@ -53,7 +52,7 @@ public class ErisTransaction {
         result += getSizeHexString(this.sequence);
         result += toHexString(this.sequence,Long.valueOf(getSizeHexString(this.sequence)));
         result += SEQUENCE_END;
-        result += this.transactionSignature;
+        result += this.signature;
         result += SEQUENCE_END;
         result += this.callerPubKey;
         if(!isDeploy) {
