@@ -1,43 +1,48 @@
-package com.softjourn.eris.transaction.parser;
+package com.softjourn.eris.transaction.parser.v11;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.softjourn.eris.transaction.pojo.ErisTransaction;
+import com.softjourn.eris.transaction.parser.ErisParser;
+import com.softjourn.eris.transaction.pojo.ErisCallTransaction;
+import com.softjourn.eris.transaction.pojo.ErisTransactionType;
 import com.softjourn.eris.transaction.pojo.NotValidTransactionException;
 import lombok.Data;
 
 import java.util.ArrayList;
 
-public class ErisTransactionParserObjectV11 implements IErisTransactionParser {
 
+public class Eris11CallTransactionParser implements ErisParser {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public ErisTransaction parse(Object inputArray) throws NotValidTransactionException {
-        if (inputArray instanceof ArrayNode) {
-            ArrayNode input = (ArrayNode) inputArray;
-            return parse(input);
-        } else {
-            if (inputArray instanceof ArrayList) {
-                ArrayList input = (ArrayList) inputArray;
-                return parse(input);
-            } else {
-                throw new NotValidTransactionException("Wrong instance of parse object required ArrayList or ArrayNode");
-            }
-        }
+    public ErisTransactionType getTransactionType() {
+        return ErisTransactionType.CALL;
     }
 
-    public ErisTransaction parse(ArrayList inputArray) throws NotValidTransactionException {
+    @Override
+    public ErisCallTransaction parse(Object inputArray) throws NotValidTransactionException {
+        if (inputArray instanceof ArrayNode) {
+            return parse((ArrayNode) inputArray);
+        }
+        if (inputArray instanceof ArrayList) {
+            return parse((ArrayList) inputArray);
+        }
+        throw new NotValidTransactionException("Type is not supported");
+    }
+
+    private ErisCallTransaction parse(ArrayList inputArray) throws NotValidTransactionException {
         ArrayNode arrayNode = objectMapper.convertValue(inputArray, ArrayNode.class);
         return parse(arrayNode);
     }
 
-    public ErisTransaction parse(ArrayNode inputArray) throws NotValidTransactionException {
+    private ErisCallTransaction parse(ArrayNode inputArray) throws NotValidTransactionException {
         try {
+
+            if (inputArray.get(0).asInt() != this.getTransactionType().getCode()) {
+                throw new NotValidTransactionException("Type is not supported");
+            }
             ErisTransactionV11 transactionV11 = objectMapper.treeToValue(inputArray.get(1), ErisTransactionV11.class);
-            return ErisTransaction.builder()
-                    .txTypeCall((byte) inputArray.get(0).asInt())
+            return ErisCallTransaction.builder()
                     .gasLimit(transactionV11.getGas_limit())
                     .fee(transactionV11.getFee())
                     .callingData(transactionV11.data)
@@ -48,10 +53,10 @@ public class ErisTransactionParserObjectV11 implements IErisTransactionParser {
                     .signature(transactionV11.getInput().getSignature()[1].toString())
                     .callerPubKey(getPublicKey(transactionV11))
                     .isDeploy(transactionV11.getAddress().isEmpty())
-                    .functionNameHash(getFunctionNameHash(transactionV11))
+                    .functionName(getFunctionNameHash(transactionV11))
                     .build();
 
-        } catch (JsonProcessingException | IndexOutOfBoundsException e) {
+        } catch (Exception e) {
             throw new NotValidTransactionException("Unsupported format of input param", e);
         }
     }

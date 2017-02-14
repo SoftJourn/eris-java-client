@@ -1,0 +1,63 @@
+{
+  "result": {
+    "header": {
+      "chain_id": "SJTestChain",
+      "height": 3424287,
+      "time": "2016-12-29T09:55:14.177Z",
+      "fees": 0,
+      "num_txs": 1,
+      "last_block_hash": "24D6CF49C83AA95B986B149D236FCB7649155C99",
+      "last_block_parts": {
+        "total": 1,
+        "hash": "B235E70C449D4B5A73C0CA5E2528D28CB75CA8D5"
+      },
+      "last_validation_hash": "F9030E9D92AF950C3AC4DFDB04DBA0581968D8B6",
+      "data_hash": "21AC0F3819FBA0B05F54B715F84B9E76B97AFD09",
+      "state_hash": "F6DF890924AD4C47FA85E87481E39F52C8C4F20D"
+    },
+    "data": {
+      "txs": [
+        [
+          2,
+          {
+            "input": {
+              "address": "2C76A03ADA83E4F0A9DD9D8FBFC54E5EE4026C3F",
+              "amount": 1,
+              "sequence": 68,
+              "signature": [
+                1,
+                "7D53DE3E0D41C605F2A1FF4C34153CCFCBF0D98680F7934896F3CB33B9964EB67B415BD75F4D5308D0C5965B204AF6C1608A7E8675032B449FA7FD6760A51C06"
+              ],
+              "pub_key": null
+            },
+            "address": "FC7A363EE4BDDF8E83389A157D95FD12AE3A1EFB",
+            "gas_limit": 2147483647,
+            "fee": 0,
+            "data": "40C10F19000000000000000000000000AD27386658430CE592E58ABDAA7E6CB1CAA4F11900000000000000000000000000000000000000000000000000000000000003E8"
+          }
+        ]
+      ]
+    },
+    "last_validation": {
+      "precommits": [
+        {
+          "height": 3424286,
+          "round": 0,
+          "type": 2,
+          "block_hash": "24D6CF49C83AA95B986B149D236FCB7649155C99",
+          "block_parts_header": {
+            "total": 1,
+            "hash": "B235E70C449D4B5A73C0CA5E2528D28CB75CA8D5"
+          },
+          "signature": [
+            1,
+            "8F54853E59396A442D4C8E996F492FFE0762580DEDF5464D96EAFA758572A45E70547DCE030D0C5139D0644844FEBBE71F2529F099C26D1A1A5CE2F28355C406"
+          ]
+        }
+      ]
+    }
+  },
+  "error": null,
+  "id": "",
+  "jsonrpc": "2.0"
+}

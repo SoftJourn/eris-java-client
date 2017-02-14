@@ -10,11 +10,11 @@ import lombok.Data;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-class BlockMeta {
+class ErisBlockMeta {
     String hash;
-    BlockHeader header;
+    ErisBlockHeader header;
 
-    public boolean haveTransaction() {
+    boolean haveTransaction() {
         return header != null && header.getNumTxs() > 0;
     }
 }

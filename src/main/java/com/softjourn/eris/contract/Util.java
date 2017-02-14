@@ -34,12 +34,15 @@ public class Util {
         return sha3(val.getBytes());
     }
 
-    public static String sha3(byte[] value) {
+    private static String sha3(byte[] value) {
         byte[] hash = SHA3_DIGEST.digest(value);
         return Hex.encodeHexString(hash);
     }
 
     public static HashMap<String, ContractUnit> parseAbi(String abi) throws IOException {
+        if (abi == null) {
+            throw new IllegalArgumentException("ABI can't be null");
+        }
         ObjectMapper mapper = new ObjectMapper();
         ObjectReader objectReader = mapper.readerFor(ContractUnit.class);
         HashMap<String, ContractUnit> result = new HashMap<>();
@@ -89,7 +92,7 @@ public class Util {
      * @param value public key value
      * @return addess value
      */
-    public static String tendermintRIPEDM160Hash(byte[] value, byte[] prefix) {
+     private static String tendermintRIPEDM160Hash(byte[] value, byte[] prefix) {
         byte[] withType = new byte[value.length+3];
 
         System.arraycopy(prefix, 0, withType, 0, 3);
@@ -104,7 +107,7 @@ public class Util {
      * @return byte array that represents string
      * @throws NumberFormatException if string is not properly formatted hexadecimal value
      */
-    public static byte[] hexStringToBytes(String value) {
+    static byte[] hexStringToBytes(String value) {
         return new BigInteger(value, 16).toByteArray();
     }
 
@@ -136,6 +139,8 @@ public class Util {
      * @param c chat to fill with
      * @return padded to required length value
      */
+
+    @SuppressWarnings("SameParameterValue")
     public static String rightPad(String val, int length, char c) {
         int diff = length - val.length();
         if (diff > 0) {

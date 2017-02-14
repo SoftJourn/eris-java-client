@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  */
 @Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class Blocks {
+public class ErisBlocks {
 
     private Integer minHeight;
     private Integer maxHeight;
@@ -28,18 +28,18 @@ public class Blocks {
     @Getter(AccessLevel.PACKAGE)
     @JsonProperty("block_metas")
     @SuppressWarnings({"SpellCheckingInspection", "MismatchedQueryAndUpdateOfCollection"})
-    private List<BlockMeta> blockMetaList = new ArrayList<>();
+    private List<ErisBlockMeta> blockMetaList = new ArrayList<>();
 
-    private static Stream<Long> getBlockNumbersWithTransaction(Stream<BlockMeta> blockMetaStream) {
+    private static Stream<Long> getBlockNumbersWithTransaction(Stream<ErisBlockMeta> blockMetaStream) {
         return blockMetaStream
                 .filter(Objects::nonNull)
-                .filter(BlockMeta::haveTransaction)
-                .map(BlockMeta::getHeader)
+                .filter(ErisBlockMeta::haveTransaction)
+                .map(ErisBlockMeta::getHeader)
                 .filter(Objects::nonNull)
-                .map(BlockHeader::getHeight);
+                .map(ErisBlockHeader::getHeight);
     }
 
     public Stream<Long> getBlockNumbersWithTransaction() {
-        return Blocks.getBlockNumbersWithTransaction(blockMetaList.stream());
+        return ErisBlocks.getBlockNumbersWithTransaction(blockMetaList.stream());
     }
 }

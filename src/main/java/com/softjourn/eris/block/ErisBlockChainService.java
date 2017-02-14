@@ -1,14 +1,15 @@
 package com.softjourn.eris.block;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softjourn.eris.block.pojo.Block;
-import com.softjourn.eris.block.pojo.Blocks;
+import com.softjourn.eris.block.pojo.ErisBlock;
+import com.softjourn.eris.block.pojo.ErisBlocks;
 import com.softjourn.eris.block.pojo.Height;
 import com.softjourn.eris.filter.FilterData;
 import com.softjourn.eris.filter.Filters;
 import com.softjourn.eris.filter.Operation;
 import com.softjourn.eris.filter.type.FilterHeight;
 import com.softjourn.eris.rpc.*;
+import com.softjourn.eris.transaction.TransactionService;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -17,22 +18,13 @@ import java.util.stream.Stream;
  * Manage data in block chain stored data
  * Created by vromanchuk on 10.02.17.
  */
-public class ErisBlockChainService implements BlockChainService{
+public class ErisBlockChainService implements BlockChainService {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
     private final HTTPRPCClient httpRpcClient;
+    private TransactionService transactionService;
 
-    @Override
-    public Block getBlock(long blockNumber) throws ErisRPCError {
-        String json = this.getBlockJson(blockNumber);
-        ErisRPCResponseEntity<Block> response = new ErisRPCResponseEntity<>(json, Block.class);
-        if (response.getError() != null) {
-            throw response.getError();
-        } else {
-            return response.getResult();
-        }
-    }
 
     @Override
     public Long getLatestBlockNumber() {
@@ -43,16 +35,39 @@ public class ErisBlockChainService implements BlockChainService{
     }
 
     @Override
-    public Stream<Block> getBlocksWithTransactions(long from, long to) {
-        return getBlockNumbersWithTx(from,to)
+    public void visitTransactionsFromBlock(long blockHeight) {
+        ErisBlock block = this.getBlock(blockHeight);
+        transactionService.visitTransactions(block);
+    }
+
+    @Override
+    public void visitTransactionsFromBlocks(long fromBlockHeight, long toBlockHeight) {
+        this.getBlocksWithTransactions(fromBlockHeight,toBlockHeight)
+                .forEach( block -> transactionService.visitTransactions(block));
+    }
+
+
+    public ErisBlockChainService(String host, TransactionService transactionService) {
+        this.httpRpcClient = new HTTPRPCClient(host);
+        this.transactionService = transactionService;
+    }
+
+    ErisBlock getBlock(long blockNumber) throws ErisRPCError {
+        String json = this.getBlockJson(blockNumber);
+        ErisRPCResponseEntity<ErisBlock> response = new ErisRPCResponseEntity<>(json, ErisBlock.class);
+        if (response.getError() != null) {
+            throw response.getError();
+        } else {
+            return response.getResult();
+        }
+    }
+
+    Stream<ErisBlock> getBlocksWithTransactions(long from, long to) {
+        return getBlockNumbersWithTx(from, to)
                 .map(this::getBlock);
     }
 
-    public ErisBlockChainService(String host) {
-        this.httpRpcClient = new HTTPRPCClient(host);
-    }
-
-    String getBlockJson(Long blockNumber) {
+    String getBlockJson(long blockNumber) {
         Height height = new Height(blockNumber);
         Map<String, Object> param = objectMapper.convertValue(height, Map.class);
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
@@ -65,7 +80,7 @@ public class ErisBlockChainService implements BlockChainService{
                 .limit(calculateLimit(from, to))
                 .map(curFrom -> getBlocksRequestEntity(curFrom, getMiddleNumber(curFrom, to)))
                 .map(httpRpcClient::call)
-                .map(resultJSON -> new ErisRPCResponseEntity<>(resultJSON, Blocks.class))
+                .map(resultJSON -> new ErisRPCResponseEntity<>(resultJSON, ErisBlocks.class))
                 .map(ErisRPCResponseEntity::getResult)
                 .peek(res -> delayRequests())
                 .flatMap(blocks -> blocks.getBlockNumbersWithTransaction());

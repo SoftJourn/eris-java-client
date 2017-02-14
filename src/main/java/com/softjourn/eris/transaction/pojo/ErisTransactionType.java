@@ -2,6 +2,8 @@ package com.softjourn.eris.transaction.pojo;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+
 /**
  * This type is beginning byte of transaction
  * link https://github.com/eris-ltd/eris-db/blob/f9c5c013523b73d380889bf17e66c2772aaf3d8d/txs/tx.go
@@ -19,5 +21,12 @@ public enum ErisTransactionType {
 
     ErisTransactionType(int code){
         this.code = (byte) code;
+    }
+
+    public static ErisTransactionType findByCode(int code){
+        return Arrays.stream(ErisTransactionType.values())
+                .filter(type -> type.code == code)
+                .findFirst()
+                .orElse(null);
     }
 }

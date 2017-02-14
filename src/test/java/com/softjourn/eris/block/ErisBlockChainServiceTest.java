@@ -1,6 +1,7 @@
 package com.softjourn.eris.block;
 
-import com.softjourn.eris.block.pojo.Block;
+import com.softjourn.eris.TestUtil;
+import com.softjourn.eris.block.pojo.ErisBlock;
 import com.softjourn.eris.filter.Filters;
 import com.softjourn.eris.filter.Operation;
 import com.softjourn.eris.filter.type.FilterHeight;
@@ -8,23 +9,30 @@ import com.softjourn.eris.rpc.ErisRPCError;
 import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCMethod;
-import com.softjourn.eris.transaction.pojo.ClassifiableErisTransaction;
+import com.softjourn.eris.transaction.ErisTransactionService;
+import com.softjourn.eris.transaction.parser.ErisParser;
+import com.softjourn.eris.transaction.parser.AbstractErisParserService;
+import com.softjourn.eris.transaction.parser.v11.Eris11CallTransactionParser;
+import com.softjourn.eris.transaction.parser.v11.Eris11ParserService;
+import com.softjourn.eris.transaction.pojo.ErisCallTransaction;
+import com.softjourn.eris.transaction.pojo.ErisTransactionType;
 import lombok.extern.java.Log;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import static com.softjourn.eris.TestUtil.getStringFromFile;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -39,6 +47,7 @@ import static org.mockito.Mockito.when;
 
 @Log
 public class ErisBlockChainServiceTest {
+
     // Disable info stack trace if run tests
     static {
         boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
@@ -47,19 +56,18 @@ public class ErisBlockChainServiceTest {
             log.setLevel(Level.OFF);
     }
 
-    private static boolean isRealCallsToEris = false;
+    private static boolean isRealCallsToEris = true;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    private String chainUrl = "http://46.101.203.71:1337";
+    private final String chainUrl = "http://46.101.203.71:1337";
 
-    private ErisBlockChainService erisTransactionService = new ErisBlockChainService(chainUrl);
+    private ErisTransactionService transactionService;
+    private ErisBlockChainService blockChainService;
 
     private HTTPRPCClient httpRpcClient;
 
     private double random = Math.random();
-
-    private String abi;
 
     private long block10 = 10;
     private long block62 = 62;
@@ -71,13 +79,13 @@ public class ErisBlockChainServiceTest {
     public void getBlockJson() throws Exception {
         String json;
 
-        json = erisTransactionService.getBlockJson(block3847WithTx);
+        json = blockChainService.getBlockJson(block3847WithTx);
         log.info("block 3847 includes transaction");
         log.info(json);
         assertNotNull(json);
         assertFalse(json.isEmpty());
 
-        json = erisTransactionService.getBlockJson(block62);
+        json = blockChainService.getBlockJson(block62);
         log.info("block 62");
         log.info(json);
         assertNotNull(json);
@@ -85,14 +93,14 @@ public class ErisBlockChainServiceTest {
 
     @Test
     public void getBlock() throws Exception {
-        Block block = erisTransactionService.getBlock(block62);
+        ErisBlock block = blockChainService.getBlock(block62);
 
         assertNotNull(block);
 
         assertNotNull(block.getBlockNumber());
         assertNotNull(block.getChainName());
         assertNotNull(block.getTimeCreated());
-        assertNotNull(block.getTransactions());
+        assertNotNull(block.getUndefinedTransactions());
 
         log.info(block.toString());
 
@@ -100,25 +108,25 @@ public class ErisBlockChainServiceTest {
 
     @Test
     public void getBlock_10_BlockN10() throws Exception {
-        assertThat(erisTransactionService.getBlock(block10), instanceOf(Block.class));
-        Block block = erisTransactionService.getBlock(block10);
+        assertThat(blockChainService.getBlock(block10), instanceOf(ErisBlock.class));
+        ErisBlock block = blockChainService.getBlock(block10);
 
         assertNotNull(block);
         assertNotNull(block.getHeader());
         assertNotNull(block.getData());
-        assertEquals(block10, block.getHeader().getHeight().longValue());
+        assertEquals(block10, block.getBlockNumber().longValue());
     }
 
     @Test
     public void getBlock_3847_BlockN3847() throws Exception {
-        assertThat(erisTransactionService.getBlock(block3847WithTx), instanceOf(Block.class));
-        Block block = erisTransactionService.getBlock(block3847WithTx);
+        assertThat(blockChainService.getBlock(block3847WithTx), instanceOf(ErisBlock.class));
+        ErisBlock block = blockChainService.getBlock(block3847WithTx);
         assertEquals(block3847WithTx, block.getBlockNumber().longValue());
     }
 
     @Test
     public void getLatestBlockNumber() throws Exception {
-        Long heightFirst = erisTransactionService.getLatestBlockNumber();
+        Long heightFirst = blockChainService.getLatestBlockNumber();
 
         assertNotNull(heightFirst);
         assertThat(heightFirst, instanceOf(Long.class));
@@ -127,9 +135,9 @@ public class ErisBlockChainServiceTest {
         log.info("First request for get latest block number " + heightFirst);
         Thread.sleep(1000L);
         if (!isRealCallsToEris) {
-            setUpLatestBlockResponse("v12/height3847.json");
+            setUpLatestBlockResponse("json/v12/height3847.json");
         }
-        Long heightLast = erisTransactionService.getLatestBlockNumber();
+        Long heightLast = blockChainService.getLatestBlockNumber();
         assertNotNull(heightLast);
         assertThat(heightFirst, instanceOf(Long.class));
 
@@ -140,14 +148,14 @@ public class ErisBlockChainServiceTest {
 
     @Test
     public void getBlock_RandBlockNLessThanLatest_Block() throws Exception {
-        Long latest = erisTransactionService.getLatestBlockNumber();
+        Long latest = blockChainService.getLatestBlockNumber();
         double doubleRandom = latest.doubleValue() * this.random;
         Integer integerRandom = (int) doubleRandom;
         Long rand = new Long(integerRandom.toString());
-        assertNotNull(erisTransactionService.getBlock(rand));
-        assertNotNull(erisTransactionService.getBlock(rand).getHeader());
-        assertNotNull(erisTransactionService.getBlock(rand).getHeader().getHeight());
-        assertEquals(rand, erisTransactionService.getBlock(rand).getHeader().getHeight());
+        assertNotNull(blockChainService.getBlock(rand));
+        assertNotNull(blockChainService.getBlock(rand).getHeader());
+        assertNotNull(blockChainService.getBlock(rand).getHeader().getBlockNumber());
+        assertEquals(rand, blockChainService.getBlock(rand).getHeader().getBlockNumber());
 
     }
 
@@ -158,15 +166,15 @@ public class ErisBlockChainServiceTest {
      */
     @Test(expected = ErisRPCError.class)
     public void getBlock_BlockGreaterThanLatest_Null() throws Exception {
-        Long latest = erisTransactionService.getLatestBlockNumber();
+        Long latest = blockChainService.getLatestBlockNumber();
         Long greater = latest + 10;
-        log.info(erisTransactionService.getBlock(greater).toString());
+        log.info(blockChainService.getBlock(greater).toString());
     }
 
     @Test
     public void getBlockNumbersWithTx() throws Exception {
 
-        List<Long> blockNumbersWithTx = erisTransactionService
+        List<Long> blockNumbersWithTx = blockChainService
                 .getBlockNumbersWithTx(block3846, block3848)
                 .collect(Collectors.toList());
         assertEquals(1, blockNumbersWithTx.size());
@@ -175,8 +183,8 @@ public class ErisBlockChainServiceTest {
 
     @Test
     public void getBlockNumbersWithTx_1_75_3Elements() throws Exception {
-        List<Long> transactionBlocks = erisTransactionService
-                .getBlockNumbersWithTx(1,76)
+        List<Long> transactionBlocks = blockChainService
+                .getBlockNumbersWithTx(1, 76)
                 .collect(Collectors.toList());
         log.info(transactionBlocks.toString());
         assertEquals(3, transactionBlocks.size());
@@ -184,27 +192,27 @@ public class ErisBlockChainServiceTest {
 
     @Test
     public void getBlocksWithTransactions() throws Exception {
-        List<Block> blocks = erisTransactionService
+        List<ErisBlock> blocks = blockChainService
                 .getBlocksWithTransactions(block3846, block3848)
                 .collect(Collectors.toList());
         assertEquals(1, blocks.size());
-        Block block = blocks.get(0);
+        ErisBlock block = blocks.get(0);
         assertEquals(block3847WithTx, block.getBlockNumber().longValue());
-        assertEquals(1, block.getTransactions().size());
+        assertEquals(1, block.getUndefinedTransactions().size());
     }
 
     @Test
     public void getBlocksWithTransactions_0_10_IllegalArgumentException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("From height can't be less then 1");
-        erisTransactionService.getBlocksWithTransactions(0L, 10L);
+        blockChainService.getBlocksWithTransactions(0L, 10L);
     }
 
     @Test
     public void getBlocksWithTransactions_10_0_IllegalArgumentException() throws Exception {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("From height can't be grater or equals To height");
-        erisTransactionService.getBlocksWithTransactions(10, 0);
+        blockChainService.getBlocksWithTransactions(10, 0);
     }
 
 
@@ -212,78 +220,79 @@ public class ErisBlockChainServiceTest {
     public void getTransactionFromBlock() throws Exception {
         if (!isRealCallsToEris) {
             String expected = "{owner=90CCB0132FA9287AB3C3283978C0E523FA1450A0, amount=110}";
-            List<ClassifiableErisTransaction> erisTransactions = erisTransactionService.getBlock(block3847WithTx).getTransactions();
+            List<Object> erisTransactions = blockChainService.getBlock(block3847WithTx).getUndefinedTransactions();
             assertEquals(1, erisTransactions.size());
-            ClassifiableErisTransaction erisTransaction = erisTransactions.get(0);
             //TODO implement transaction data parsing from unit
         }
     }
 
-
     @Before
     public void setUp() throws Exception {
-        File abiFile = new File("src/test/resources/json/v12/coinsContractAbi.json");
-        this.abi = new Scanner(abiFile).useDelimiter("\\Z").next();
+        String abi = getStringFromFile("json/coinsContractAbi.json");
+        Function<String, String> getAbiFromContract = str -> abi;
+        Map consumerMap = new HashMap<ErisTransactionType, Consumer<ErisCallTransaction>>() {{
+            put(ErisTransactionType.CALL, eris -> System.out.println(eris.toString()));
+        }};
+        ErisParser parser = new Eris11CallTransactionParser();
+        AbstractErisParserService parserService = new Eris11ParserService(parser);
+        this.blockChainService = new ErisBlockChainService(chainUrl, transactionService);
+        this.transactionService = new ErisTransactionService(parserService, consumerMap, getAbiFromContract);
+
 
         if (!isRealCallsToEris) {
             // Inject httpRpcClient
-            Field field = erisTransactionService.getClass().getDeclaredField("httpRpcClient");
+            Field field = blockChainService.getClass().getDeclaredField("httpRpcClient");
             field.setAccessible(true);
             httpRpcClient = mock(HTTPRPCClient.class);
-            field.set(erisTransactionService, httpRpcClient);
+            field.set(blockChainService, httpRpcClient);
 
-            setUpBlockCall(block10, "v12/block10.json");
-            setUpBlockCall(block62, "v11/block62.json");
-            setUpBlockCall(block3847WithTx, "v12/block3847.json");
+            setUpBlockCall(block10, "json/v12/block10.json");
+            setUpBlockCall(block62, "json/v11/block62.json");
+            setUpBlockCall(block3847WithTx, "json/v12/block3847.json");
 
-            setUpLatestBlockResponse("v12/height10.json");
+            setUpLatestBlockResponse("json/v12/height10.json");
 
             //PreDefined when mock up
             this.random = 1;
 
             //Illegal request for block height grater than latest
-            Long latest = erisTransactionService.getLatestBlockNumber();
+            Long latest = blockChainService.getLatestBlockNumber();
             Long greater = latest + 10;
-            setUpBlockCall(greater, "v11/blockGraterThanLatest.json");
+            setUpBlockCall(greater, "json/v11/blockGraterThanLatest.json");
 
-            setUpBlockRangeCall(block3846, block3848, "v12/blockRange3846-3847.json");
-            setUpBlockRangeCall(0, 10, "v12/blockRange0-10.json");
-            setUpBlockRangeCall(1, 53, "v12/blockRange1-52.json");
-            setUpBlockRangeCall(52, 76, "v12/blockRange53-75.json");
+            setUpBlockRangeCall(block3846, block3848, "json/v12/blockRange3846-3847.json");
+            setUpBlockRangeCall(0, 10, "json/v12/blockRange0-10.json");
+            setUpBlockRangeCall(1, 53, "json/v12/blockRange1-52.json");
+            setUpBlockRangeCall(52, 76, "json/v12/blockRange53-75.json");
 
         }
 
     }
 
-    private final String rootPath = "src/test/resources/json/";
-
     /**
      * <p>Please specify eris version and file name</p>
      *
      * @param blockNumber height of block that you want to set up
-     * @param relPath     relative path from json folder. Full path ../src/test/resources/json/ + relPath
+     * @param pathFromResource relative path from resource folder. Full path ../src/test/resources/ + pathFromResource
      */
-    private void setUpBlockCall(long blockNumber, String relPath) throws FileNotFoundException {
-        final String path = rootPath + relPath;
+    private void setUpBlockCall(long blockNumber, String pathFromResource) throws FileNotFoundException {
+        // Format request entity
         final String paramName = "height";
-
         Map<String, Object> param = new HashMap<>();
         param.put(paramName, blockNumber);
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
-        File file = new File(path);
 
-        when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
+        String block = getStringFromFile(pathFromResource);
+        when(httpRpcClient.call(entity)).thenReturn(block);
     }
 
-    private void setUpLatestBlockResponse(String relPath) throws FileNotFoundException {
-        String path = rootPath + relPath;
+    private void setUpLatestBlockResponse(String pathFromResource) throws FileNotFoundException {
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(null, RPCMethod.GET_LATEST_BLOCK);
-        File file = new File(path);
-        when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next());
+        String latestBlock = getStringFromFile(pathFromResource);
+        when(httpRpcClient.call(entity)).thenReturn(latestBlock);
     }
 
-    private void setUpBlockRangeCall(long from, long to, String relPath) throws FileNotFoundException {
-        String path = rootPath + relPath;
+    private void setUpBlockRangeCall(long from, long to, String pathFromResource) throws FileNotFoundException {
 
         Filters filters = new Filters();
         FilterHeight filterFrom = new FilterHeight(Operation.GREATER_OR_EQUALS, from);
@@ -291,8 +300,8 @@ public class ErisBlockChainServiceTest {
         filters.add(filterFrom);
         filters.add(filterTo);
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(filters.getMap(), RPCMethod.GET_BLOCKS);
-        File file = new File(path);
-        when(httpRpcClient.call(entity)).thenReturn(new Scanner(file).useDelimiter("\\Z").next().replaceAll("\\n ", ""));
+        String blocks = getStringFromFile(pathFromResource);
+        when(httpRpcClient.call(entity)).thenReturn(blocks);
 
     }
 

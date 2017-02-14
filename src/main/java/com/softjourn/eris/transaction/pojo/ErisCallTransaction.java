@@ -1,9 +1,11 @@
 package com.softjourn.eris.transaction.pojo;
 
-import lombok.AllArgsConstructor;
+import com.softjourn.eris.block.pojo.BlockHeader;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 /**
  *
@@ -11,10 +13,7 @@ import lombok.NoArgsConstructor;
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ErisCallTransaction extends ClassifiableErisTransaction implements ITxInput {
-    { transactionType = ErisTransactionType.CALL; }
+public class ErisCallTransaction extends ErisTransaction implements ITxInput {
 
     private String callerAddress;
     private Long amount;
@@ -24,8 +23,32 @@ public class ErisCallTransaction extends ClassifiableErisTransaction implements 
     private String contractAddress;
     private Long gasLimit;
     private Long fee;
-    private String functionNameHash;
     private String callingData;
     private Boolean isDeploy;
+
+    private String functionName;
+    private Map<String,String> functionArguments;
+
+    @Builder(toBuilder = true)
+    public ErisCallTransaction(BlockHeader blockHeader, String callerAddress, Long amount, Long sequence
+            , String signature, String callerPubKey, String contractAddress, Long gasLimit, Long fee
+            , String callingData, Boolean isDeploy , String functionName, Map<String,String> functionArguments) {
+        super(ErisTransactionType.CALL);
+
+        this.blockHeader = blockHeader;
+        this.callerAddress = callerAddress;
+        this.amount = amount;
+        this.sequence = sequence;
+        this.signature = signature;
+        this.callerPubKey = callerPubKey;
+        this.contractAddress = contractAddress;
+        this.gasLimit = gasLimit;
+        this.fee = fee;
+        this.callingData = callingData;
+        this.isDeploy = isDeploy;
+
+        this.functionName = functionName;
+        this.functionArguments = functionArguments;
+    }
 
 }
