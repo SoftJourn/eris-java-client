@@ -15,7 +15,7 @@ public class Params {
 
     /**
      * Creates call params that should be used for calling contract methods
-     * that don't require transaction(i.e. doesn't change state of chain)
+     * that don't require body(i.e. doesn't change state of chain)
      * @param from caller account address
      * @param contractAddress contract address
      * @param data call data (Keccak256 hash of function name and properly formatted arguments)

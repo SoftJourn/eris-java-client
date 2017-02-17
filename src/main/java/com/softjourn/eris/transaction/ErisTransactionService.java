@@ -33,23 +33,25 @@ public class ErisTransactionService implements TransactionService {
         for (Object unParsedTx : block.getUndefinedTransactions()
                 ) {
             BlockHeader header = block.getHeader();
-            ErisTransaction transaction;
+            ErisUndefinedTransaction undefinedTransaction = new ErisUndefinedTransaction(unParsedTx, header);
             Consumer consumer;
+            ErisTransaction transaction;
             try {
-                transaction = parserService.parse(unParsedTx);
-                consumer = consumerMap.get(transaction.getTransactionType());
-                if (transaction instanceof ErisCallTransaction) {
-                    ErisCallTransaction callTransaction = (ErisCallTransaction) transaction;
-                    ErisCallDataTransactionParser.parse(callTransaction, getAbiFromContractAddress);
-                }
+                transaction = parserService.parse(undefinedTransaction);
             } catch (NotValidTransactionException e) {
-                transaction = new ErisUndefinedTransaction(unParsedTx, header);
-                consumer = consumerMap.get(ErisTransactionType.UNDEFINED);
+                transaction = undefinedTransaction;
             }
 
+            if (transaction instanceof ErisCallTransaction) {
+                ErisCallTransaction callTransaction = (ErisCallTransaction) transaction;
+                ErisCallDataTransactionParser.parse(callTransaction, getAbiFromContractAddress);
+            }
+
+            consumer = consumerMap.get(transaction.getTransactionType());
             if (consumer != null) {
                 consumer.accept(transaction);
             }
+
         }
     }
 }

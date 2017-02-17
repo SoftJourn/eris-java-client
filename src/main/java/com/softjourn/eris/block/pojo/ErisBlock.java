@@ -40,6 +40,11 @@ public class ErisBlock implements BlockHeader, BlockData {
     }
 
     @Override
+    public String getDataHash() {
+        return header == null ? null : header.getDataHash();
+    }
+
+    @Override
     public List<Object> getUndefinedTransactions() {
         return data == null ? null : data.getUndefinedTransactions();
     }

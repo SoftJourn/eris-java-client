@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class ErisCallTransaction extends ErisTransaction implements ITxInput {
+public class ErisCallTransaction extends ErisTransaction implements TxInput {
 
     private String callerAddress;
     private Long amount;
@@ -26,16 +26,17 @@ public class ErisCallTransaction extends ErisTransaction implements ITxInput {
     private String callingData;
     private Boolean isDeploy;
 
+    private String txId;
     private String functionName;
     private Map<String,String> functionArguments;
 
     @Builder(toBuilder = true)
     public ErisCallTransaction(BlockHeader blockHeader, String callerAddress, Long amount, Long sequence
             , String signature, String callerPubKey, String contractAddress, Long gasLimit, Long fee
-            , String callingData, Boolean isDeploy , String functionName, Map<String,String> functionArguments) {
-        super(ErisTransactionType.CALL);
+            , String callingData, Boolean isDeploy , String txId, String functionName, Map<String,String> functionArguments) {
+        super(ErisTransactionType.CALL, blockHeader);
+        this.txId = txId;
 
-        this.blockHeader = blockHeader;
         this.callerAddress = callerAddress;
         this.amount = amount;
         this.sequence = sequence;

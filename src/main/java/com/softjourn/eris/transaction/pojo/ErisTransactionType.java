@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 /**
- * This type is beginning byte of transaction
+ * This type is beginning byte of body
  * link https://github.com/eris-ltd/eris-db/blob/f9c5c013523b73d380889bf17e66c2772aaf3d8d/txs/tx.go
  */
 public enum ErisTransactionType {

@@ -1,9 +1,9 @@
 //package com.softjourn.eris.transaction.parser;
 //
 //import com.softjourn.eris.ErisVersion;
-//import com.softjourn.eris.transaction.parser.v11.ErisCallTransactionParser11;
-//import com.softjourn.eris.transaction.parser.v12.ErisCallTransactionParser12;
-//import com.softjourn.eris.transaction.pojo.ErisTransactionType;
+//import com.softjourn.eris.body.parser.v11.ErisCallTransactionParser11;
+//import com.softjourn.eris.body.parser.v12.ErisCallTransactionParser12;
+//import com.softjourn.eris.body.pojo.ErisTransactionType;
 //
 //public class ErisTransactionParserFactory {
 //    public ErisTransactionParser getParser(ErisVersion version, ErisTransactionType type){

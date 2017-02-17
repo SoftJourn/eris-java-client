@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.softjourn.eris.transaction.parser.AbstractErisParserService;
 import com.softjourn.eris.transaction.parser.ErisParser;
 import com.softjourn.eris.transaction.pojo.ErisTransactionType;
+import com.softjourn.eris.transaction.pojo.ErisUndefinedTransaction;
 
 import java.util.ArrayList;
 

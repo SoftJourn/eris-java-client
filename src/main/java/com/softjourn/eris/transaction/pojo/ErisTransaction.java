@@ -11,9 +11,10 @@ import lombok.Data;
 public abstract class ErisTransaction {
 
     public final ErisTransactionType transactionType;
-    protected BlockHeader blockHeader;
+    public final BlockHeader blockHeader;
 
-    ErisTransaction(ErisTransactionType type){
+    ErisTransaction(ErisTransactionType type, BlockHeader blockHeader){
         this.transactionType = type;
+        this.blockHeader = blockHeader;
     }
 }

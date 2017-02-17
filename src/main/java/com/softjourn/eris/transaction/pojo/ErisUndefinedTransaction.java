@@ -1,25 +1,28 @@
 package com.softjourn.eris.transaction.pojo;
 
 import com.softjourn.eris.block.pojo.BlockHeader;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ErisUndefinedTransaction extends ErisTransaction {
-    private Object transaction;
+    private Object body;
 
-    private ErisUndefinedTransaction(){
-        super(ErisTransactionType.UNDEFINED);
+    private ErisUndefinedTransaction(BlockHeader blockHeader){
+        super(ErisTransactionType.UNDEFINED, blockHeader);
     }
 
-    public ErisUndefinedTransaction(Object transaction, BlockHeader blockHeader) {
-        this(transaction);
-        this.blockHeader = blockHeader;
+    public ErisUndefinedTransaction(Object body){
+        this(null);
+        this.body = body;
     }
 
-    private ErisUndefinedTransaction(Object transaction) {
-        this();
-        this.transaction = transaction;
+    @Builder
+    public ErisUndefinedTransaction(Object body, BlockHeader blockHeader) {
+        this(blockHeader);
+        this.body = body;
     }
+
 }

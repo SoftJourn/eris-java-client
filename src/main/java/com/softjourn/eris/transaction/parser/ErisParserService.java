@@ -6,6 +6,6 @@ import com.softjourn.eris.transaction.pojo.NotValidTransactionException;
 
 
 public interface ErisParserService {
-    ErisTransactionType defineType(Object transaction);
-    ErisTransaction parse(Object input) throws NotValidTransactionException;
+    ErisTransactionType defineType(Object transactionBody);
+    ErisTransaction parse(Object transaction) throws NotValidTransactionException;
 }

@@ -1,16 +1,20 @@
 package com.softjourn.eris.transaction.parser.v12;
 
-import com.softjourn.eris.transaction.parser.ErisParser;
+import com.softjourn.eris.block.pojo.BlockHeader;
+import com.softjourn.eris.contract.Util;
+import com.softjourn.eris.transaction.parser.AbstractErisCallTransactionParser;
 import com.softjourn.eris.transaction.pojo.ErisCallTransaction;
 import com.softjourn.eris.transaction.pojo.ErisTransactionType;
+import com.softjourn.eris.transaction.pojo.ErisUndefinedTransaction;
 import com.softjourn.eris.transaction.pojo.NotValidTransactionException;
 
 import java.util.regex.Pattern;
 
 import static com.softjourn.eris.transaction.parser.v12.Eris12CallTransactionParser.Structure.*;
+import static com.softjourn.eris.transaction.pojo.ErisCallTransaction.ErisCallTransactionBuilder;
 
 
-public class Eris12CallTransactionParser implements ErisParser {
+public class Eris12CallTransactionParser extends AbstractErisCallTransactionParser {
 
     private static final Integer START = 0;
     private static final Integer HEX_BASE = 16;
@@ -46,74 +50,127 @@ public class Eris12CallTransactionParser implements ErisParser {
         return ErisTransactionType.CALL;
     }
 
-
     @Override
-    public ErisCallTransaction parse(Object input) throws NotValidTransactionException {
-        if (input instanceof String) {
-            String inputString = input.toString();
-            int shift = START;
-            try {
-                if (!Byte.valueOf(inputString.substring(shift, TX_TYPE.length), HEX_BASE)
-                        .equals(this.getTransactionType().getCode())) {
-                    throw new NotValidTransactionException("Type is not supported");
-                }
-                shift += TX_TYPE.length;
-                shift += SEQUENCE_END.length();
-                shift += DELIMITER.length();
+    public ErisCallTransaction parse(Object transaction) throws NotValidTransactionException {
 
-                ErisCallTransaction.ErisCallTransactionBuilder builder = ErisCallTransaction.builder();
-                builder.callerAddress(inputString.substring(shift, shift += CALLER_ADDRESS.length));
+        if (transaction instanceof String) {
+            String inputString = (String) transaction;
+            return parse(inputString).build();
+        }
 
-                String amount = inputString.substring(shift, shift += AMOUNT.length);
-                builder.amount(Long.valueOf(amount, HEX_BASE));
-
-                String sequenceSizeString = inputString.substring(shift, shift += SEQUENCE_SIZE.length);
-                byte sequenceSize = Byte.valueOf(sequenceSizeString, HEX_BASE);
-
-                String sequence = inputString.substring(shift, shift += sequenceSize * CHARS_IN_BYTE);
-                builder.sequence(Long.valueOf(sequence, HEX_BASE));
-                //SEQUENCE_END "01"
-                shift += SEQUENCE_END.length();
-
-                builder.signature(inputString.substring(shift, shift += SIGNATURE.length));
-                //SEQUENCE_END "01"
-                shift += SEQUENCE_END.length();
-
-                builder.callerPubKey(inputString.substring(shift, shift += PUB_KEY.length));
-
-                if (!isDeployTx(inputString)) {
-                    //DELIMITER1 "0114"
-                    shift += DELIMITER.length();
-                    builder.contractAddress(inputString.substring(shift, shift += CONTRACT_ADDRESS.length));
-                    String gasLimit = inputString.substring(shift, shift += GAS_LIMIT.length);
-                    builder.gasLimit(Long.valueOf(gasLimit, HEX_BASE));
-                    String fee = inputString.substring(shift, shift += FEE.length);
-                    builder.fee(Long.valueOf(fee, HEX_BASE));
-                    // DELIMITER2 "0144"
-                    shift += DELIMITER2.length();
-                    builder.callingData(inputString.substring(shift));
-                    builder.isDeploy(false);
-                } else {
-                    //TODO check if next byte is "00" for deploy builders. Next calculation expect that condition
-                    //DELIMITER3 "00"
-                    shift += DELIMITER3.length();
-                    builder.contractAddress("");
-                    String gasLimit = inputString.substring(shift, shift += GAS_LIMIT.length);
-                    builder.gasLimit(Long.valueOf(gasLimit, HEX_BASE));
-                    String fee = inputString.substring(shift, shift += FEE.length);
-                    builder.fee(Long.valueOf(fee, HEX_BASE));
-                    //TODO 3 bytes of unknown data Example: "0205C5"
-                    builder.functionName(inputString.substring(shift, shift += DEPLOY_UNKNOWN_DATA.length));
-                    builder.callingData(inputString.substring(shift));
-                    builder.isDeploy(true);
-                }
-                return builder.build();
-            } catch (Exception e) {
-                throw new NotValidTransactionException(e);
-            }
+        if (transaction instanceof ErisUndefinedTransaction) {
+            ErisUndefinedTransaction undefinedTransaction = (ErisUndefinedTransaction) transaction;
+            return parse(undefinedTransaction.getBody(), undefinedTransaction.getBlockHeader());
         }
         throw new NotValidTransactionException("Type is not supported");
     }
+
+    public ErisCallTransaction parse(Object transaction, BlockHeader header) throws NotValidTransactionException {
+        if (transaction instanceof String) {
+            String inputString = (String) transaction;
+            ErisCallTransactionBuilder transactionBuilder = parse(inputString);
+            transactionBuilder.blockHeader(header);
+            ErisCallTransaction parsedTransaction = transactionBuilder.build();
+            String txId = getTxId(parsedTransaction);
+            parsedTransaction.setTxId(txId);
+            return parsedTransaction;
+
+        }
+        throw new NotValidTransactionException("Type is not supported");
+    }
+
+    @Override
+    protected String getTxId(String txJson) {
+        return Util.tendermintTransactionV12RipeMd160Hash(txJson.getBytes());
+    }
+
+    private ErisCallTransactionBuilder parse(String inputString) throws NotValidTransactionException {
+        int shift = START;
+        try {
+
+            checkTransactionType(inputString);
+
+            shift += TX_TYPE.length;
+            shift += SEQUENCE_END.length();
+            shift += DELIMITER.length();
+
+            ErisCallTransaction.ErisCallTransactionBuilder builder = ErisCallTransaction.builder();
+
+            shift = parseTxInput(inputString, shift, builder);
+            if (!isDeployTx(inputString)) {
+                parseAsRegularTransaction(inputString, shift, builder);
+            } else {
+                parseAsDeployTransaction(inputString, shift, builder);
+            }
+
+            return builder;
+        } catch (Exception e) {
+            throw new NotValidTransactionException(e);
+        }
+    }
+
+    private void checkTransactionType(String inputString) throws NotValidTransactionException {
+        int shift = START;
+        if (!Byte.valueOf(inputString.substring(shift, TX_TYPE.length), HEX_BASE)
+                .equals(this.getTransactionType().getCode())) {
+            throw new NotValidTransactionException("Type is not supported");
+        }
+    }
+
+    private int parseTxInput(String inputString, int shift,
+                             ErisCallTransactionBuilder builder) {
+        builder.callerAddress(inputString.substring(shift, shift += CALLER_ADDRESS.length));
+
+        String amount = inputString.substring(shift, shift += AMOUNT.length);
+        builder.amount(Long.valueOf(amount, HEX_BASE));
+
+        String sequenceSizeString = inputString.substring(shift, shift += SEQUENCE_SIZE.length);
+        byte sequenceSize = Byte.valueOf(sequenceSizeString, HEX_BASE);
+
+        String sequence = inputString.substring(shift, shift += sequenceSize * CHARS_IN_BYTE);
+        builder.sequence(Long.valueOf(sequence, HEX_BASE));
+        //SEQUENCE_END "01"
+        shift += SEQUENCE_END.length();
+
+        builder.signature(inputString.substring(shift, shift += SIGNATURE.length));
+        //SEQUENCE_END "01"
+        shift += SEQUENCE_END.length();
+
+        builder.callerPubKey(inputString.substring(shift, shift += PUB_KEY.length));
+        return shift;
+    }
+
+    private void parseAsRegularTransaction(String inputString, int shift,
+                                           ErisCallTransactionBuilder builder) {
+        //DELIMITER1 "0114"
+        shift += DELIMITER.length();
+        builder.contractAddress(inputString.substring(shift, shift += CONTRACT_ADDRESS.length));
+        String gasLimit = inputString.substring(shift, shift += GAS_LIMIT.length);
+        builder.gasLimit(Long.valueOf(gasLimit, HEX_BASE));
+        String fee = inputString.substring(shift, shift += FEE.length);
+        builder.fee(Long.valueOf(fee, HEX_BASE));
+        // DELIMITER2 "0144"
+        shift += DELIMITER2.length();
+        builder.callingData(inputString.substring(shift));
+        builder.isDeploy(false);
+    }
+
+    private void parseAsDeployTransaction(String inputStringEnding, int shift,
+                                          ErisCallTransactionBuilder builder) {
+        //TODO check if next byte is "00" for deploy builders. Next calculation expect that condition
+        //DELIMITER3 "00"
+        shift += DELIMITER3.length();
+        builder.contractAddress("");
+        String gasLimit = inputStringEnding.substring(shift, shift += GAS_LIMIT.length);
+        builder.gasLimit(Long.valueOf(gasLimit, HEX_BASE));
+        String fee = inputStringEnding.substring(shift, shift += FEE.length);
+        builder.fee(Long.valueOf(fee, HEX_BASE));
+        //TODO 3 bytes of unknown data Example: "0205C5"
+        builder.functionName(inputStringEnding.substring(shift, shift += DEPLOY_UNKNOWN_DATA.length));
+        builder.callingData(inputStringEnding.substring(shift));
+        builder.isDeploy(true);
+    }
+
 
     String generateOrigin(ErisCallTransaction transaction) {
         String result = toHexString(transaction.getTransactionType().getCode());

@@ -1,9 +1,9 @@
 package com.softjourn.eris.transaction.pojo;
 
 /**
- * Parameters that were used to emmit transaction
+ * Parameters that were used to emmit body
  */
-public interface ITxInput {
+public interface TxInput {
     String getCallerAddress();
     Long getAmount();
     Long getSequence();

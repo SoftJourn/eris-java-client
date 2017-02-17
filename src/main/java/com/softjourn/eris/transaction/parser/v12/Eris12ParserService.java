@@ -9,10 +9,10 @@ public class Eris12ParserService extends AbstractErisParserService {
     private static final Integer HEX_BASE = 16;
 
     @Override
-    public ErisTransactionType defineType(Object transaction) {
+    public ErisTransactionType defineType(Object transactionBody) {
         int code = 0;
-        if(transaction instanceof String){
-            String txString = (String) transaction;
+        if(transactionBody instanceof String){
+            String txString = (String) transactionBody;
             code = Integer.valueOf(txString.substring(0,2),HEX_BASE);
         }
         return ErisTransactionType.findByCode(code);

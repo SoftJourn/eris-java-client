@@ -18,4 +18,5 @@ public interface BlockHeader {
     String getChainName();
     LocalDateTime getTimeCreated();
     Integer getTransactionsNumber();
+    String getDataHash();
 }

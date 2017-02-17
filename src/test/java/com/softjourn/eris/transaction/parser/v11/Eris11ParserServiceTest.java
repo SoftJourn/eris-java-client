@@ -2,6 +2,7 @@ package com.softjourn.eris.transaction.parser.v11;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softjourn.eris.transaction.pojo.ErisTransactionType;
+import com.softjourn.eris.transaction.pojo.ErisUndefinedTransaction;
 import org.junit.Before;
 import org.junit.Test;
 

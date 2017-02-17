@@ -2,24 +2,36 @@ package com.softjourn.eris.transaction.parser.v11;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.softjourn.eris.block.pojo.ErisBlock;
+import com.softjourn.eris.rpc.ErisRPCResponseEntity;
 import com.softjourn.eris.transaction.pojo.ErisCallTransaction;
+import com.softjourn.eris.transaction.pojo.ErisUndefinedTransaction;
 import com.softjourn.eris.transaction.pojo.NotValidTransactionException;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.Scanner;
+import java.io.FileNotFoundException;
 
+import static com.softjourn.eris.TestUtil.getStringFromFile;
 import static org.junit.Assert.*;
 
 
 public class Eris11CallTransactionParserTest {
 
+    private final static String root = "src/test/resources/";
+
     private String transactionJson;
     private Eris11CallTransactionParser parser;
-    private JsonNode transactionArray;
+    private JsonNode transactionArrayNode;
     private Object transactionArrayList;
-    private Object transactionArrayList2;
+    private Object txWithoutPubKey;
+    private ErisUndefinedTransaction tx3424287;
+    private String tx3424287Id;
+    private ErisUndefinedTransaction tx3772584FirstTransaction;
+    private ErisUndefinedTransaction tx3772584SecondTransaction;
+    private String tx3772584FirstTransactionId;
+    private String tx3772584SecondTransactionId;
 
     @Test
     public void parse() throws Exception {
@@ -35,7 +47,7 @@ public class Eris11CallTransactionParserTest {
 
     @Test
     public void parseWithoutPubKey() throws Exception {
-        ErisCallTransaction transaction = parser.parse(transactionArrayList2);
+        ErisCallTransaction transaction = parser.parse(txWithoutPubKey);
 
         assertNotNull(transaction);
         assertNotNull(transaction.getAmount());
@@ -48,20 +60,52 @@ public class Eris11CallTransactionParserTest {
         parser.parse(transactionJson);
     }
 
+    @Test
+    public void getTxId() throws Exception {
+        ErisCallTransaction transaction;
+        transaction = parser.parse(tx3424287);
+        assertNotNull(transaction);
+        assertEquals(tx3424287Id, transaction.getTxId());
+    }
+
+    @Test
+    public void getTxId_TwoTransactionInBlock() throws Exception {
+        ErisCallTransaction transaction;
+
+//        transaction = parser.parse(tx3772584FirstTransaction);
+//        assertNotNull(transaction);
+//        assertEquals(tx3772584FirstTransactionId, transaction.getTxId());
+//
+//        transaction = parser.parse(tx3772584SecondTransaction);
+//        assertNotNull(transaction);
+//        assertEquals(tx3772584SecondTransactionId, transaction.getTxId());
+    }
+
     @Before
     public void setUp() throws Exception {
         parser = new Eris11CallTransactionParser();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        File file;
-        String root = "src/test/resources/";
-        file = new File(root + "json/v11/transaction62.json");
-        transactionJson = new Scanner(file).useDelimiter("\\Z").next();
+        String path = "json/v11/transaction62.json";
+        transactionJson = getStringFromFile(path);
+        transactionArrayNode = objectMapper.readTree(transactionJson);
+        transactionArrayList = objectMapper.readValue(new File(root + path), Object.class);
 
-        transactionArray = objectMapper.readTree(transactionJson);
+        txWithoutPubKey = objectMapper.readValue(new File(root + "json/v11/txWithoutPubKey.json"), Object.class);
 
-        transactionArrayList = objectMapper.readValue(file, Object.class);
+        tx3424287 = getUndefinedTxFromBlock("/json/v11/block3424287.json",0);
+        tx3772584FirstTransaction = getUndefinedTxFromBlock("/json/v11/block3772584.json",1);
+        tx3772584SecondTransaction = getUndefinedTxFromBlock("/json/v11/block3772584.json",2);
 
-        transactionArrayList2 = objectMapper.readValue(new File(root + "json/v11/txWithoutPubKey.json"), Object.class);
+        tx3424287Id = "21AC0F3819FBA0B05F54B715F84B9E76B97AFD09";
+        tx3772584FirstTransactionId = "9a4bd15449ad77f7e69def67177489c1c1fe49d9";
+        tx3772584SecondTransactionId = "6aba851efc88df65d3c4b5a2616d4b3c800f0dec";
+
+    }
+
+    private static ErisUndefinedTransaction getUndefinedTxFromBlock(String path,int index) throws FileNotFoundException {
+        String json = getStringFromFile(path);
+        ErisBlock block = new ErisRPCResponseEntity<>(json, ErisBlock.class).getResult();
+        return new ErisUndefinedTransaction(block.getUndefinedTransactions().get(index), block.getHeader());
     }
 }

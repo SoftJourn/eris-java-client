@@ -1,6 +1,5 @@
 package com.softjourn.eris.block;
 
-import com.softjourn.eris.TestUtil;
 import com.softjourn.eris.block.pojo.ErisBlock;
 import com.softjourn.eris.filter.Filters;
 import com.softjourn.eris.filter.Operation;
@@ -10,8 +9,8 @@ import com.softjourn.eris.rpc.ErisRPCRequestEntity;
 import com.softjourn.eris.rpc.HTTPRPCClient;
 import com.softjourn.eris.rpc.RPCMethod;
 import com.softjourn.eris.transaction.ErisTransactionService;
-import com.softjourn.eris.transaction.parser.ErisParser;
 import com.softjourn.eris.transaction.parser.AbstractErisParserService;
+import com.softjourn.eris.transaction.parser.ErisParser;
 import com.softjourn.eris.transaction.parser.v11.Eris11CallTransactionParser;
 import com.softjourn.eris.transaction.parser.v11.Eris11ParserService;
 import com.softjourn.eris.transaction.pojo.ErisCallTransaction;
@@ -56,11 +55,11 @@ public class ErisBlockChainServiceTest {
             log.setLevel(Level.OFF);
     }
 
-    private static boolean isRealCallsToEris = true;
+    private static boolean isRealCallsToEris;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    private final String chainUrl = "http://46.101.203.71:1337";
+    private final String chainUrl;
 
     private ErisTransactionService transactionService;
     private ErisBlockChainService blockChainService;
@@ -75,6 +74,11 @@ public class ErisBlockChainServiceTest {
     private long block3847WithTx = 3847;
     private long block3848 = 3848;
 
+    public ErisBlockChainServiceTest() {
+        chainUrl = "http://46.101.203.71:1337";
+        isRealCallsToEris = false;
+    }
+
     @Test
     public void getBlockJson() throws Exception {
         String json;
@@ -85,10 +89,16 @@ public class ErisBlockChainServiceTest {
         assertNotNull(json);
         assertFalse(json.isEmpty());
 
+    }
+
+    @Test
+    public void getBlockJSON62() throws Exception {
+        String json;
         json = blockChainService.getBlockJson(block62);
         log.info("block 62");
         log.info(json);
         assertNotNull(json);
+
     }
 
     @Test
@@ -222,7 +232,7 @@ public class ErisBlockChainServiceTest {
             String expected = "{owner=90CCB0132FA9287AB3C3283978C0E523FA1450A0, amount=110}";
             List<Object> erisTransactions = blockChainService.getBlock(block3847WithTx).getUndefinedTransactions();
             assertEquals(1, erisTransactions.size());
-            //TODO implement transaction data parsing from unit
+            //TODO implement body data parsing from unit
         }
     }
 

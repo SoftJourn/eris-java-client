@@ -51,7 +51,7 @@ public class ErisRPCRequestEntity implements RPCRequestEntity {
     }
 
     /**
-     * Creates entity to call method that not requires transaction
+     * Creates entity to call method that not requires body
      * @param params params to pass to contract method
      * @return RequestEntity
      */
@@ -60,7 +60,7 @@ public class ErisRPCRequestEntity implements RPCRequestEntity {
     }
 
     /**
-     * Creates entity to call method that requires transaction
+     * Creates entity to call method that requires body
      * @param params params to pass to contract method
      * @return RequestEntity
      */
@@ -69,7 +69,7 @@ public class ErisRPCRequestEntity implements RPCRequestEntity {
     }
 
     /**
-     * Creates entity to call method that requires transaction
+     * Creates entity to call method that requires body
      * @param params params to pass to contract method
      * @return RequestEntity
      */
