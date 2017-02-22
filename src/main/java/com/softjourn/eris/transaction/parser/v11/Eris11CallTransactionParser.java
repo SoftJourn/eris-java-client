@@ -12,7 +12,6 @@ import lombok.Data;
 
 import java.util.ArrayList;
 
-import static com.softjourn.eris.transaction.pojo.ErisCallTransaction.ErisCallTransactionBuilder;
 
 public class Eris11CallTransactionParser extends AbstractErisCallTransactionParser {
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -31,7 +30,7 @@ public class Eris11CallTransactionParser extends AbstractErisCallTransactionPars
             }
             return result;
         }
-        ErisCallTransactionBuilder result = parseArrays(transaction);
+        ErisCallTransaction.ErisCallTransactionBuilder result = parseArrays(transaction);
         if (result != null) {
             return result.build();
         } else {
@@ -39,7 +38,7 @@ public class Eris11CallTransactionParser extends AbstractErisCallTransactionPars
         }
     }
 
-    private ErisCallTransactionBuilder parseArrays(Object transaction) throws NotValidTransactionException {
+    private ErisCallTransaction.ErisCallTransactionBuilder parseArrays(Object transaction) throws NotValidTransactionException {
         if (transaction instanceof ArrayNode) {
             return parse((ArrayNode) transaction);
         }
@@ -54,12 +53,12 @@ public class Eris11CallTransactionParser extends AbstractErisCallTransactionPars
         return Util.tendermintTransactionV11RipeMd160Hash(txJson.getBytes()).toUpperCase();
     }
 
-    private ErisCallTransactionBuilder parse(ArrayList inputArray) throws NotValidTransactionException {
+    private ErisCallTransaction.ErisCallTransactionBuilder parse(ArrayList inputArray) throws NotValidTransactionException {
         ArrayNode arrayNode = objectMapper.convertValue(inputArray, ArrayNode.class);
         return parse(arrayNode);
     }
 
-    private ErisCallTransactionBuilder parse(ArrayNode inputArray) throws NotValidTransactionException {
+    private ErisCallTransaction.ErisCallTransactionBuilder parse(ArrayNode inputArray) throws NotValidTransactionException {
         try {
 
             if (inputArray.get(0).asInt() != this.getTransactionType().getCode()) {

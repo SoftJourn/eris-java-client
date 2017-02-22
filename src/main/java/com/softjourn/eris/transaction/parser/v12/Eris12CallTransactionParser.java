@@ -11,7 +11,6 @@ import com.softjourn.eris.transaction.pojo.NotValidTransactionException;
 import java.util.regex.Pattern;
 
 import static com.softjourn.eris.transaction.parser.v12.Eris12CallTransactionParser.Structure.*;
-import static com.softjourn.eris.transaction.pojo.ErisCallTransaction.ErisCallTransactionBuilder;
 
 
 public class Eris12CallTransactionParser extends AbstractErisCallTransactionParser {
@@ -68,7 +67,7 @@ public class Eris12CallTransactionParser extends AbstractErisCallTransactionPars
     public ErisCallTransaction parse(Object transaction, BlockHeader header) throws NotValidTransactionException {
         if (transaction instanceof String) {
             String inputString = (String) transaction;
-            ErisCallTransactionBuilder transactionBuilder = parse(inputString);
+            ErisCallTransaction.ErisCallTransactionBuilder transactionBuilder = parse(inputString);
             transactionBuilder.blockHeader(header);
             ErisCallTransaction parsedTransaction = transactionBuilder.build();
             String txId = getTxId(parsedTransaction);
@@ -84,7 +83,7 @@ public class Eris12CallTransactionParser extends AbstractErisCallTransactionPars
         return Util.tendermintTransactionV12RipeMd160Hash(txJson.getBytes()).toUpperCase();
     }
 
-    private ErisCallTransactionBuilder parse(String inputString) throws NotValidTransactionException {
+    private ErisCallTransaction.ErisCallTransactionBuilder parse(String inputString) throws NotValidTransactionException {
         int shift = START;
         try {
 
@@ -118,7 +117,7 @@ public class Eris12CallTransactionParser extends AbstractErisCallTransactionPars
     }
 
     private int parseTxInput(String inputString, int shift,
-                             ErisCallTransactionBuilder builder) {
+                             ErisCallTransaction.ErisCallTransactionBuilder builder) {
         builder.callerAddress(inputString.substring(shift, shift += CALLER_ADDRESS.length));
 
         String amount = inputString.substring(shift, shift += AMOUNT.length);
@@ -141,7 +140,7 @@ public class Eris12CallTransactionParser extends AbstractErisCallTransactionPars
     }
 
     private void parseAsRegularTransaction(String inputString, int shift,
-                                           ErisCallTransactionBuilder builder) {
+                                           ErisCallTransaction.ErisCallTransactionBuilder builder) {
         //DELIMITER1 "0114"
         shift += DELIMITER.length();
         builder.contractAddress(inputString.substring(shift, shift += CONTRACT_ADDRESS.length));
@@ -156,7 +155,7 @@ public class Eris12CallTransactionParser extends AbstractErisCallTransactionPars
     }
 
     private void parseAsDeployTransaction(String inputStringEnding, int shift,
-                                          ErisCallTransactionBuilder builder) {
+                                          ErisCallTransaction.ErisCallTransactionBuilder builder) {
         //TODO check if next byte is "00" for deploy builders. Next calculation expect that condition
         //DELIMITER3 "00"
         shift += DELIMITER3.length();
