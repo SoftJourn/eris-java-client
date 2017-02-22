@@ -51,7 +51,7 @@ public class Eris11CallTransactionParser extends AbstractErisCallTransactionPars
 
     @Override
     protected String getTxId(String txJson) {
-        return Util.tendermintTransactionV11RipeMd160Hash(txJson.getBytes());
+        return Util.tendermintTransactionV11RipeMd160Hash(txJson.getBytes()).toUpperCase();
     }
 
     private ErisCallTransactionBuilder parse(ArrayList inputArray) throws NotValidTransactionException {

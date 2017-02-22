@@ -16,6 +16,8 @@ import java.util.function.Function;
  */
 public class ErisTransactionService implements TransactionService {
 
+    private static final String DEPLOY = "DEPLOY";
+    private static final String UNKNOWN = "UNKNOWN";
     private ErisParserService parserService;
     private Function<String, String> getAbiFromContractAddress;
     private Map<ErisTransactionType, Consumer<? extends ErisTransaction>> consumerMap;
@@ -44,7 +46,15 @@ public class ErisTransactionService implements TransactionService {
 
             if (transaction instanceof ErisCallTransaction) {
                 ErisCallTransaction callTransaction = (ErisCallTransaction) transaction;
-                ErisCallDataTransactionParser.parse(callTransaction, getAbiFromContractAddress);
+                if(callTransaction.getIsDeploy())
+                    callTransaction.setFunctionName(DEPLOY);
+                else {
+                    try {
+                        ErisCallDataTransactionParser.parse(callTransaction, getAbiFromContractAddress);
+                    } catch (Exception e) {
+                        callTransaction.setFunctionName(UNKNOWN);
+                    }
+                }
             }
 
             consumer = consumerMap.get(transaction.getTransactionType());

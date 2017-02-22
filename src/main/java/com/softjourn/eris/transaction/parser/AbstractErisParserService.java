@@ -21,9 +21,10 @@ public abstract class AbstractErisParserService implements ErisParserService {
     public ErisTransaction parse(Object transaction) throws NotValidTransactionException {
         ErisTransactionType type ;
         if(transaction instanceof ErisUndefinedTransaction){
-            transaction = ((ErisUndefinedTransaction) transaction).getBody();
+            type = defineType(((ErisUndefinedTransaction) transaction).getBody());
+        } else {
+            type = defineType(transaction);
         }
-        type = defineType(transaction);
         ErisParser parser = getParser(type);
         if (parser == null) {
             throw new NotValidTransactionException("Parser is not defined for this type of transaction "+type.name());
