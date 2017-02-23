@@ -3,6 +3,7 @@ package com.softjourn.eris.contract;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import lombok.NonNull;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.jcajce.provider.digest.RIPEMD160;
@@ -38,10 +39,7 @@ public class Util {
         return Hex.encodeHexString(hash);
     }
 
-    public static HashMap<String, ContractUnit> parseAbi(String abi) throws IOException {
-        if (abi == null) {
-            throw new IllegalArgumentException("ABI can't be null");
-        }
+    public static HashMap<String, ContractUnit> parseAbi(@NonNull String abi) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         ObjectReader objectReader = mapper.readerFor(ContractUnit.class);
         HashMap<String, ContractUnit> result = new HashMap<>();
