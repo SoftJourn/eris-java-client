@@ -30,4 +30,13 @@ public class UtilTest {
         assertEquals("11111111", Util.rightPad("11111111", 8, '0'));
         assertEquals("111111111", Util.rightPad("111111111", 8, '0'));
     }
+
+    @Test
+    public void nomberBytesCountTest() {
+        assertEquals(0, Util.getNumberLengthInBytes(0));
+        assertEquals(1, Util.getNumberLengthInBytes(1));
+        assertEquals(1, Util.getNumberLengthInBytes(255));
+        assertEquals(2, Util.getNumberLengthInBytes(256));
+        assertEquals(2, Util.getNumberLengthInBytes(511));
+    }
 }

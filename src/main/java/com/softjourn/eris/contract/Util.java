@@ -9,6 +9,7 @@ import org.bouncycastle.jcajce.provider.digest.RIPEMD160;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,11 +20,6 @@ public class Util {
     private static final MessageDigest SHA3_DIGEST = new Keccak.Digest256();
 
     private static final MessageDigest RIPEDM160 = new RIPEMD160.Digest();
-
-    private static final byte[] ADDRESS_HASH_CUSTOM_PREFIX_BYTES = new byte[]{1, 1, 32};
-    private static final byte[] TRANSACTION_HASH_CUSTOM_PREFIX_BYTES = new byte[]{2, 1, 101};
-
-
 
     /**
      * Get hexadecimal string representation of Keccak256 hash of passed param
@@ -63,7 +59,7 @@ public class Util {
      * @return addess value
      */
     public static String tendermintAddressRipeMd160Hash(byte[] value) {
-        return tendermintRIPEDM160Hash(value, ADDRESS_HASH_CUSTOM_PREFIX_BYTES);
+        return tendermintRIPEDM160Hash(value, getBytesPrefix(value));
     }
 
     /**
@@ -72,8 +68,33 @@ public class Util {
      * @return addess value
      */
     public static String tendermintTransactionV11RipeMd160Hash(byte[] value) {
-        return tendermintRIPEDM160Hash(value, TRANSACTION_HASH_CUSTOM_PREFIX_BYTES);
+        return tendermintRIPEDM160Hash(value, getBytesPrefix(value));
     }
+
+    private static byte[] getBytesPrefix(byte[] value) {
+        int length = value.length;
+        byte size = getNumberLengthInBytes(length);
+        int prefixLength = size + 1;
+        byte[] prefix = new byte[prefixLength];
+        prefix[0] = size;
+        byte[] lengthBytes = longToBytes(length);
+        System.arraycopy(lengthBytes, 8 - size, prefix, 1, size);
+        return prefix;
+    }
+
+    private static byte[] longToBytes(long value) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(value);
+        return buffer.array();
+    }
+
+    /**
+     * @return minimal bytes count to represent given number as unsigned int
+     */
+    public static byte getNumberLengthInBytes(long number) {
+        return (byte) (8 - Long.numberOfLeadingZeros(number) / 8);
+    }
+
 
     /**
      * Get Eris(temdermint) specific Ripedm160 Hash as account address
@@ -93,10 +114,10 @@ public class Util {
      * @return addess value
      */
      private static String tendermintRIPEDM160Hash(byte[] value, byte[] prefix) {
-        byte[] withType = new byte[value.length+3];
+        byte[] withType = new byte[value.length+prefix.length];
 
-        System.arraycopy(prefix, 0, withType, 0, 3);
-        System.arraycopy(value, 0, withType, 3, value.length);
+        System.arraycopy(prefix, 0, withType, 0, prefix.length);
+        System.arraycopy(value, 0, withType, prefix.length, value.length);
         byte[] hash = RIPEDM160.digest(withType);
         return Hex.encodeHexString(hash);
     }
