@@ -21,6 +21,9 @@ public class Util {
 
     private static final MessageDigest RIPEDM160 = new RIPEMD160.Digest();
 
+    private static final byte TENDERMINT_PUB_KEY_TYPE_ED25519 = 1;
+    private static final byte TENDERMINT_PUB_KEY_TYPE_SECP256K1 = 2;
+
     /**
      * Get hexadecimal string representation of Keccak256 hash of passed param
      * @param val value to be hashed
@@ -59,7 +62,14 @@ public class Util {
      * @return addess value
      */
     public static String tendermintAddressRipeMd160Hash(byte[] value) {
-        return tendermintRIPEDM160Hash(value, getBytesPrefix(value));
+        return tendermintRIPEDM160Hash(value, preppend(getBytesPrefix(value), TENDERMINT_PUB_KEY_TYPE_ED25519));
+    }
+
+    private static byte[] preppend(byte[] data, byte... value) {
+        byte[] result = new byte[data.length + value.length];
+        System.arraycopy(value, 0, result, 0, value.length);
+        System.arraycopy(data, 0, result, value.length, data.length);
+        return result;
     }
 
     /**
@@ -119,7 +129,7 @@ public class Util {
         System.arraycopy(prefix, 0, withType, 0, prefix.length);
         System.arraycopy(value, 0, withType, prefix.length, value.length);
         byte[] hash = RIPEDM160.digest(withType);
-        return Hex.encodeHexString(hash);
+        return Hex.encodeHexString(hash).toUpperCase();
     }
 
     /**
