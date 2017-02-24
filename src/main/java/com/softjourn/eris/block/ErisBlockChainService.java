@@ -12,6 +12,7 @@ import com.softjourn.eris.rpc.*;
 import com.softjourn.eris.transaction.TransactionService;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -24,6 +25,7 @@ public class ErisBlockChainService implements BlockChainService {
 
     private final HTTPRPCClient httpRpcClient;
     private TransactionService transactionService;
+    private static int maxCallAttempts = 3;
 
 
     @Override
@@ -79,11 +81,26 @@ public class ErisBlockChainService implements BlockChainService {
         return Stream.iterate(from, i -> i + MAX_BLOCKS_PER_REQUEST)
                 .limit(calculateLimit(from, to))
                 .map(curFrom -> getBlocksRequestEntity(curFrom, getMiddleNumber(curFrom, to)))
-                .map(httpRpcClient::call)
+                .map(this::call)
                 .map(resultJSON -> new ErisRPCResponseEntity<>(resultJSON, ErisBlocks.class))
                 .map(ErisRPCResponseEntity::getResult)
                 .peek(res -> delayRequests())
                 .flatMap(blocks -> blocks.getBlockNumbersWithTransaction());
+    }
+
+    private synchronized String call(ErisRPCRequestEntity erisRPCRequestEntity){
+        int attempts = 0;
+        ErisRPCRequestException exception;
+        do {
+            try {
+                return httpRpcClient.call(erisRPCRequestEntity);
+            } catch (ErisRPCRequestException e) {
+                attempts++;
+                exception = e;
+                delayRequests();
+            }
+        }while (attempts < maxCallAttempts);
+        throw exception;
     }
 
     private ErisRPCRequestEntity getBlocksRequestEntity(long from, long to) {

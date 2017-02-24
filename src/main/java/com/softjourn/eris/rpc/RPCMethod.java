@@ -12,12 +12,32 @@ package com.softjourn.eris.rpc;
  *
  * GET_BLOCKS("erisdb.getBlocks")
  * param Filters
- * Created by vromanchuk on 16.01.17.
+ *
+ * CONSTANT_CALL("erisdb.call")
+ * param
+ *      address: <string>
+ *      data: <string>
+ * return
+ *      return:   <string>
+ *      gas_used: <number>
+ *
+ * TRANSACTIONAL_CALL("erisdb.transactAndHold")
+ * TODO this value should be changed when Eris will start supporting signing
+ * see https://docs.erisindustries.com/documentation/eris-db-api/#unsafe
+ *
+ * SEND_CALL("erisdb.sendAndHold")
+ * TODO this value should be changed when Eris will start supporting signing
+ * see https://docs.erisindustries.com/documentation/eris-db-api/#unsafe
+ *
  */
 public enum RPCMethod {
     GET_BLOCK("erisdb.getBlock"),
     GET_LATEST_BLOCK("erisdb.getLatestBlockHeight"),
-    GET_BLOCKS("erisdb.getBlocks");
+    GET_BLOCKS("erisdb.getBlocks"),
+    CONSTANT_CALL("erisdb.call"),
+    TRANSACTIONAL_CALL("erisdb.transactAndHold"),
+    SEND_CALL("erisdb.sendAndHold");
+
     String name;
 
     RPCMethod(String name) {
