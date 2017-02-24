@@ -15,18 +15,24 @@ import lombok.extern.java.Log;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
 
+import static com.softjourn.eris.TestUtil.getBlockFromFile;
 import static com.softjourn.eris.TestUtil.getStringFromFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Log
 public class ErisTransactionServiceTest {
+    static {
+        log.setLevel(Level.OFF);
+    }
 
     private String abi;
     private ErisTransactionService transactionServiceV11;
@@ -35,6 +41,7 @@ public class ErisTransactionServiceTest {
     private ArrayList<ErisUndefinedTransaction> undefinedTransactions;
     private ErisBlock blockV12;
     private ErisBlock blockV11;
+    private ErisBlock blockX;
 
     @Test
     public void visitTransactions() throws Exception {
@@ -52,6 +59,14 @@ public class ErisTransactionServiceTest {
         assertEquals(0, undefinedTransactions.size());
     }
 
+    @Test
+    public void visitTransactions_LogUndefinedTx() throws Exception {
+        assertTrue(transactions.isEmpty());
+        transactionServiceV11.visitTransactions(blockX);
+        assertEquals(1, transactions.size());
+        assertEquals(2, undefinedTransactions.size());
+    }
+
     @Before
     public void setUp() throws Exception {
 
@@ -66,7 +81,10 @@ public class ErisTransactionServiceTest {
         Map consumerMap = new HashMap<ErisTransactionType, Consumer<ErisTransaction>>() {{
             put(ErisTransactionType.CALL, transaction -> transactions.add((ErisCallTransaction) transaction));
             put(ErisTransactionType.UNDEFINED
-                    , transaction -> undefinedTransactions.add((ErisUndefinedTransaction) transaction));
+                , transaction -> {
+                    log.info(transaction.toString());
+                    undefinedTransactions.add((ErisUndefinedTransaction) transaction);
+                });
         }};
         transactionServiceV12 = new ErisTransactionService(parserService, consumerMap, getAbi);
 
@@ -74,17 +92,11 @@ public class ErisTransactionServiceTest {
         parserService = new Eris11ParserService(eris11CallTransactionParser);
         transactionServiceV11 = new ErisTransactionService(parserService, consumerMap, getAbi);
 
-        String blockString;
-        ErisRPCResponseEntity<ErisBlock> entity;
-
-        blockString = getStringFromFile("json/v12/block3847.json");
-        entity = new ErisRPCResponseEntity<>(blockString, ErisBlock.class);
-        blockV12 = entity.getResult();
-
-        blockString = getStringFromFile("json/v11/block3424287.json");
-        entity = new ErisRPCResponseEntity<>(blockString, ErisBlock.class);
-        blockV11 = entity.getResult();
-
+        blockV12 = getBlockFromFile("json/v12/block3847.json");
+        blockV11 = getBlockFromFile("json/v11/block3424287.json");
+        blockX = getBlockFromFile("json/v11/blockX.json");
 
     }
+
+
 }
