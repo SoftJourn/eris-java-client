@@ -4,9 +4,11 @@ import com.softjourn.eris.block.pojo.BlockHeader;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper=true)
 public class ErisUndefinedTransaction extends ErisTransaction {
     private Object body;
 

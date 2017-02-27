@@ -4,6 +4,7 @@ import com.softjourn.eris.block.pojo.BlockHeader;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.Map;
 
@@ -11,8 +12,9 @@ import java.util.Map;
  *
  * Created by vromanchuk on 10.02.17.
  */
-@EqualsAndHashCode(callSuper = false)
 @Data
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = true)
 public class ErisCallTransaction extends ErisTransaction implements TxInput {
 
     private String callerAddress;

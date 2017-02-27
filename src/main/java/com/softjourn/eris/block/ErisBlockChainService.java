@@ -12,7 +12,6 @@ import com.softjourn.eris.rpc.*;
 import com.softjourn.eris.transaction.TransactionService;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -21,17 +20,19 @@ import java.util.stream.Stream;
  */
 public class ErisBlockChainService implements BlockChainService {
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final static int DEFAULT_MAX_CALL_ATTEMPTS = 3;
+    private final static int DEFAULT_DELAY = 500;
 
     private final HTTPRPCClient httpRpcClient;
     private TransactionService transactionService;
-    private static int maxCallAttempts = 3;
+    private int maxCallAttempts;
+    private int delayTime;
 
 
     @Override
     public Long getLatestBlockNumber() {
         ErisRPCRequestEntity entity = new ErisRPCRequestEntity(null, RPCMethod.GET_LATEST_BLOCK);
-        String json = httpRpcClient.call(entity);
+        String json = call(entity);
         ErisRPCResponseEntity<Height> response = new ErisRPCResponseEntity<>(json, Height.class);
         return response.getResult().getHeight();
     }
@@ -52,6 +53,8 @@ public class ErisBlockChainService implements BlockChainService {
     public ErisBlockChainService(String host, TransactionService transactionService) {
         this.httpRpcClient = new HTTPRPCClient(host);
         this.transactionService = transactionService;
+        this.setDelayTime(DEFAULT_DELAY);
+        this.setMaxCallAttempts(DEFAULT_MAX_CALL_ATTEMPTS);
     }
 
     ErisBlock getBlock(long blockNumber) throws ErisRPCError {
@@ -71,9 +74,8 @@ public class ErisBlockChainService implements BlockChainService {
 
     String getBlockJson(long blockNumber) {
         Height height = new Height(blockNumber);
-        Map<String, Object> param = objectMapper.convertValue(height, Map.class);
-        ErisRPCRequestEntity entity = new ErisRPCRequestEntity(param, RPCMethod.GET_BLOCK);
-        return httpRpcClient.call(entity);
+        ErisRPCRequestEntity entity = new ErisRPCRequestEntity(height.getParams(), RPCMethod.GET_BLOCK);
+        return call(entity);
     }
 
     Stream<Long> getBlockNumbersWithTx(long from, final long to) {
@@ -136,11 +138,30 @@ public class ErisBlockChainService implements BlockChainService {
 
     private void delayRequests() {
         try {
-            Thread.sleep(500);
+            Thread.sleep(delayTime);
         } catch (InterruptedException e) {
             throw new RuntimeException("Execution of getting blocks was interrupted.", e);
         }
     }
 
+    /**
+     * Number of tries to make a call before exception is thrown
+     * <p>Default value is 3 </p>
+     * @param maxCallAttempts max value of tries
+     */
+    public void setMaxCallAttempts(int maxCallAttempts) {
+        if(maxCallAttempts > 1)
+            this.maxCallAttempts = maxCallAttempts;
+        else
+            throw new IllegalArgumentException("Max call attempts value can't be less than 1");
+    }
 
+    /**
+     * Time to wait after every call to Eris block chain
+     * <p>Default value is 500</p>
+     * @param delayTime milli seconds
+     */
+    public void setDelayTime(int delayTime) {
+        this.delayTime = delayTime;
+    }
 }
