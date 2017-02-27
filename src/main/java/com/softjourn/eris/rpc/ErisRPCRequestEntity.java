@@ -13,8 +13,6 @@ import java.util.Map;
  */
 @Getter
 @EqualsAndHashCode
-// TODO 2. Set returned class to enum RPCMethod.
-// TODO 3. Modify call method to return class that was declared at enum RPCMethod
 public class ErisRPCRequestEntity implements RPCRequestEntity {
 
     private String jsonrpc = "2.0";

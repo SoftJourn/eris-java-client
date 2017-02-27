@@ -2,22 +2,14 @@ package com.softjourn.eris.rpc;
 
 public class ErisRPCRequestException extends RuntimeException {
 
-    public ErisRPCRequestException() {
-    }
+    private final RPCRequestEntity entity;
 
-    public ErisRPCRequestException(String s) {
-        super(s);
-    }
-
-    public ErisRPCRequestException(String s, Throwable throwable) {
+    ErisRPCRequestException(String s, RPCRequestEntity entity, Throwable throwable) {
         super(s, throwable);
+        this.entity = entity;
     }
 
-    public ErisRPCRequestException(Throwable throwable) {
-        super(throwable);
-    }
-
-    public ErisRPCRequestException(String s, Throwable throwable, boolean b, boolean b1) {
-        super(s, throwable, b, b1);
+    public RPCRequestEntity getEntity() {
+        return entity;
     }
 }

@@ -1,6 +1,5 @@
 package com.softjourn.eris.block;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softjourn.eris.block.pojo.ErisBlock;
 import com.softjourn.eris.block.pojo.ErisBlocks;
 import com.softjourn.eris.block.pojo.Height;
@@ -11,12 +10,10 @@ import com.softjourn.eris.filter.type.FilterHeight;
 import com.softjourn.eris.rpc.*;
 import com.softjourn.eris.transaction.TransactionService;
 
-import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Manage data in block chain stored data
- * Created by vromanchuk on 10.02.17.
+ * Manage data in eris block chain
  */
 public class ErisBlockChainService implements BlockChainService {
 
@@ -123,14 +120,14 @@ public class ErisBlockChainService implements BlockChainService {
         return Long.min(from + MAX_BLOCKS_PER_REQUEST + 1, maxTo);
     }
 
-    private void validateGetBlocksParams(Long from, final Long to) {
-        if (from.compareTo(1L) < 0)
+    private void validateGetBlocksParams(long from, final long to) {
+        if (from < 1)
             throw new IllegalArgumentException("From height can't be less then 1");
-        if (from.compareTo(to) >= 0)
+        if (from >= to)
             throw new IllegalArgumentException("From height can't be grater or equals To height");
     }
 
-    private long calculateLimit(Long from, final Long to) {
+    private long calculateLimit(long from, final long to) {
         long temp = to - from - 1;
         long mod = temp % MAX_BLOCKS_PER_REQUEST;
         return mod > 0 ? temp / MAX_BLOCKS_PER_REQUEST + 1 : temp / MAX_BLOCKS_PER_REQUEST;

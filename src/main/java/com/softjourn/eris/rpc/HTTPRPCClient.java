@@ -32,17 +32,12 @@ public class HTTPRPCClient implements RPCClient {
         try {
             HttpResponse response = makeRequest(URL + "/rpc", entity.toString());
             StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() >= 400) throw new IOException(statusLine.getReasonPhrase());
+            if (statusLine.getStatusCode() >= 400)
+                throw new IOException(statusLine.getReasonPhrase());
             BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             return reader.lines().collect(Collectors.joining("\n"));
         } catch (IOException e) {
-            //TODO when eris is not responding do smth
-            /*
-            Example
-            com.softjourn.eris.rpc.ErisRPCRequestException: Request failed
-            {"jsonrpc":"2.0","method":"erisdb.getBlocks","id":"","params":{"filters":[{"field":"height","op":">=","value":"614757"},{"field":"height","op":"<","value":"614809"}]}}
-            */
-            throw new ErisRPCRequestException("Request failed \n" + entity.toString(), e);
+            throw new ErisRPCRequestException("Request failed \n" + entity.toString(), entity, e);
         }
     }
 
