@@ -113,7 +113,7 @@ public class ContractManager {
          *             parameters in the same order that they are in contract constructor)
          * @return Contract
          */
-        public Contract buildAndDeploy(Object... args) {
+        public DeployResponse buildAndDeploy(Object... args) {
             if (eventHandler == null)
                 throw new RuntimeException("EventHandler is not provided. Can't create contract.");
             if (client == null) throw new RuntimeException("RPCClient is not provided. Can't create contract.");
@@ -122,8 +122,10 @@ public class ContractManager {
                 throw new RuntimeException("Solidity byte code is not provided. Can't create contract");
             ContractDeployer deployer = new ContractDeployer(client, accountData);
             DeployResponse response = deployer.deploy(contractUnits.get(null), solidityByteCode, args);
-            return new ContractImpl(response.getResult().getCall_data().getCallee(),
+            Contract contract = new ContractImpl(response.getResult().getCall_data().getCallee(),
                     client, (Map<String, ContractUnit>) contractUnits.clone(), accountData, eventHandler);
+            response.setContract(contract);
+            return response;
         }
 
     }

@@ -1,5 +1,6 @@
 package com.softjourn.eris.contract.response;
 
+import com.softjourn.eris.contract.Contract;
 import lombok.Data;
 
 @Data
@@ -12,5 +13,7 @@ public class DeployResponse {
     private final Error error;
 
     private final String jsonrpc;
+
+    private Contract contract;
 
 }
