@@ -46,6 +46,7 @@ public class ArgumentsDecoderTest {
         function3.setAnonymous(false);
         function3.setType(ContractUnitType.function);
         function3.setInputs(new Variable[]{staticIntVariable, staticIntVariable, dynamicStringVariable});
+        function3.setOutputs(new Variable[]{staticIntVariable, staticIntVariable, dynamicStringVariable});
     }
 
     @Test
@@ -102,6 +103,22 @@ public class ArgumentsDecoderTest {
         );
 
         assertEquals(expected.toUpperCase(), result);
+    }
+
+    @Test
+    public void readStringArgs() throws Exception {
+        String data = "000000000000000000000000000000000000000000000000000000000000019000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000001142726F756768742034303020636f696e73000000000000000000000000000000";
+
+        List<Object> expected = Arrays.asList(
+                BigInteger.valueOf(400),
+                BigInteger.valueOf(1),
+                "Brought 400 coins"
+        );
+
+        List<Object> result = decoder.readArgs(function3, data);
+        for (int i = 0; i < expected.size(); i++) {
+            assertEquals(expected.get(i), result.get(i));
+        }
     }
 
 }

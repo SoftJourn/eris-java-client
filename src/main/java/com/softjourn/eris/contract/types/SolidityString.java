@@ -33,7 +33,7 @@ public class SolidityString extends Type<String> {
 
     @Override
     public boolean canRepresent(String value) {
-        return false;
+        return true;
     }
 
     @Override
@@ -59,6 +59,11 @@ public class SolidityString extends Type<String> {
     @Override
     public Type<String> createFromName(String name) {
         return new SolidityString((getLength(name)));
+    }
+
+    @Override
+    public int staticPartLength() {
+        return (length == 0 ? 1 : length) * getStaticArrayLength();
     }
 
 }

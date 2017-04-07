@@ -107,7 +107,7 @@ public class ArgumentsDecoder {
         //find this value offset
         int dynamicOffset = Integer.parseInt(value.substring(offset * 2, offset * 2 + 64), 16);
         //find this value length
-        int length = Integer.parseInt(value.substring(dynamicOffset * 2, dynamicOffset * 2 + 64));
+        int length = Integer.parseInt(value.substring(dynamicOffset * 2, dynamicOffset * 2 + 64),16);
         //all values is padded to 32 bytes (64 hex chars)
         //find how many 32 byte parts contains this value
         int roundedLength = (length * type.staticPartLength() + 31) / 32;
