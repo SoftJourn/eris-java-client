@@ -65,6 +65,16 @@ public abstract class Type<T> {
     }
 
     /**
+     * Method decides if current type is dynamic he returns full value if not returns empty string
+     *
+     * @param s
+     * @return String
+     */
+    public String dynamicPart(String s) {
+        return this.isDynamic() ? s : "";
+    }
+
+    /**
      * @return length of static part of array or 1
      * Should be overridden in arrays
      */
@@ -97,10 +107,12 @@ public abstract class Type<T> {
                 new Address(),
                 new Bool(),
                 new Bytes(),
+                new SolidityString(),
                 new Array(new Uint()),
                 new Array(new Address()),
                 new Array(new Bool()),
-                new Array(new Bytes())
+                new Array(new Bytes()),
+                new Array(new SolidityString())
         };
     }
 

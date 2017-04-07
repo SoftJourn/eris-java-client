@@ -20,11 +20,14 @@ public class ArgumentsDecoderTest {
 
     ContractUnit function2 = new ContractUnit();
 
+    ContractUnit function3 = new ContractUnit();
+
     Variable<List<BigInteger>> staticArrayVariabe = new Variable<>("stArr", new Array<>(new Uint(), 2));
     Variable<List<BigInteger>> dynamicArrayVariabe = new Variable<>("dnArr", new Array<>(new Uint()));
     Variable<byte[]> staticBytesVariable = new Variable<>("stBytes", new Bytes(16));
     Variable<byte[]> dynamicBytesVariable = new Variable<>("dnBytes", new Bytes());
     Variable<BigInteger> staticIntVariable = new Variable<>("stInt", new Uint());
+    Variable<String> dynamicStringVariable = new Variable<>("dnStr", new SolidityString());
 
     @Before
     public void setUp() throws Exception {
@@ -38,6 +41,11 @@ public class ArgumentsDecoderTest {
 
         function2.setOutputs(new Variable[]{new Variable<>("x", new Address())});
 
+        function3.setName("f3");
+        function3.setConstant(true);
+        function3.setAnonymous(false);
+        function3.setType(ContractUnitType.function);
+        function3.setInputs(new Variable[]{staticIntVariable, staticIntVariable, dynamicStringVariable});
     }
 
     @Test
@@ -55,7 +63,7 @@ public class ArgumentsDecoderTest {
 
         for (int i = 0; i < expected.size(); i++) {
             if (expected.get(i) instanceof byte[]) {
-                assertArrayEquals((byte[])expected.get(i), (byte[])result.get(i));
+                assertArrayEquals((byte[]) expected.get(i), (byte[]) result.get(i));
             } else {
                 assertEquals(expected.get(i), result.get(i));
             }
@@ -81,6 +89,19 @@ public class ArgumentsDecoderTest {
         );
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void writeStringArgs() throws Exception {
+        String expected = "000000000000000000000000000000000000000000000000000000000000019000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000001142726F756768742034303020636f696e73000000000000000000000000000000";
+
+        String result = decoder.writeArgs(function3,
+                BigInteger.valueOf(400),
+                BigInteger.valueOf(1),
+                "Brought 400 coins"
+        );
+
+        assertEquals(expected.toUpperCase(), result);
     }
 
 }

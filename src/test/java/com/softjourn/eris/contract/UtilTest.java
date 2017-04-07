@@ -38,4 +38,14 @@ public class UtilTest {
         assertEquals(2, Util.getNumberLengthInBytes(256));
         assertEquals(2, Util.getNumberLengthInBytes(511));
     }
+
+    @Test
+    public void fromUtf8Test() {
+        assertEquals("0x42726f756768742034303020636f696e73", Util.fromUtf8("Brought 400 coins"));
+    }
+
+    @Test
+    public void toUtf8Test() {
+        assertEquals("Brought 400 coins", Util.toUtf8("0x42726f756768742034303020636f696e73"));
+    }
 }

@@ -25,8 +25,11 @@ public class Util {
     private static final byte TENDERMINT_PUB_KEY_TYPE_ED25519 = 1;
     private static final byte TENDERMINT_PUB_KEY_TYPE_SECP256K1 = 2;
 
+    private static final String HEX_PREFIX = "0x";
+
     /**
      * Get hexadecimal string representation of Keccak256 hash of passed param
+     *
      * @param val value to be hashed
      * @return hashed value
      */
@@ -56,6 +59,7 @@ public class Util {
 
     /**
      * Get Eris(temdermint) specific Ripedm160 Hash as account address
+     *
      * @param value public key value
      * @return addess value
      */
@@ -72,6 +76,7 @@ public class Util {
 
     /**
      * Get Eris(temdermint) specific Ripedm160 Hash as account address
+     *
      * @param value public key value
      * @return addess value
      */
@@ -106,6 +111,7 @@ public class Util {
 
     /**
      * Get Eris(temdermint) specific Ripedm160 Hash as account address
+     *
      * @param value public key value
      * @return addess value
      */
@@ -118,11 +124,12 @@ public class Util {
      * Get Eris(temdermint) specific Ripedm160 Hash
      * Eris add some 3 custom bytes.
      * For different hashes different bytes
+     *
      * @param value public key value
      * @return addess value
      */
-     private static String tendermintRIPEDM160Hash(byte[] value, byte[] prefix) {
-        byte[] withType = new byte[value.length+prefix.length];
+    private static String tendermintRIPEDM160Hash(byte[] value, byte[] prefix) {
+        byte[] withType = new byte[value.length + prefix.length];
 
         System.arraycopy(prefix, 0, withType, 0, prefix.length);
         System.arraycopy(value, 0, withType, prefix.length, value.length);
@@ -132,6 +139,7 @@ public class Util {
 
     /**
      * Convert hexadecimal string to byte representation
+     *
      * @param value string to be converted
      * @return byte array that represents string
      * @throws NumberFormatException if string is not properly formatted hexadecimal value
@@ -144,9 +152,10 @@ public class Util {
      * Fill left side of passed value with passed {@param c}
      * to make it required {@param length}.
      * If value length is already greater or equals returns {@param val} without any changes
-     * @param val value to be padded
+     *
+     * @param val    value to be padded
      * @param length required length
-     * @param c chat to fill with
+     * @param c      chat to fill with
      * @return padded to required length value
      */
     public static String leftPad(String val, int length, char c) {
@@ -163,9 +172,10 @@ public class Util {
      * Fill right side of passed value with passed {@param c}
      * to make it required {@param length}.
      * If value length is already greater or equals returns {@param val} without any changes
-     * @param val value to be padded
+     *
+     * @param val    value to be padded
      * @param length required length
-     * @param c chat to fill with
+     * @param c      chat to fill with
      * @return padded to required length value
      */
 
@@ -192,5 +202,43 @@ public class Util {
 
     public static String encodeInt(int value) {
         return leftPad(BigInteger.valueOf(value).toString(16), 64, '0');
+    }
+
+    /**
+     * Method converts utf8 string into hex string
+     *
+     * @param s
+     * @return String
+     */
+    public static String fromUtf8(String s) {
+        String result = "";
+        for (int i = 0; i < s.length(); i++) {
+            int code = s.codePointAt(i);
+            if (code == 0) {
+                break;
+            }
+            String encoded = Integer.toHexString(code);
+            result += encoded.length() < 2 ? "0" + encoded : encoded;
+        }
+        return HEX_PREFIX + result;
+    }
+
+    /**
+     * Method converts hex string into utf8 string
+     *
+     * @param hex
+     * @return String
+     */
+    public static String toUtf8(String hex) {
+        String result = "";
+        int i = 0, length = hex.length();
+        if (hex.substring(0, 2).equals(HEX_PREFIX)) {
+            i = 2;
+        }
+        for (; i < length; i += 2) {
+            int code = Integer.parseInt(hex.substring(i, i + 2), 16);
+            result += Character.toString((char) code);
+        }
+        return result;
     }
 }
