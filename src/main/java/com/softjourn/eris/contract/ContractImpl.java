@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 
-class ContractImpl implements Contract, Cloneable {
+public class ContractImpl implements Contract, Cloneable {
 
     private final String contractAddress;
 
