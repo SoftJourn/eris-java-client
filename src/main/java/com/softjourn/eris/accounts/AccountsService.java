@@ -38,7 +38,7 @@ public class AccountsService {
 
     }
 
-    private Response sendTokens(String userPrivateKey, String address, Integer defaultAmountToSend) throws IOException {
+    public Response sendTokens(String userPrivateKey, String address, Integer defaultAmountToSend) throws IOException {
 
         ResponseParser parser = new ResponseParser(null);
 
